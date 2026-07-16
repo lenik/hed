@@ -1,0 +1,246 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "User Commands"
+.SH NAME
+insert \- insert text or file contents into a file at a line position
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+splices the contents of each
+.I SRC
+into the target
+.I FILE
+at a chosen line position.
+The target is rewritten only when the result differs
+(atomic write via a temporary file beside the target).
+.PP
+By default each
+.I SRC
+is an
+.B extended
+source (\fB\-e\fR):
+if it begins with
+.BR @ ,
+the remainder is a filename to read;
+otherwise the argument is a string literal.
+.PP
+When no position option is given,
+.B insert
+appends to the end of the file.
+.SH OPTIONS
+.SS Source modes
+These options are mutually exclusive; the last one wins.
+.TP
+.BR \-l ", " \-\-strings
+Treat each
+.I SRC
+as a string literal (raw bytes, plus any trailing newlines from
+.BR \-\-blank ).
+.TP
+.BR \-f ", " \-\-filenames
+Treat each
+.I SRC
+as a path to read.
+.TP
+.BR \-e ", " \-\-extended
+Extended sources (default):
+.BI @ FILE
+reads from
+.IR FILE ;
+any other argument is a string literal.
+.SS Position
+.TP
+.BI \-n " NUM"
+Insert before 1-based line
+.IR NUM .
+If the file has fewer than
+.I NUM
+lines, empty lines are appended after the end of the file
+(and a missing final newline is added first if needed)
+so the inserted content lands on line
+.IR NUM .
+.TP
+.BR \-0 " .. " \-9
+Digit short options that accumulate into a decimal number
+(for example
+.B \-20
+is
+.B 2
+then
+.BR 0 ).
+.RS
+.TP
+.B \-1
+Same as
+.BR \-\-prepend .
+.TP
+.B \-0
+Prepend the content and then one blank line
+(content appears before the original start, separated by an empty line).
+.TP
+.B \-N
+(with
+.IR N " \(>= 2)"
+Same as
+.BI \-n " N"
+(insert before line
+.IR N ,
+with end-of-file padding when necessary).
+.TP
+After
+.B \-a
+Digits select append style:
+.B 0
+appends at end;
+.B 1
+or greater inserts before the Nth line from the end.
+.RE
+.TP
+.BR \-a ", " \-\-append
+Append-oriented position.
+.B \-a
+or
+.B \-a0
+appends at the end of the file (like shell
+.BR >> ).
+.B \-a1
+inserts before the last line;
+.BI \-a N
+(with
+.IR N " \(>= 1)"
+inserts before the
+.IR N th
+line from the end.
+.TP
+.BR \-p ", " \-\-prepend
+Prepend to the start of the file.
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+Remove
+.I NUM
+lines at the insert point before inserting.
+With no
+.I SRC
+arguments this deletes those lines.
+Examples:
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+Delete lines 3 and 4.
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+Replace the shebang.
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+Replace the last line (footer).
+.RE
+When
+.B \-r
+is used with no insert content and the line position is past the end of the file,
+no empty lines are padded; only deletion is attempted (often a no-op at EOF).
+When no
+.I SRC
+is given at prepend (\fB\-p\fR, \fB\-1\fR, \fB\-0\fR),
+.I NUM
+selects the first line to keep (1-based); earlier lines are deleted
+(for example \fBinsert \-0 \-r3 FILE\fR on \fIa/b/c/d/e\fR yields \fIc/d/e\fR).
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+Append
+.I NUM
+newline characters after each
+.IR SRC .
+When this option is omitted, the default is
+.B 1
+for string literals and
+.B 0
+for filenames
+(under
+.BR \-e :
+string arguments vs
+.BI @ FILE ).
+When
+.B \-b
+is given, the same
+.I NUM
+applies to every
+.IR SRC .
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+If a filename source cannot be read, use
+.I TEXT
+instead of failing.
+Missing-text is treated like a string for
+.B \-\-blank
+defaults.
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+Increase logging verbosity (may be repeated).
+.TP
+.BR \-q ", " \-\-quiet
+Decrease logging verbosity.
+.TP
+.BR \-h ", " \-\-help
+Print a usage message and exit.
+.TP
+.B \-\-version
+Print version information and exit.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Usage error, missing target, I/O failure, or out of memory.
+.SH EXAMPLES
+Prepend a header line (string default adds a trailing newline):
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+Insert a file snippet before line 20 (pads if the file is shorter):
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+Delete lines 3–4:
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+Replace the shebang:
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+Replace the footer line:
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Select the language for messages and translated man pages when available.
+.SH AUTHOR
+Written by @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Report bugs to <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)
