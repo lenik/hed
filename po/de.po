@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: hed 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"POT-Creation-Date: 2026-07-16 15:22+0800\n"
 "PO-Revision-Date: 2026-07-16 14:00+0800\n"
 "Last-Translator: Lenik <hed@bodz.net>\n"
 "Language-Team: German\n"
@@ -24,7 +24,8 @@ msgid ""
 msgstr ""
 "Aufruf: insert [OPTION]... DATEI [QUELLE]...\n"
 "Inhalt von QUELLE an einer Zeilenposition in DATEI einfügen.\n"
-"Mit -r Zeilen an der Einfügeposition entfernen (nützlich zum Löschen/Aktualisieren).\n"
+"Mit -r Zeilen an der Einfügeposition entfernen (nützlich zum Löschen/"
+"Aktualisieren).\n"
 
 #: src/insert.c:50
 msgid "Source modes:\n"
@@ -87,11 +88,11 @@ msgstr "wiederholen für ausführlichere Protokollierung\n"
 msgid "show less logging messages\n"
 msgstr "weniger Protokollmeldungen anzeigen\n"
 
-#: src/insert.c:79 src/repl.c:147
+#: src/insert.c:79 src/repl.c:178
 msgid "display this help and exit\n"
 msgstr "diese Hilfe anzeigen und beenden\n"
 
-#: src/insert.c:81 src/repl.c:149
+#: src/insert.c:81 src/repl.c:180
 msgid "output version information and exit\n"
 msgstr "Versionsinformationen ausgeben und beenden\n"
 
@@ -115,12 +116,12 @@ msgstr "%s: ungültige Zeilennummer: %s\n"
 msgid "%s: invalid blank count: %s\n"
 msgstr "%s: ungültige Leerzeilenanzahl: %s\n"
 
-#: src/insert.c:338 src/repl.c:559
+#: src/insert.c:338 src/repl.c:780
 #, c-format
 msgid "Copyright (C) %d %s\n"
 msgstr "Copyright (C) %d %s\n"
 
-#: src/insert.c:339 src/repl.c:560
+#: src/insert.c:339 src/repl.c:781
 msgid ""
 "License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
 msgstr ""
@@ -151,12 +152,12 @@ msgstr "Es gibt KEINE GARANTIE, soweit gesetzlich zulässig.\n"
 msgid "%s: missing FILE\n"
 msgstr "%s: DATEI fehlt\n"
 
-#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#: src/insert.c:413 src/insert.c:427 src/insert.c:540
 #, c-format
 msgid "%s: out of memory\n"
 msgstr "%s: Speicher erschöpft\n"
 
-#: src/repl.c:73
+#: src/repl.c:94
 msgid ""
 "Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
 "       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
@@ -171,140 +172,156 @@ msgstr ""
 "Ohne DATEI wird die Standardeingabe gelesen und auf die Standardausgabe "
 "geschrieben.\n"
 
-#: src/repl.c:80
+#: src/repl.c:101
 msgid "Pattern selection (default: fixed strings):\n"
 msgstr "Musterauswahl (Standard: feste Zeichenketten):\n"
 
-#: src/repl.c:82
+#: src/repl.c:103
 msgid "interpret patterns as fixed strings (default)\n"
 msgstr "Muster als feste Zeichenketten interpretieren (Standard)\n"
 
-#: src/repl.c:84
+#: src/repl.c:105
 msgid "interpret patterns as POSIX extended regular expressions\n"
 msgstr "Muster als erweiterte POSIX-reguläre Ausdrücke interpretieren\n"
 
-#: src/repl.c:86
+#: src/repl.c:107
 msgid "interpret patterns as POSIX basic regular expressions\n"
 msgstr "Muster als einfache POSIX-reguläre Ausdrücke interpretieren\n"
 
-#: src/repl.c:88
+#: src/repl.c:109
 msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
 msgstr "Muster als Perl-kompatible reguläre Ausdrücke (PCRE2) interpretieren\n"
 
-#: src/repl.c:90
+#: src/repl.c:111
 msgid "use PATTERNS; may be repeated; combine with -f\n"
 msgstr "MUSTER verwenden; darf wiederholt werden; kombinierbar mit -f\n"
 
-#: src/repl.c:92
+#: src/repl.c:113
 msgid "read patterns from FILE, one per line; - means standard input\n"
 msgstr "Muster aus DATEI lesen, eines pro Zeile; - bedeutet Standardeingabe\n"
 
-#: src/repl.c:94
+#: src/repl.c:115
 msgid "ignore case distinctions in patterns and data\n"
 msgstr "Groß-/Kleinschreibung in Mustern und Daten ignorieren\n"
 
-#: src/repl.c:96
+#: src/repl.c:117
 msgid "do not ignore case (default); cancels a prior -i\n"
 msgstr ""
 "Groß-/Kleinschreibung nicht ignorieren (Standard); hebt ein vorheriges -i "
 "auf\n"
 
-#: src/repl.c:98
+#: src/repl.c:119
 msgid "replace each non-matching line entirely with REPLACEMENT\n"
 msgstr "jede nicht übereinstimmende Zeile vollständig durch ERSATZ ersetzen\n"
 
-#: src/repl.c:100
+#: src/repl.c:121
 msgid "match only whole words\n"
 msgstr "nur ganze Wörter abgleichen\n"
 
-#: src/repl.c:102
+#: src/repl.c:123
 msgid "match only whole lines\n"
 msgstr "nur ganze Zeilen abgleichen\n"
 
-#: src/repl.c:104
+#: src/repl.c:125
 msgid "File selection:\n"
 msgstr "Dateiauswahl:\n"
 
-#: src/repl.c:106
+#: src/repl.c:127
 msgid "recurse directories; follow symlinks only if on the command line\n"
 msgstr ""
 "Verzeichnisse rekursiv durchlaufen; symbolische Links nur folgen, wenn auf "
 "der Befehlszeile\n"
 
-#: src/repl.c:110
+#: src/repl.c:131
 msgid "recurse directories, following all symbolic links\n"
 msgstr ""
 "Verzeichnisse rekursiv durchlaufen und allen symbolischen Links folgen\n"
 
-#: src/repl.c:112
+#: src/repl.c:133
 msgid "limit directory recursion depth\n"
 msgstr "Rekursionstiefe für Verzeichnisse begrenzen\n"
 
-#: src/repl.c:114
+#: src/repl.c:135
 msgid "skip files whose base name matches GLOB\n"
 msgstr "Dateien überspringen, deren Basisname auf GLOB passt\n"
 
-#: src/repl.c:116
+#: src/repl.c:137
 msgid "read exclude globs from FILE, one per line\n"
 msgstr "Ausschluss-Globs aus DATEI lesen, eines pro Zeile\n"
 
-#: src/repl.c:118
+#: src/repl.c:139
 msgid "skip directories whose base name matches GLOB\n"
 msgstr "Verzeichnisse überspringen, deren Basisname auf GLOB passt\n"
 
-#: src/repl.c:120
+#: src/repl.c:141
 msgid "only process files whose base name matches GLOB\n"
 msgstr "nur Dateien verarbeiten, deren Basisname auf GLOB passt\n"
 
-#: src/repl.c:124
+#: src/repl.c:145
 msgid "how to handle directories: repl (default), skip, or recurse\n"
 msgstr "Umgang mit Verzeichnissen: repl (Standard), skip oder recurse\n"
 
-#: src/repl.c:126
+#: src/repl.c:147
 msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
 msgstr "Umgang mit Geräten/FIFOs/Sockets: repl (Standard) oder skip\n"
 
-#: src/repl.c:128
+#: src/repl.c:149
 msgid "binary (default: stop before non-printable), without-match, or text\n"
 msgstr ""
 "binary (Standard: vor Nicht-Druckbarem anhalten), without-match oder text\n"
 
-#: src/repl.c:130
+#: src/repl.c:151
 msgid "same as --binary-files=without-match\n"
 msgstr "gleichbedeutend mit --binary-files=without-match\n"
 
-#: src/repl.c:132
+#: src/repl.c:153
 msgid "treat files as binary; disable the binary heuristic\n"
 msgstr "Dateien als Binär behandeln; die Binärheuristik deaktivieren\n"
 
-#: src/repl.c:134
+#: src/repl.c:155
 msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
 msgstr ""
 "Eingabe als NUL-terminierte Zeilen statt newline-terminiert behandeln\n"
 
-#: src/repl.c:136
+#: src/repl.c:157
 msgid "Reporting:\n"
 msgstr "Berichterstattung:\n"
 
-#: src/repl.c:138
+#: src/repl.c:159
+msgid ""
+"show what would change; with -u/-c print diffs, but do not update files\n"
+msgstr ""
+
+#: src/repl.c:162
 msgid "suppress the default one-line summary\n"
 msgstr "die standardmäßige einzeilige Zusammenfassung unterdrücken\n"
 
-#: src/repl.c:140
+#: src/repl.c:164
 msgid "print a context diff (diff -c) for each changed file\n"
 msgstr "Kontext-Diff (diff -c) für jede geänderte Datei ausgeben\n"
 
-#: src/repl.c:142
+#: src/repl.c:166
 msgid "print a unified diff (diff -u) for each changed file\n"
 msgstr "Unified-Diff (diff -u) für jede geänderte Datei ausgeben\n"
 
-#: src/repl.c:144
+#: src/repl.c:168
 msgid "print a detailed batch summary (files examined/changed, counts)\n"
 msgstr ""
 "detaillierte Stapelzusammenfassung ausgeben (geprüfte/geänderte Dateien, "
 "Zählungen)\n"
 
-#: src/repl.c:150
+#: src/repl.c:170
+msgid ""
+"color diffs; WHEN is never, always, or auto (default with --color: auto)\n"
+msgstr ""
+
+#: src/repl.c:173
+msgid ""
+"colors when --color is active; colon-separated terminfo/SGR list "
+"(rs:hd:ad:de:ln)\n"
+msgstr ""
+
+#: src/repl.c:181
 #, c-format
 msgid ""
 "\n"
@@ -313,51 +330,79 @@ msgstr ""
 "\n"
 "Fehler melden an: <%s>\n"
 
-#: src/repl.c:275
+#: src/repl.c:455
 #, c-format
 msgid "%s: replace failed: %s\n"
 msgstr "%s: Ersetzen fehlgeschlagen: %s\n"
 
-#: src/repl.c:316
+#: src/repl.c:491
+#, fuzzy, c-format
+msgid "would change: %s (%zu replacement(s))\n"
+msgstr "%zu Datei(en) geändert, %zu Ersetzung(en)\n"
+
+#: src/repl.c:493 src/repl.c:509
 #, c-format
 msgid "%s: %zu replacement(s)\n"
 msgstr "%s: %zu Ersetzung(en)\n"
 
-#: src/repl.c:472
+#: src/repl.c:671
 #, c-format
 msgid "%s: invalid max-depth\n"
 msgstr "%s: ungültige max-depth\n"
 
-#: src/repl.c:506
+#: src/repl.c:705
 #, c-format
 msgid "%s: invalid --binary-files value\n"
 msgstr "%s: ungültiger Wert für --binary-files\n"
 
-#: src/repl.c:522
+#: src/repl.c:721
 #, c-format
 msgid "%s: invalid --directories action\n"
 msgstr "%s: ungültige Aktion für --directories\n"
 
-#: src/repl.c:532
+#: src/repl.c:731
 #, c-format
 msgid "%s: invalid --devices action\n"
 msgstr "%s: ungültige Aktion für --devices\n"
 
-#: src/repl.c:574
+#: src/repl.c:764
+#, c-format
+msgid "%s: invalid --color value (use never, always, or auto)\n"
+msgstr ""
+
+#: src/repl.c:771
+#, fuzzy, c-format
+msgid "%s: invalid --palette\n"
+msgstr "%s: ungültige max-depth\n"
+
+#: src/repl.c:795
 #, c-format
 msgid "%s: missing PATTERN and REPLACEMENT\n"
 msgstr "%s: MUSTER und ERSATZ fehlen\n"
 
-#: src/repl.c:586
+#: src/repl.c:807
 #, c-format
 msgid "%s: missing REPLACEMENT\n"
 msgstr "%s: ERSATZ fehlt\n"
 
-#: src/repl.c:600
+#: src/repl.c:821
 msgid "pattern error"
 msgstr "Musterfehler"
 
-#: src/repl.c:658
+#: src/repl.c:888
+#, fuzzy, c-format
+msgid ""
+"files examined:     %zu\n"
+"files would change: %zu\n"
+"replacements:       %zu\n"
+"binary skipped:     %zu\n"
+msgstr ""
+"geprüfte Dateien:   %zu\n"
+"geänderte Dateien:  %zu\n"
+"Ersetzungen:        %zu\n"
+"binary übersprungen: %zu\n"
+
+#: src/repl.c:895
 #, c-format
 msgid ""
 "files examined: %zu\n"
@@ -370,7 +415,12 @@ msgstr ""
 "Ersetzungen:        %zu\n"
 "binary übersprungen: %zu\n"
 
-#: src/repl.c:665
+#: src/repl.c:903
+#, fuzzy, c-format
+msgid "%zu file(s) would change, %zu replacement(s)\n"
+msgstr "%zu Datei(en) geändert, %zu Ersetzung(en)\n"
+
+#: src/repl.c:906
 #, c-format
 msgid "%zu file(s) changed, %zu replacement(s)\n"
 msgstr "%zu Datei(en) geändert, %zu Ersetzung(en)\n"

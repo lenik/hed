@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: hed 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"POT-Creation-Date: 2026-07-16 15:22+0800\n"
 "PO-Revision-Date: 2026-07-16 14:00+0800\n"
 "Last-Translator: Lenik <hed@bodz.net>\n"
 "Language-Team: Vietnamese\n"
@@ -83,11 +83,11 @@ msgstr "lặp lại để ghi nhật ký chi tiết hơn\n"
 msgid "show less logging messages\n"
 msgstr "hiển thị ít thông báo nhật ký hơn\n"
 
-#: src/insert.c:79 src/repl.c:147
+#: src/insert.c:79 src/repl.c:178
 msgid "display this help and exit\n"
 msgstr "hiển thị trợ giúp này và thoát\n"
 
-#: src/insert.c:81 src/repl.c:149
+#: src/insert.c:81 src/repl.c:180
 msgid "output version information and exit\n"
 msgstr "xuất thông tin phiên bản và thoát\n"
 
@@ -111,12 +111,12 @@ msgstr "%s: số dòng không hợp lệ: %s\n"
 msgid "%s: invalid blank count: %s\n"
 msgstr "%s: số dòng trống không hợp lệ: %s\n"
 
-#: src/insert.c:338 src/repl.c:559
+#: src/insert.c:338 src/repl.c:780
 #, c-format
 msgid "Copyright (C) %d %s\n"
 msgstr "Bản quyền (C) %d %s\n"
 
-#: src/insert.c:339 src/repl.c:560
+#: src/insert.c:339 src/repl.c:781
 msgid ""
 "License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
 msgstr ""
@@ -147,12 +147,12 @@ msgstr "KHÔNG CÓ BẢO ĐẢM, trong phạm vi luật cho phép.\n"
 msgid "%s: missing FILE\n"
 msgstr "%s: thiếu TỆP\n"
 
-#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#: src/insert.c:413 src/insert.c:427 src/insert.c:540
 #, c-format
 msgid "%s: out of memory\n"
 msgstr "%s: hết bộ nhớ\n"
 
-#: src/repl.c:73
+#: src/repl.c:94
 msgid ""
 "Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
 "       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
@@ -166,133 +166,149 @@ msgstr ""
 "Tệp chỉ được viết lại khi nội dung sẽ thay đổi.\n"
 "Không có TỆP thì đọc đầu vào chuẩn và ghi ra đầu ra chuẩn.\n"
 
-#: src/repl.c:80
+#: src/repl.c:101
 msgid "Pattern selection (default: fixed strings):\n"
 msgstr "Chọn mẫu (mặc định: chuỗi cố định):\n"
 
-#: src/repl.c:82
+#: src/repl.c:103
 msgid "interpret patterns as fixed strings (default)\n"
 msgstr "diễn giải mẫu như chuỗi cố định (mặc định)\n"
 
-#: src/repl.c:84
+#: src/repl.c:105
 msgid "interpret patterns as POSIX extended regular expressions\n"
 msgstr "diễn giải mẫu như biểu thức chính quy mở rộng POSIX\n"
 
-#: src/repl.c:86
+#: src/repl.c:107
 msgid "interpret patterns as POSIX basic regular expressions\n"
 msgstr "diễn giải mẫu như biểu thức chính quy cơ bản POSIX\n"
 
-#: src/repl.c:88
+#: src/repl.c:109
 msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
 msgstr "diễn giải mẫu như biểu thức chính quy tương thích Perl (PCRE2)\n"
 
-#: src/repl.c:90
+#: src/repl.c:111
 msgid "use PATTERNS; may be repeated; combine with -f\n"
 msgstr "dùng PATTERNS; có thể lặp lại; kết hợp với -f\n"
 
-#: src/repl.c:92
+#: src/repl.c:113
 msgid "read patterns from FILE, one per line; - means standard input\n"
 msgstr "đọc mẫu từ TỆP, mỗi dòng một mẫu; - nghĩa là đầu vào chuẩn\n"
 
-#: src/repl.c:94
+#: src/repl.c:115
 msgid "ignore case distinctions in patterns and data\n"
 msgstr "bỏ qua phân biệt chữ hoa/thường trong mẫu và dữ liệu\n"
 
-#: src/repl.c:96
+#: src/repl.c:117
 msgid "do not ignore case (default); cancels a prior -i\n"
 msgstr "không bỏ qua chữ hoa/thường (mặc định); hủy -i trước đó\n"
 
-#: src/repl.c:98
+#: src/repl.c:119
 msgid "replace each non-matching line entirely with REPLACEMENT\n"
 msgstr "thay toàn bộ mỗi dòng không khớp bằng THAY_THẾ\n"
 
-#: src/repl.c:100
+#: src/repl.c:121
 msgid "match only whole words\n"
 msgstr "chỉ khớp cả từ\n"
 
-#: src/repl.c:102
+#: src/repl.c:123
 msgid "match only whole lines\n"
 msgstr "chỉ khớp cả dòng\n"
 
-#: src/repl.c:104
+#: src/repl.c:125
 msgid "File selection:\n"
 msgstr "Chọn tệp:\n"
 
-#: src/repl.c:106
+#: src/repl.c:127
 msgid "recurse directories; follow symlinks only if on the command line\n"
 msgstr ""
 "duyệt thư mục đệ quy; chỉ theo liên kết tượng trưng nếu trên dòng lệnh\n"
 
-#: src/repl.c:110
+#: src/repl.c:131
 msgid "recurse directories, following all symbolic links\n"
 msgstr "duyệt thư mục đệ quy, theo mọi liên kết tượng trưng\n"
 
-#: src/repl.c:112
+#: src/repl.c:133
 msgid "limit directory recursion depth\n"
 msgstr "giới hạn độ sâu duyệt thư mục đệ quy\n"
 
-#: src/repl.c:114
+#: src/repl.c:135
 msgid "skip files whose base name matches GLOB\n"
 msgstr "bỏ qua tệp có tên cơ sở khớp GLOB\n"
 
-#: src/repl.c:116
+#: src/repl.c:137
 msgid "read exclude globs from FILE, one per line\n"
 msgstr "đọc glob loại trừ từ TỆP, mỗi dòng một mục\n"
 
-#: src/repl.c:118
+#: src/repl.c:139
 msgid "skip directories whose base name matches GLOB\n"
 msgstr "bỏ qua thư mục có tên cơ sở khớp GLOB\n"
 
-#: src/repl.c:120
+#: src/repl.c:141
 msgid "only process files whose base name matches GLOB\n"
 msgstr "chỉ xử lý tệp có tên cơ sở khớp GLOB\n"
 
-#: src/repl.c:124
+#: src/repl.c:145
 msgid "how to handle directories: repl (default), skip, or recurse\n"
 msgstr "cách xử lý thư mục: repl (mặc định), skip hoặc recurse\n"
 
-#: src/repl.c:126
+#: src/repl.c:147
 msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
 msgstr "cách xử lý thiết bị/FIFO/socket: repl (mặc định) hoặc skip\n"
 
-#: src/repl.c:128
+#: src/repl.c:149
 msgid "binary (default: stop before non-printable), without-match, or text\n"
 msgstr ""
 "binary (mặc định: dừng trước ký tự không in được), without-match hoặc text\n"
 
-#: src/repl.c:130
+#: src/repl.c:151
 msgid "same as --binary-files=without-match\n"
 msgstr "giống --binary-files=without-match\n"
 
-#: src/repl.c:132
+#: src/repl.c:153
 msgid "treat files as binary; disable the binary heuristic\n"
 msgstr "coi tệp là nhị phân; tắt heuristic nhị phân\n"
 
-#: src/repl.c:134
+#: src/repl.c:155
 msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
 msgstr "coi đầu vào là các dòng kết thúc bằng NUL thay vì ký tự xuống dòng\n"
 
-#: src/repl.c:136
+#: src/repl.c:157
 msgid "Reporting:\n"
 msgstr "Báo cáo:\n"
 
-#: src/repl.c:138
+#: src/repl.c:159
+msgid ""
+"show what would change; with -u/-c print diffs, but do not update files\n"
+msgstr ""
+
+#: src/repl.c:162
 msgid "suppress the default one-line summary\n"
 msgstr "ẩn tóm tắt một dòng mặc định\n"
 
-#: src/repl.c:140
+#: src/repl.c:164
 msgid "print a context diff (diff -c) for each changed file\n"
 msgstr "in diff ngữ cảnh (diff -c) cho mỗi tệp đã thay đổi\n"
 
-#: src/repl.c:142
+#: src/repl.c:166
 msgid "print a unified diff (diff -u) for each changed file\n"
 msgstr "in diff thống nhất (diff -u) cho mỗi tệp đã thay đổi\n"
 
-#: src/repl.c:144
+#: src/repl.c:168
 msgid "print a detailed batch summary (files examined/changed, counts)\n"
 msgstr "in tóm tắt lô chi tiết (tệp đã xét/đã đổi, số lần)\n"
 
-#: src/repl.c:150
+#: src/repl.c:170
+msgid ""
+"color diffs; WHEN is never, always, or auto (default with --color: auto)\n"
+msgstr ""
+
+#: src/repl.c:173
+msgid ""
+"colors when --color is active; colon-separated terminfo/SGR list "
+"(rs:hd:ad:de:ln)\n"
+msgstr ""
+
+#: src/repl.c:181
 #, c-format
 msgid ""
 "\n"
@@ -301,51 +317,79 @@ msgstr ""
 "\n"
 "Báo lỗi tới: <%s>\n"
 
-#: src/repl.c:275
+#: src/repl.c:455
 #, c-format
 msgid "%s: replace failed: %s\n"
 msgstr "%s: thay thế thất bại: %s\n"
 
-#: src/repl.c:316
+#: src/repl.c:491
+#, fuzzy, c-format
+msgid "would change: %s (%zu replacement(s))\n"
+msgstr "%zu tệp đã đổi, %zu lần thay thế\n"
+
+#: src/repl.c:493 src/repl.c:509
 #, c-format
 msgid "%s: %zu replacement(s)\n"
 msgstr "%s: %zu lần thay thế\n"
 
-#: src/repl.c:472
+#: src/repl.c:671
 #, c-format
 msgid "%s: invalid max-depth\n"
 msgstr "%s: max-depth không hợp lệ\n"
 
-#: src/repl.c:506
+#: src/repl.c:705
 #, c-format
 msgid "%s: invalid --binary-files value\n"
 msgstr "%s: giá trị --binary-files không hợp lệ\n"
 
-#: src/repl.c:522
+#: src/repl.c:721
 #, c-format
 msgid "%s: invalid --directories action\n"
 msgstr "%s: hành động --directories không hợp lệ\n"
 
-#: src/repl.c:532
+#: src/repl.c:731
 #, c-format
 msgid "%s: invalid --devices action\n"
 msgstr "%s: hành động --devices không hợp lệ\n"
 
-#: src/repl.c:574
+#: src/repl.c:764
+#, c-format
+msgid "%s: invalid --color value (use never, always, or auto)\n"
+msgstr ""
+
+#: src/repl.c:771
+#, fuzzy, c-format
+msgid "%s: invalid --palette\n"
+msgstr "%s: max-depth không hợp lệ\n"
+
+#: src/repl.c:795
 #, c-format
 msgid "%s: missing PATTERN and REPLACEMENT\n"
 msgstr "%s: thiếu MẪU và THAY_THẾ\n"
 
-#: src/repl.c:586
+#: src/repl.c:807
 #, c-format
 msgid "%s: missing REPLACEMENT\n"
 msgstr "%s: thiếu THAY_THẾ\n"
 
-#: src/repl.c:600
+#: src/repl.c:821
 msgid "pattern error"
 msgstr "lỗi mẫu"
 
-#: src/repl.c:658
+#: src/repl.c:888
+#, fuzzy, c-format
+msgid ""
+"files examined:     %zu\n"
+"files would change: %zu\n"
+"replacements:       %zu\n"
+"binary skipped:     %zu\n"
+msgstr ""
+"tệp đã kiểm tra:   %zu\n"
+"tệp đã đổi:        %zu\n"
+"lần thay thế:      %zu\n"
+"bỏ qua nhị phân:   %zu\n"
+
+#: src/repl.c:895
 #, c-format
 msgid ""
 "files examined: %zu\n"
@@ -358,7 +402,12 @@ msgstr ""
 "lần thay thế:      %zu\n"
 "bỏ qua nhị phân:   %zu\n"
 
-#: src/repl.c:665
+#: src/repl.c:903
+#, fuzzy, c-format
+msgid "%zu file(s) would change, %zu replacement(s)\n"
+msgstr "%zu tệp đã đổi, %zu lần thay thế\n"
+
+#: src/repl.c:906
 #, c-format
 msgid "%zu file(s) changed, %zu replacement(s)\n"
 msgstr "%zu tệp đã đổi, %zu lần thay thế\n"
