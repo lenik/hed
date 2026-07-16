@@ -2,3 +2,7 @@
 
 %:
 	dh $@ --buildsystem=meson --builddirectory=debian/build
+
+override_dh_dwz:
+	@echo "Skipping broken dwz compression step"
+
