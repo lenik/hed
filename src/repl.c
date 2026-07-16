@@ -892,7 +892,7 @@ int main(int argc, char **argv) {
         ctx.use_color = 0;
     }
 
-    if (argc == 0) {
+    if (argc == 0 && !ctx.walk.recursive) {
         /* read stdin, write stdout */
         char *data = NULL;
         size_t len = 0, cap = 0;
@@ -924,7 +924,14 @@ int main(int argc, char **argv) {
         free(data);
         ctx.stats.replacements = n_repl;
     } else {
+        char *default_path[] = {"."};
         int i;
+
+        /* -r/-R with no path: walk the current directory */
+        if (argc == 0) {
+            argv = default_path;
+            argc = 1;
+        }
         for (i = 0; i < argc; i++) {
             if (walk_path(argv[i], 1, &ctx.walk, process_file, &ctx) < 0) {
                 fprintf(stderr, "%s: ", exe);

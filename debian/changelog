@@ -1,3 +1,9 @@
+hed (1.2.1) testing; urgency=medium
+
+  * repl(1): when -r/-R specified, default to . if no file argument given.
+
+ -- Lenik (谢继雷) <lenik@bodz.net>  Fri, 17 Jul 2026 00:26:55 +0800
+
 hed (1.2.0) testing; urgency=medium
 
   * repl(1): add -l/--line to expand match to entire line (default: matched only).
