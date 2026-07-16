@@ -1,0 +1,15 @@
+hed (1.0.0) testing; urgency=medium
+
+  * insert(1): in-place line splicing with extended/string/filename sources,
+    digit position options (-0..-9, -n, -a, -p), trailing --blank defaults,
+    EOF padding, and -r/--remove for delete/update operations.
+  * insert: empty delete at prepend (-0/-p/-1 -rN) keeps from 1-based line N
+    without adding a trailing blank (e.g. insert -0 -r3 on a/b/c/d/e => c/d/e).
+  * repl(1): batch in-place replace with fixed/POSIX/PCRE2 patterns, grep-like
+    file selection, binary handling, and diff/summary reporting.
+  * Standalone insert and repl binaries (no shared libhed).
+  * gettext UI translations (de, eo, fr, it, ja, ko, th, vi, zh_CN, zh_TW).
+  * Translated man pages for insert(1) and repl(1) in the same languages.
+  * Check-based unit and CLI integration tests.
+
+ -- Lenik (谢继雷) <lenik@bodz.net>  Thu, 16 Jul 2026 14:40:00 +0800

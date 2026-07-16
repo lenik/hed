@@ -1,0 +1,20 @@
+Source: hed
+Section: utils
+Priority: optional
+Maintainer: Lenik <hed@bodz.net>
+Build-Depends: debhelper-compat (= 13), meson, ninja-build, pkgconf, check,
+ libbas-c-dev, libpcre2-dev
+Standards-Version: 4.6.0
+Homepage: https://github.com/lenik/hed
+Rules-Requires-Root: no
+
+Package: hed
+Architecture: any
+Depends: 
+    ${shlibs:Depends}, 
+    ${misc:Depends}
+Description: human editor — in-place insert and replace tools
+ hed provides insert(1) and repl(1) for editing files in place:
+ insert splices text or file contents at a line position; repl does
+ batch pattern replacement with grep-like matching options.
+ Files are rewritten only when their contents would change.
