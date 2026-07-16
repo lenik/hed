@@ -1,0 +1,367 @@
+# hed translation for Vietnamese.
+# Copyright (C) 2026 Lenik <hed@bodz.net>
+# This file is distributed under the same license as the hed package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hed 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"PO-Revision-Date: 2026-07-16 14:00+0800\n"
+"Last-Translator: Lenik <hed@bodz.net>\n"
+"Language-Team: Vietnamese\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/insert.c:45
+msgid ""
+"Usage: insert [OPTION]... FILE [SRC]...\n"
+"Insert SRC content into FILE at a line position.\n"
+"With -r, remove lines at the insert point (useful for delete/update).\n"
+msgstr ""
+"Cách dùng: insert [TÙY_CHỌN]... TỆP [NGUỒN]...\n"
+"Chèn nội dung NGUỒN vào TỆP tại vị trí dòng.\n"
+"Với -r, xóa các dòng tại điểm chèn (hữu ích để xóa/cập nhật).\n"
+
+#: src/insert.c:50
+msgid "Source modes:\n"
+msgstr "Chế độ nguồn:\n"
+
+#: src/insert.c:52
+msgid "treat each SRC as a string literal\n"
+msgstr "coi mỗi NGUỒN là chuỗi ký tự\n"
+
+#: src/insert.c:54
+msgid "treat each SRC as a filename\n"
+msgstr "coi mỗi NGUỒN là tên tệp\n"
+
+#: src/insert.c:56
+msgid "@FILE or string (default)\n"
+msgstr "@TỆP hoặc chuỗi (mặc định)\n"
+
+#: src/insert.c:58
+msgid "Position:\n"
+msgstr "Vị trí:\n"
+
+#: src/insert.c:60
+msgid "insert before 1-based line NUM (pads empty lines if needed)\n"
+msgstr "chèn trước dòng NUM (đánh số từ 1; thêm dòng trống nếu cần)\n"
+
+#: src/insert.c:62
+msgid "digit cluster: -1 prepend, -0 prepend+blank, -N before line N\n"
+msgstr "nhóm chữ số: -1 chèn đầu, -0 chèn đầu+dòng trống, -N trước dòng N\n"
+
+#: src/insert.c:64
+msgid "append; -a0 like >> (end), -a1 insert before last line\n"
+msgstr "thêm vào cuối; -a0 như >> (cuối), -a1 chèn trước dòng cuối\n"
+
+#: src/insert.c:66
+msgid "prepend to the start\n"
+msgstr "chèn vào đầu\n"
+
+#: src/insert.c:68
+msgid "remove NUM lines at the insert point before inserting\n"
+msgstr "xóa NUM dòng tại điểm chèn trước khi chèn\n"
+
+#: src/insert.c:70
+msgid ""
+"trailing blank lines after each SRC (default: 1 for strings, 0 for files)\n"
+msgstr "dòng trống cuối sau mỗi NGUỒN (mặc định: 1 cho chuỗi, 0 cho tệp)\n"
+
+#: src/insert.c:72
+msgid "use TEXT when a source file is missing\n"
+msgstr "dùng VĂN_BẢN khi thiếu tệp nguồn\n"
+
+#: src/insert.c:75
+msgid "repeat for more verbose loggings\n"
+msgstr "lặp lại để ghi nhật ký chi tiết hơn\n"
+
+#: src/insert.c:77
+msgid "show less logging messages\n"
+msgstr "hiển thị ít thông báo nhật ký hơn\n"
+
+#: src/insert.c:79 src/repl.c:147
+msgid "display this help and exit\n"
+msgstr "hiển thị trợ giúp này và thoát\n"
+
+#: src/insert.c:81 src/repl.c:149
+msgid "output version information and exit\n"
+msgstr "xuất thông tin phiên bản và thoát\n"
+
+#: src/insert.c:83
+#, c-format
+msgid "Report bugs to: <%s>\n"
+msgstr "Báo lỗi tới: <%s>\n"
+
+#: src/insert.c:292
+#, c-format
+msgid "%s: invalid remove count: %s\n"
+msgstr "%s: số dòng xóa không hợp lệ: %s\n"
+
+#: src/insert.c:302
+#, c-format
+msgid "%s: invalid line number: %s\n"
+msgstr "%s: số dòng không hợp lệ: %s\n"
+
+#: src/insert.c:314
+#, c-format
+msgid "%s: invalid blank count: %s\n"
+msgstr "%s: số dòng trống không hợp lệ: %s\n"
+
+#: src/insert.c:338 src/repl.c:559
+#, c-format
+msgid "Copyright (C) %d %s\n"
+msgstr "Bản quyền (C) %d %s\n"
+
+#: src/insert.c:339 src/repl.c:560
+msgid ""
+"License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+msgstr ""
+"Giấy phép AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+
+#: src/insert.c:341
+msgid "This is free software: you are free to change and redistribute it.\n"
+msgstr "Đây là phần mềm tự do: bạn được tự do thay đổi và phân phối lại.\n"
+
+#: src/insert.c:343
+msgid "This project opposes AI exploitation and AI hegemony.\n"
+msgstr "Dự án này phản đối việc khai thác AI và bá quyền AI.\n"
+
+#: src/insert.c:344
+msgid ""
+"This project rejects mindless MIT-style licensing and politically naive BSD-"
+"style licensing.\n"
+msgstr ""
+"Dự án này từ chối giấy phép kiểu MIT thiếu suy nghĩ và giấy phép kiểu BSD "
+"ngây thơ về chính trị.\n"
+
+#: src/insert.c:347
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr "KHÔNG CÓ BẢO ĐẢM, trong phạm vi luật cho phép.\n"
+
+#: src/insert.c:372
+#, c-format
+msgid "%s: missing FILE\n"
+msgstr "%s: thiếu TỆP\n"
+
+#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#, c-format
+msgid "%s: out of memory\n"
+msgstr "%s: hết bộ nhớ\n"
+
+#: src/repl.c:73
+msgid ""
+"Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
+"       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+"Batch replace PATTERN with REPLACEMENT in files.\n"
+"A file is rewritten only when its contents would change.\n"
+"With no FILE, read standard input and write to standard output.\n"
+msgstr ""
+"Cách dùng: repl [TÙY_CHỌN]... MẪU THAY_THẾ [TỆP]...\n"
+"       repl [TÙY_CHỌN]... -e MẪU ... THAY_THẾ [TỆP]...\n"
+"Thay thế hàng loạt MẪU bằng THAY_THẾ trong các tệp.\n"
+"Tệp chỉ được viết lại khi nội dung sẽ thay đổi.\n"
+"Không có TỆP thì đọc đầu vào chuẩn và ghi ra đầu ra chuẩn.\n"
+
+#: src/repl.c:80
+msgid "Pattern selection (default: fixed strings):\n"
+msgstr "Chọn mẫu (mặc định: chuỗi cố định):\n"
+
+#: src/repl.c:82
+msgid "interpret patterns as fixed strings (default)\n"
+msgstr "diễn giải mẫu như chuỗi cố định (mặc định)\n"
+
+#: src/repl.c:84
+msgid "interpret patterns as POSIX extended regular expressions\n"
+msgstr "diễn giải mẫu như biểu thức chính quy mở rộng POSIX\n"
+
+#: src/repl.c:86
+msgid "interpret patterns as POSIX basic regular expressions\n"
+msgstr "diễn giải mẫu như biểu thức chính quy cơ bản POSIX\n"
+
+#: src/repl.c:88
+msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
+msgstr "diễn giải mẫu như biểu thức chính quy tương thích Perl (PCRE2)\n"
+
+#: src/repl.c:90
+msgid "use PATTERNS; may be repeated; combine with -f\n"
+msgstr "dùng PATTERNS; có thể lặp lại; kết hợp với -f\n"
+
+#: src/repl.c:92
+msgid "read patterns from FILE, one per line; - means standard input\n"
+msgstr "đọc mẫu từ TỆP, mỗi dòng một mẫu; - nghĩa là đầu vào chuẩn\n"
+
+#: src/repl.c:94
+msgid "ignore case distinctions in patterns and data\n"
+msgstr "bỏ qua phân biệt chữ hoa/thường trong mẫu và dữ liệu\n"
+
+#: src/repl.c:96
+msgid "do not ignore case (default); cancels a prior -i\n"
+msgstr "không bỏ qua chữ hoa/thường (mặc định); hủy -i trước đó\n"
+
+#: src/repl.c:98
+msgid "replace each non-matching line entirely with REPLACEMENT\n"
+msgstr "thay toàn bộ mỗi dòng không khớp bằng THAY_THẾ\n"
+
+#: src/repl.c:100
+msgid "match only whole words\n"
+msgstr "chỉ khớp cả từ\n"
+
+#: src/repl.c:102
+msgid "match only whole lines\n"
+msgstr "chỉ khớp cả dòng\n"
+
+#: src/repl.c:104
+msgid "File selection:\n"
+msgstr "Chọn tệp:\n"
+
+#: src/repl.c:106
+msgid "recurse directories; follow symlinks only if on the command line\n"
+msgstr ""
+"duyệt thư mục đệ quy; chỉ theo liên kết tượng trưng nếu trên dòng lệnh\n"
+
+#: src/repl.c:110
+msgid "recurse directories, following all symbolic links\n"
+msgstr "duyệt thư mục đệ quy, theo mọi liên kết tượng trưng\n"
+
+#: src/repl.c:112
+msgid "limit directory recursion depth\n"
+msgstr "giới hạn độ sâu duyệt thư mục đệ quy\n"
+
+#: src/repl.c:114
+msgid "skip files whose base name matches GLOB\n"
+msgstr "bỏ qua tệp có tên cơ sở khớp GLOB\n"
+
+#: src/repl.c:116
+msgid "read exclude globs from FILE, one per line\n"
+msgstr "đọc glob loại trừ từ TỆP, mỗi dòng một mục\n"
+
+#: src/repl.c:118
+msgid "skip directories whose base name matches GLOB\n"
+msgstr "bỏ qua thư mục có tên cơ sở khớp GLOB\n"
+
+#: src/repl.c:120
+msgid "only process files whose base name matches GLOB\n"
+msgstr "chỉ xử lý tệp có tên cơ sở khớp GLOB\n"
+
+#: src/repl.c:124
+msgid "how to handle directories: repl (default), skip, or recurse\n"
+msgstr "cách xử lý thư mục: repl (mặc định), skip hoặc recurse\n"
+
+#: src/repl.c:126
+msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
+msgstr "cách xử lý thiết bị/FIFO/socket: repl (mặc định) hoặc skip\n"
+
+#: src/repl.c:128
+msgid "binary (default: stop before non-printable), without-match, or text\n"
+msgstr ""
+"binary (mặc định: dừng trước ký tự không in được), without-match hoặc text\n"
+
+#: src/repl.c:130
+msgid "same as --binary-files=without-match\n"
+msgstr "giống --binary-files=without-match\n"
+
+#: src/repl.c:132
+msgid "treat files as binary; disable the binary heuristic\n"
+msgstr "coi tệp là nhị phân; tắt heuristic nhị phân\n"
+
+#: src/repl.c:134
+msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
+msgstr "coi đầu vào là các dòng kết thúc bằng NUL thay vì ký tự xuống dòng\n"
+
+#: src/repl.c:136
+msgid "Reporting:\n"
+msgstr "Báo cáo:\n"
+
+#: src/repl.c:138
+msgid "suppress the default one-line summary\n"
+msgstr "ẩn tóm tắt một dòng mặc định\n"
+
+#: src/repl.c:140
+msgid "print a context diff (diff -c) for each changed file\n"
+msgstr "in diff ngữ cảnh (diff -c) cho mỗi tệp đã thay đổi\n"
+
+#: src/repl.c:142
+msgid "print a unified diff (diff -u) for each changed file\n"
+msgstr "in diff thống nhất (diff -u) cho mỗi tệp đã thay đổi\n"
+
+#: src/repl.c:144
+msgid "print a detailed batch summary (files examined/changed, counts)\n"
+msgstr "in tóm tắt lô chi tiết (tệp đã xét/đã đổi, số lần)\n"
+
+#: src/repl.c:150
+#, c-format
+msgid ""
+"\n"
+"Report bugs to: <%s>\n"
+msgstr ""
+"\n"
+"Báo lỗi tới: <%s>\n"
+
+#: src/repl.c:275
+#, c-format
+msgid "%s: replace failed: %s\n"
+msgstr "%s: thay thế thất bại: %s\n"
+
+#: src/repl.c:316
+#, c-format
+msgid "%s: %zu replacement(s)\n"
+msgstr "%s: %zu lần thay thế\n"
+
+#: src/repl.c:472
+#, c-format
+msgid "%s: invalid max-depth\n"
+msgstr "%s: max-depth không hợp lệ\n"
+
+#: src/repl.c:506
+#, c-format
+msgid "%s: invalid --binary-files value\n"
+msgstr "%s: giá trị --binary-files không hợp lệ\n"
+
+#: src/repl.c:522
+#, c-format
+msgid "%s: invalid --directories action\n"
+msgstr "%s: hành động --directories không hợp lệ\n"
+
+#: src/repl.c:532
+#, c-format
+msgid "%s: invalid --devices action\n"
+msgstr "%s: hành động --devices không hợp lệ\n"
+
+#: src/repl.c:574
+#, c-format
+msgid "%s: missing PATTERN and REPLACEMENT\n"
+msgstr "%s: thiếu MẪU và THAY_THẾ\n"
+
+#: src/repl.c:586
+#, c-format
+msgid "%s: missing REPLACEMENT\n"
+msgstr "%s: thiếu THAY_THẾ\n"
+
+#: src/repl.c:600
+msgid "pattern error"
+msgstr "lỗi mẫu"
+
+#: src/repl.c:658
+#, c-format
+msgid ""
+"files examined: %zu\n"
+"files changed:  %zu\n"
+"replacements:   %zu\n"
+"binary skipped: %zu\n"
+msgstr ""
+"tệp đã kiểm tra:   %zu\n"
+"tệp đã đổi:        %zu\n"
+"lần thay thế:      %zu\n"
+"bỏ qua nhị phân:   %zu\n"
+
+#: src/repl.c:665
+#, c-format
+msgid "%zu file(s) changed, %zu replacement(s)\n"
+msgstr "%zu tệp đã đổi, %zu lần thay thế\n"
+
+#~ msgid "append; -a0 append, -a1 blank then append\n"
+#~ msgstr "thêm vào cuối; -a0 thêm, -a1 dòng trống rồi thêm\n"

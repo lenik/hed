@@ -1,0 +1,390 @@
+# hed translation for French.
+# Copyright (C) 2026 Lenik <hed@bodz.net>
+# This file is distributed under the same license as the hed package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hed 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"PO-Revision-Date: 2026-07-16 14:00+0800\n"
+"Last-Translator: Lenik <hed@bodz.net>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/insert.c:45
+msgid ""
+"Usage: insert [OPTION]... FILE [SRC]...\n"
+"Insert SRC content into FILE at a line position.\n"
+"With -r, remove lines at the insert point (useful for delete/update).\n"
+msgstr ""
+"Usage : insert [OPTION]... FICHIER [SOURCE]...\n"
+"Insérer le contenu de SOURCE dans FICHIER à une position de ligne.\n"
+"Avec -r, supprimer des lignes au point d'insertion (utile pour supprimer/mettre à jour).\n"
+
+#: src/insert.c:50
+msgid "Source modes:\n"
+msgstr "Modes source :\n"
+
+#: src/insert.c:52
+msgid "treat each SRC as a string literal\n"
+msgstr "traiter chaque SOURCE comme une chaîne littérale\n"
+
+#: src/insert.c:54
+msgid "treat each SRC as a filename\n"
+msgstr "traiter chaque SOURCE comme un nom de fichier\n"
+
+#: src/insert.c:56
+msgid "@FILE or string (default)\n"
+msgstr "@FICHIER ou chaîne (par défaut)\n"
+
+#: src/insert.c:58
+msgid "Position:\n"
+msgstr "Position :\n"
+
+#: src/insert.c:60
+msgid "insert before 1-based line NUM (pads empty lines if needed)\n"
+msgstr ""
+"insérer avant la ligne NUM (numérotation à partir de 1 ; complète avec des "
+"lignes vides si besoin)\n"
+
+#: src/insert.c:62
+msgid "digit cluster: -1 prepend, -0 prepend+blank, -N before line N\n"
+msgstr ""
+"groupe de chiffres : -1 préfixer, -0 préfixer+ligne vide, -N avant la ligne "
+"N\n"
+
+#: src/insert.c:64
+msgid "append; -a0 like >> (end), -a1 insert before last line\n"
+msgstr "ajouter en fin ; -a0 comme >> (fin), -a1 insérer avant la dernière ligne\n"
+
+#: src/insert.c:66
+msgid "prepend to the start\n"
+msgstr "préfixer au début\n"
+
+#: src/insert.c:68
+msgid "remove NUM lines at the insert point before inserting\n"
+msgstr "supprimer NUM lignes au point d'insertion avant d'insérer\n"
+
+#: src/insert.c:70
+msgid ""
+"trailing blank lines after each SRC (default: 1 for strings, 0 for files)\n"
+msgstr ""
+"lignes vides finales après chaque SOURCE (par défaut : 1 pour les chaînes, 0 "
+"pour les fichiers)\n"
+
+#: src/insert.c:72
+msgid "use TEXT when a source file is missing\n"
+msgstr "utiliser TEXTE lorsqu'un fichier source est manquant\n"
+
+#: src/insert.c:75
+msgid "repeat for more verbose loggings\n"
+msgstr "répéter pour des journaux plus verbeux\n"
+
+#: src/insert.c:77
+msgid "show less logging messages\n"
+msgstr "afficher moins de messages de journalisation\n"
+
+#: src/insert.c:79 src/repl.c:147
+msgid "display this help and exit\n"
+msgstr "afficher cette aide et quitter\n"
+
+#: src/insert.c:81 src/repl.c:149
+msgid "output version information and exit\n"
+msgstr "afficher les informations de version et quitter\n"
+
+#: src/insert.c:83
+#, c-format
+msgid "Report bugs to: <%s>\n"
+msgstr "Signaler les bogues à : <%s>\n"
+
+#: src/insert.c:292
+#, c-format
+msgid "%s: invalid remove count: %s\n"
+msgstr "%s : nombre de suppressions invalide : %s\n"
+
+#: src/insert.c:302
+#, c-format
+msgid "%s: invalid line number: %s\n"
+msgstr "%s : numéro de ligne invalide : %s\n"
+
+#: src/insert.c:314
+#, c-format
+msgid "%s: invalid blank count: %s\n"
+msgstr "%s : nombre de lignes vides invalide : %s\n"
+
+#: src/insert.c:338 src/repl.c:559
+#, c-format
+msgid "Copyright (C) %d %s\n"
+msgstr "Copyright (C) %d %s\n"
+
+#: src/insert.c:339 src/repl.c:560
+msgid ""
+"License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+msgstr ""
+"Licence AGPL-3.0-or-later : <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+
+#: src/insert.c:341
+msgid "This is free software: you are free to change and redistribute it.\n"
+msgstr ""
+"Ceci est un logiciel libre : vous êtes libre de le modifier et de le "
+"redistribuer.\n"
+
+#: src/insert.c:343
+msgid "This project opposes AI exploitation and AI hegemony.\n"
+msgstr ""
+"Ce projet s'oppose à l'exploitation par l'IA et à l'hégémonie de l'IA.\n"
+
+#: src/insert.c:344
+msgid ""
+"This project rejects mindless MIT-style licensing and politically naive BSD-"
+"style licensing.\n"
+msgstr ""
+"Ce projet rejette les licences de type MIT sans réflexion et les licences de "
+"type BSD politiquement naïves.\n"
+
+#: src/insert.c:347
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr "Il n'y a AUCUNE GARANTIE, dans la mesure permise par la loi.\n"
+
+#: src/insert.c:372
+#, c-format
+msgid "%s: missing FILE\n"
+msgstr "%s : FICHIER manquant\n"
+
+#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#, c-format
+msgid "%s: out of memory\n"
+msgstr "%s : mémoire insuffisante\n"
+
+#: src/repl.c:73
+msgid ""
+"Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
+"       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+"Batch replace PATTERN with REPLACEMENT in files.\n"
+"A file is rewritten only when its contents would change.\n"
+"With no FILE, read standard input and write to standard output.\n"
+msgstr ""
+"Usage : repl [OPTION]... MOTIF REMPLACEMENT [FICHIER]...\n"
+"       repl [OPTION]... -e MOTIF ... REMPLACEMENT [FICHIER]...\n"
+"Remplace en lot MOTIF par REMPLACEMENT dans les fichiers.\n"
+"Un fichier n'est réécrit que si son contenu changerait.\n"
+"Sans FICHIER, lit l'entrée standard et écrit sur la sortie standard.\n"
+
+#: src/repl.c:80
+msgid "Pattern selection (default: fixed strings):\n"
+msgstr "Sélection de motifs (par défaut : chaînes fixes) :\n"
+
+#: src/repl.c:82
+msgid "interpret patterns as fixed strings (default)\n"
+msgstr "interpréter les motifs comme des chaînes fixes (par défaut)\n"
+
+#: src/repl.c:84
+msgid "interpret patterns as POSIX extended regular expressions\n"
+msgstr ""
+"interpréter les motifs comme des expressions régulières étendues POSIX\n"
+
+#: src/repl.c:86
+msgid "interpret patterns as POSIX basic regular expressions\n"
+msgstr ""
+"interpréter les motifs comme des expressions régulières de base POSIX\n"
+
+#: src/repl.c:88
+msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
+msgstr ""
+"interpréter les motifs comme des expressions régulières compatibles Perl "
+"(PCRE2)\n"
+
+#: src/repl.c:90
+msgid "use PATTERNS; may be repeated; combine with -f\n"
+msgstr "utiliser MOTIFS ; peut être répété ; combinable avec -f\n"
+
+#: src/repl.c:92
+msgid "read patterns from FILE, one per line; - means standard input\n"
+msgstr ""
+"lire les motifs depuis FICHIER, un par ligne ; - signifie l'entrée standard\n"
+
+#: src/repl.c:94
+msgid "ignore case distinctions in patterns and data\n"
+msgstr "ignorer la casse dans les motifs et les données\n"
+
+#: src/repl.c:96
+msgid "do not ignore case (default); cancels a prior -i\n"
+msgstr "ne pas ignorer la casse (par défaut) ; annule un -i précédent\n"
+
+#: src/repl.c:98
+msgid "replace each non-matching line entirely with REPLACEMENT\n"
+msgstr ""
+"remplacer entièrement chaque ligne non correspondante par REMPLACEMENT\n"
+
+#: src/repl.c:100
+msgid "match only whole words\n"
+msgstr "ne faire correspondre que des mots entiers\n"
+
+#: src/repl.c:102
+msgid "match only whole lines\n"
+msgstr "ne faire correspondre que des lignes entières\n"
+
+#: src/repl.c:104
+msgid "File selection:\n"
+msgstr "Sélection de fichiers :\n"
+
+#: src/repl.c:106
+msgid "recurse directories; follow symlinks only if on the command line\n"
+msgstr ""
+"parcourir les répertoires récursivement ; suivre les liens symboliques "
+"seulement s'ils sont sur la ligne de commande\n"
+
+#: src/repl.c:110
+msgid "recurse directories, following all symbolic links\n"
+msgstr ""
+"parcourir les répertoires récursivement en suivant tous les liens "
+"symboliques\n"
+
+#: src/repl.c:112
+msgid "limit directory recursion depth\n"
+msgstr "limiter la profondeur de récursion des répertoires\n"
+
+#: src/repl.c:114
+msgid "skip files whose base name matches GLOB\n"
+msgstr "ignorer les fichiers dont le nom de base correspond à GLOB\n"
+
+#: src/repl.c:116
+msgid "read exclude globs from FILE, one per line\n"
+msgstr "lire les globes d'exclusion depuis FICHIER, un par ligne\n"
+
+#: src/repl.c:118
+msgid "skip directories whose base name matches GLOB\n"
+msgstr "ignorer les répertoires dont le nom de base correspond à GLOB\n"
+
+#: src/repl.c:120
+msgid "only process files whose base name matches GLOB\n"
+msgstr "ne traiter que les fichiers dont le nom de base correspond à GLOB\n"
+
+#: src/repl.c:124
+msgid "how to handle directories: repl (default), skip, or recurse\n"
+msgstr "gestion des répertoires : repl (par défaut), skip ou recurse\n"
+
+#: src/repl.c:126
+msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
+msgstr "gestion des périphériques/FIFO/sockets : repl (par défaut) ou skip\n"
+
+#: src/repl.c:128
+msgid "binary (default: stop before non-printable), without-match, or text\n"
+msgstr ""
+"binary (par défaut : s'arrêter avant les non-imprimables), without-match ou "
+"text\n"
+
+#: src/repl.c:130
+msgid "same as --binary-files=without-match\n"
+msgstr "identique à --binary-files=without-match\n"
+
+#: src/repl.c:132
+msgid "treat files as binary; disable the binary heuristic\n"
+msgstr ""
+"traiter les fichiers comme binaires ; désactiver l'heuristique binaire\n"
+
+#: src/repl.c:134
+msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
+msgstr ""
+"traiter l'entrée comme des lignes terminées par NUL plutôt que par un saut "
+"de ligne\n"
+
+#: src/repl.c:136
+msgid "Reporting:\n"
+msgstr "Rapports :\n"
+
+#: src/repl.c:138
+msgid "suppress the default one-line summary\n"
+msgstr "supprimer le résumé d'une ligne par défaut\n"
+
+#: src/repl.c:140
+msgid "print a context diff (diff -c) for each changed file\n"
+msgstr "afficher un diff contextuel (diff -c) pour chaque fichier modifié\n"
+
+#: src/repl.c:142
+msgid "print a unified diff (diff -u) for each changed file\n"
+msgstr "afficher un diff unifié (diff -u) pour chaque fichier modifié\n"
+
+#: src/repl.c:144
+msgid "print a detailed batch summary (files examined/changed, counts)\n"
+msgstr ""
+"afficher un résumé détaillé du lot (fichiers examinés/modifiés, compteurs)\n"
+
+#: src/repl.c:150
+#, c-format
+msgid ""
+"\n"
+"Report bugs to: <%s>\n"
+msgstr ""
+"\n"
+"Signaler les bogues à : <%s>\n"
+
+#: src/repl.c:275
+#, c-format
+msgid "%s: replace failed: %s\n"
+msgstr "%s : échec du remplacement : %s\n"
+
+#: src/repl.c:316
+#, c-format
+msgid "%s: %zu replacement(s)\n"
+msgstr "%s : %zu remplacement(s)\n"
+
+#: src/repl.c:472
+#, c-format
+msgid "%s: invalid max-depth\n"
+msgstr "%s : max-depth invalide\n"
+
+#: src/repl.c:506
+#, c-format
+msgid "%s: invalid --binary-files value\n"
+msgstr "%s : valeur --binary-files invalide\n"
+
+#: src/repl.c:522
+#, c-format
+msgid "%s: invalid --directories action\n"
+msgstr "%s : action --directories invalide\n"
+
+#: src/repl.c:532
+#, c-format
+msgid "%s: invalid --devices action\n"
+msgstr "%s : action --devices invalide\n"
+
+#: src/repl.c:574
+#, c-format
+msgid "%s: missing PATTERN and REPLACEMENT\n"
+msgstr "%s : MOTIF et REMPLACEMENT manquants\n"
+
+#: src/repl.c:586
+#, c-format
+msgid "%s: missing REPLACEMENT\n"
+msgstr "%s : REMPLACEMENT manquant\n"
+
+#: src/repl.c:600
+msgid "pattern error"
+msgstr "erreur de motif"
+
+#: src/repl.c:658
+#, c-format
+msgid ""
+"files examined: %zu\n"
+"files changed:  %zu\n"
+"replacements:   %zu\n"
+"binary skipped: %zu\n"
+msgstr ""
+"fichiers examinés :  %zu\n"
+"fichiers modifiés :  %zu\n"
+"remplacements :      %zu\n"
+"binaire ignoré :     %zu\n"
+
+#: src/repl.c:665
+#, c-format
+msgid "%zu file(s) changed, %zu replacement(s)\n"
+msgstr "%zu fichier(s) modifié(s), %zu remplacement(s)\n"
+
+#~ msgid "append; -a0 append, -a1 blank then append\n"
+#~ msgstr "ajouter en fin ; -a0 ajouter, -a1 ligne vide puis ajouter\n"

@@ -1,0 +1,346 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the hed package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: hed\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/insert.c:45
+msgid ""
+"Usage: insert [OPTION]... FILE [SRC]...\n"
+"Insert SRC content into FILE at a line position.\n"
+"With -r, remove lines at the insert point (useful for delete/update).\n"
+msgstr ""
+
+#: src/insert.c:50
+msgid "Source modes:\n"
+msgstr ""
+
+#: src/insert.c:52
+msgid "treat each SRC as a string literal\n"
+msgstr ""
+
+#: src/insert.c:54
+msgid "treat each SRC as a filename\n"
+msgstr ""
+
+#: src/insert.c:56
+msgid "@FILE or string (default)\n"
+msgstr ""
+
+#: src/insert.c:58
+msgid "Position:\n"
+msgstr ""
+
+#: src/insert.c:60
+msgid "insert before 1-based line NUM (pads empty lines if needed)\n"
+msgstr ""
+
+#: src/insert.c:62
+msgid "digit cluster: -1 prepend, -0 prepend+blank, -N before line N\n"
+msgstr ""
+
+#: src/insert.c:64
+msgid "append; -a0 like >> (end), -a1 insert before last line\n"
+msgstr ""
+
+#: src/insert.c:66
+msgid "prepend to the start\n"
+msgstr ""
+
+#: src/insert.c:68
+msgid "remove NUM lines at the insert point before inserting\n"
+msgstr ""
+
+#: src/insert.c:70
+msgid ""
+"trailing blank lines after each SRC (default: 1 for strings, 0 for files)\n"
+msgstr ""
+
+#: src/insert.c:72
+msgid "use TEXT when a source file is missing\n"
+msgstr ""
+
+#: src/insert.c:75
+msgid "repeat for more verbose loggings\n"
+msgstr ""
+
+#: src/insert.c:77
+msgid "show less logging messages\n"
+msgstr ""
+
+#: src/insert.c:79 src/repl.c:147
+msgid "display this help and exit\n"
+msgstr ""
+
+#: src/insert.c:81 src/repl.c:149
+msgid "output version information and exit\n"
+msgstr ""
+
+#: src/insert.c:83
+#, c-format
+msgid "Report bugs to: <%s>\n"
+msgstr ""
+
+#: src/insert.c:292
+#, c-format
+msgid "%s: invalid remove count: %s\n"
+msgstr ""
+
+#: src/insert.c:302
+#, c-format
+msgid "%s: invalid line number: %s\n"
+msgstr ""
+
+#: src/insert.c:314
+#, c-format
+msgid "%s: invalid blank count: %s\n"
+msgstr ""
+
+#: src/insert.c:338 src/repl.c:559
+#, c-format
+msgid "Copyright (C) %d %s\n"
+msgstr ""
+
+#: src/insert.c:339 src/repl.c:560
+msgid ""
+"License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+msgstr ""
+
+#: src/insert.c:341
+msgid "This is free software: you are free to change and redistribute it.\n"
+msgstr ""
+
+#: src/insert.c:343
+msgid "This project opposes AI exploitation and AI hegemony.\n"
+msgstr ""
+
+#: src/insert.c:344
+msgid ""
+"This project rejects mindless MIT-style licensing and politically naive BSD-"
+"style licensing.\n"
+msgstr ""
+
+#: src/insert.c:347
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: src/insert.c:372
+#, c-format
+msgid "%s: missing FILE\n"
+msgstr ""
+
+#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#, c-format
+msgid "%s: out of memory\n"
+msgstr ""
+
+#: src/repl.c:73
+msgid ""
+"Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
+"       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+"Batch replace PATTERN with REPLACEMENT in files.\n"
+"A file is rewritten only when its contents would change.\n"
+"With no FILE, read standard input and write to standard output.\n"
+msgstr ""
+
+#: src/repl.c:80
+msgid "Pattern selection (default: fixed strings):\n"
+msgstr ""
+
+#: src/repl.c:82
+msgid "interpret patterns as fixed strings (default)\n"
+msgstr ""
+
+#: src/repl.c:84
+msgid "interpret patterns as POSIX extended regular expressions\n"
+msgstr ""
+
+#: src/repl.c:86
+msgid "interpret patterns as POSIX basic regular expressions\n"
+msgstr ""
+
+#: src/repl.c:88
+msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
+msgstr ""
+
+#: src/repl.c:90
+msgid "use PATTERNS; may be repeated; combine with -f\n"
+msgstr ""
+
+#: src/repl.c:92
+msgid "read patterns from FILE, one per line; - means standard input\n"
+msgstr ""
+
+#: src/repl.c:94
+msgid "ignore case distinctions in patterns and data\n"
+msgstr ""
+
+#: src/repl.c:96
+msgid "do not ignore case (default); cancels a prior -i\n"
+msgstr ""
+
+#: src/repl.c:98
+msgid "replace each non-matching line entirely with REPLACEMENT\n"
+msgstr ""
+
+#: src/repl.c:100
+msgid "match only whole words\n"
+msgstr ""
+
+#: src/repl.c:102
+msgid "match only whole lines\n"
+msgstr ""
+
+#: src/repl.c:104
+msgid "File selection:\n"
+msgstr ""
+
+#: src/repl.c:106
+msgid "recurse directories; follow symlinks only if on the command line\n"
+msgstr ""
+
+#: src/repl.c:110
+msgid "recurse directories, following all symbolic links\n"
+msgstr ""
+
+#: src/repl.c:112
+msgid "limit directory recursion depth\n"
+msgstr ""
+
+#: src/repl.c:114
+msgid "skip files whose base name matches GLOB\n"
+msgstr ""
+
+#: src/repl.c:116
+msgid "read exclude globs from FILE, one per line\n"
+msgstr ""
+
+#: src/repl.c:118
+msgid "skip directories whose base name matches GLOB\n"
+msgstr ""
+
+#: src/repl.c:120
+msgid "only process files whose base name matches GLOB\n"
+msgstr ""
+
+#: src/repl.c:124
+msgid "how to handle directories: repl (default), skip, or recurse\n"
+msgstr ""
+
+#: src/repl.c:126
+msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
+msgstr ""
+
+#: src/repl.c:128
+msgid "binary (default: stop before non-printable), without-match, or text\n"
+msgstr ""
+
+#: src/repl.c:130
+msgid "same as --binary-files=without-match\n"
+msgstr ""
+
+#: src/repl.c:132
+msgid "treat files as binary; disable the binary heuristic\n"
+msgstr ""
+
+#: src/repl.c:134
+msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
+msgstr ""
+
+#: src/repl.c:136
+msgid "Reporting:\n"
+msgstr ""
+
+#: src/repl.c:138
+msgid "suppress the default one-line summary\n"
+msgstr ""
+
+#: src/repl.c:140
+msgid "print a context diff (diff -c) for each changed file\n"
+msgstr ""
+
+#: src/repl.c:142
+msgid "print a unified diff (diff -u) for each changed file\n"
+msgstr ""
+
+#: src/repl.c:144
+msgid "print a detailed batch summary (files examined/changed, counts)\n"
+msgstr ""
+
+#: src/repl.c:150
+#, c-format
+msgid ""
+"\n"
+"Report bugs to: <%s>\n"
+msgstr ""
+
+#: src/repl.c:275
+#, c-format
+msgid "%s: replace failed: %s\n"
+msgstr ""
+
+#: src/repl.c:316
+#, c-format
+msgid "%s: %zu replacement(s)\n"
+msgstr ""
+
+#: src/repl.c:472
+#, c-format
+msgid "%s: invalid max-depth\n"
+msgstr ""
+
+#: src/repl.c:506
+#, c-format
+msgid "%s: invalid --binary-files value\n"
+msgstr ""
+
+#: src/repl.c:522
+#, c-format
+msgid "%s: invalid --directories action\n"
+msgstr ""
+
+#: src/repl.c:532
+#, c-format
+msgid "%s: invalid --devices action\n"
+msgstr ""
+
+#: src/repl.c:574
+#, c-format
+msgid "%s: missing PATTERN and REPLACEMENT\n"
+msgstr ""
+
+#: src/repl.c:586
+#, c-format
+msgid "%s: missing REPLACEMENT\n"
+msgstr ""
+
+#: src/repl.c:600
+msgid "pattern error"
+msgstr ""
+
+#: src/repl.c:658
+#, c-format
+msgid ""
+"files examined: %zu\n"
+"files changed:  %zu\n"
+"replacements:   %zu\n"
+"binary skipped: %zu\n"
+msgstr ""
+
+#: src/repl.c:665
+#, c-format
+msgid "%zu file(s) changed, %zu replacement(s)\n"
+msgstr ""

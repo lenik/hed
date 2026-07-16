@@ -1,0 +1,363 @@
+# hed translation for Chinese (Traditional).
+# Copyright (C) 2026 Lenik <hed@bodz.net>
+# This file is distributed under the same license as the hed package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hed 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"PO-Revision-Date: 2026-07-16 14:00+0800\n"
+"Last-Translator: Lenik <hed@bodz.net>\n"
+"Language-Team: Chinese (Traditional)\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/insert.c:45
+msgid ""
+"Usage: insert [OPTION]... FILE [SRC]...\n"
+"Insert SRC content into FILE at a line position.\n"
+"With -r, remove lines at the insert point (useful for delete/update).\n"
+msgstr ""
+"用法：insert [選項]... 檔案 [來源]...\n"
+"在檔案的指定列位置插入來源內容。\n"
+"使用 -r 時，在插入點刪除行（適用於刪除/更新）。\n"
+
+#: src/insert.c:50
+msgid "Source modes:\n"
+msgstr "來源模式：\n"
+
+#: src/insert.c:52
+msgid "treat each SRC as a string literal\n"
+msgstr "將每個來源視為字串常值\n"
+
+#: src/insert.c:54
+msgid "treat each SRC as a filename\n"
+msgstr "將每個來源視為檔名\n"
+
+#: src/insert.c:56
+msgid "@FILE or string (default)\n"
+msgstr "@檔案或字串（預設）\n"
+
+#: src/insert.c:58
+msgid "Position:\n"
+msgstr "位置：\n"
+
+#: src/insert.c:60
+msgid "insert before 1-based line NUM (pads empty lines if needed)\n"
+msgstr "在從 1 開始計數的第 NUM 列之前插入（必要時以空列填補）\n"
+
+#: src/insert.c:62
+msgid "digit cluster: -1 prepend, -0 prepend+blank, -N before line N\n"
+msgstr "數字叢集：-1 前置，-0 前置並加空列，-N 在第 N 列之前\n"
+
+#: src/insert.c:64
+msgid "append; -a0 like >> (end), -a1 insert before last line\n"
+msgstr "附加；-a0 如同 >>（末尾），-a1 在最後一行之前插入\n"
+
+#: src/insert.c:66
+msgid "prepend to the start\n"
+msgstr "插入到開頭\n"
+
+#: src/insert.c:68
+msgid "remove NUM lines at the insert point before inserting\n"
+msgstr "在插入前於插入點刪除 NUM 行\n"
+
+#: src/insert.c:70
+msgid ""
+"trailing blank lines after each SRC (default: 1 for strings, 0 for files)\n"
+msgstr "每個來源之後的尾隨空列（預設：字串為 1，檔案為 0）\n"
+
+#: src/insert.c:72
+msgid "use TEXT when a source file is missing\n"
+msgstr "來源檔案缺失時使用 TEXT\n"
+
+#: src/insert.c:75
+msgid "repeat for more verbose loggings\n"
+msgstr "重複以獲得更詳細的記錄\n"
+
+#: src/insert.c:77
+msgid "show less logging messages\n"
+msgstr "減少記錄訊息\n"
+
+#: src/insert.c:79 src/repl.c:147
+msgid "display this help and exit\n"
+msgstr "顯示此說明並結束\n"
+
+#: src/insert.c:81 src/repl.c:149
+msgid "output version information and exit\n"
+msgstr "輸出版本資訊並結束\n"
+
+#: src/insert.c:83
+#, c-format
+msgid "Report bugs to: <%s>\n"
+msgstr "錯誤回報至：<%s>\n"
+
+#: src/insert.c:292
+#, c-format
+msgid "%s: invalid remove count: %s\n"
+msgstr "%s：無效的刪除列數：%s\n"
+
+#: src/insert.c:302
+#, c-format
+msgid "%s: invalid line number: %s\n"
+msgstr "%s：無效的列號：%s\n"
+
+#: src/insert.c:314
+#, c-format
+msgid "%s: invalid blank count: %s\n"
+msgstr "%s：無效的空列數：%s\n"
+
+#: src/insert.c:338 src/repl.c:559
+#, c-format
+msgid "Copyright (C) %d %s\n"
+msgstr "版權所有 (C) %d %s\n"
+
+#: src/insert.c:339 src/repl.c:560
+msgid ""
+"License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+msgstr ""
+"授權條款 AGPL-3.0-or-later：<https://www.gnu.org/licenses/agpl-3.0.html>\n"
+
+#: src/insert.c:341
+msgid "This is free software: you are free to change and redistribute it.\n"
+msgstr "這是自由軟體：您可以自由修改與再散佈。\n"
+
+#: src/insert.c:343
+msgid "This project opposes AI exploitation and AI hegemony.\n"
+msgstr "本專案反對 AI 剝削與 AI 霸權。\n"
+
+#: src/insert.c:344
+msgid ""
+"This project rejects mindless MIT-style licensing and politically naive BSD-"
+"style licensing.\n"
+msgstr "本專案拒絕無腦的 MIT 式授權以及政治上幼稚的 BSD 式授權。\n"
+
+#: src/insert.c:347
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr "在法律允許的範圍內，不提供任何擔保。\n"
+
+#: src/insert.c:372
+#, c-format
+msgid "%s: missing FILE\n"
+msgstr "%s：缺少檔案\n"
+
+#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#, c-format
+msgid "%s: out of memory\n"
+msgstr "%s：記憶體不足\n"
+
+#: src/repl.c:73
+msgid ""
+"Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
+"       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+"Batch replace PATTERN with REPLACEMENT in files.\n"
+"A file is rewritten only when its contents would change.\n"
+"With no FILE, read standard input and write to standard output.\n"
+msgstr ""
+"用法：repl [選項]... 模式 取代內容 [檔案]...\n"
+"       repl [選項]... -e 模式 ... 取代內容 [檔案]...\n"
+"在檔案中批次將模式取代為取代內容。\n"
+"僅當檔案內容會變更時才重寫檔案。\n"
+"若未指定檔案，則讀取標準輸入並寫入標準輸出。\n"
+
+#: src/repl.c:80
+msgid "Pattern selection (default: fixed strings):\n"
+msgstr "模式選取（預設：固定字串）：\n"
+
+#: src/repl.c:82
+msgid "interpret patterns as fixed strings (default)\n"
+msgstr "將模式解譯為固定字串（預設）\n"
+
+#: src/repl.c:84
+msgid "interpret patterns as POSIX extended regular expressions\n"
+msgstr "將模式解譯為 POSIX 延伸正規表示式\n"
+
+#: src/repl.c:86
+msgid "interpret patterns as POSIX basic regular expressions\n"
+msgstr "將模式解譯為 POSIX 基本正規表示式\n"
+
+#: src/repl.c:88
+msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
+msgstr "將模式解譯為 Perl 相容正規表示式（PCRE2）\n"
+
+#: src/repl.c:90
+msgid "use PATTERNS; may be repeated; combine with -f\n"
+msgstr "使用 PATTERNS；可重複；可與 -f 組合\n"
+
+#: src/repl.c:92
+msgid "read patterns from FILE, one per line; - means standard input\n"
+msgstr "從 FILE 讀取模式，每行一個；- 表示標準輸入\n"
+
+#: src/repl.c:94
+msgid "ignore case distinctions in patterns and data\n"
+msgstr "忽略模式與資料中的大小寫區別\n"
+
+#: src/repl.c:96
+msgid "do not ignore case (default); cancels a prior -i\n"
+msgstr "不忽略大小寫（預設）；取消先前的 -i\n"
+
+#: src/repl.c:98
+msgid "replace each non-matching line entirely with REPLACEMENT\n"
+msgstr "將每個不相符的列整列取代為 REPLACEMENT\n"
+
+#: src/repl.c:100
+msgid "match only whole words\n"
+msgstr "僅符合整個單字\n"
+
+#: src/repl.c:102
+msgid "match only whole lines\n"
+msgstr "僅符合整列\n"
+
+#: src/repl.c:104
+msgid "File selection:\n"
+msgstr "檔案選擇：\n"
+
+#: src/repl.c:106
+msgid "recurse directories; follow symlinks only if on the command line\n"
+msgstr "遞迴目錄；僅當符號連結出現在命令列時才跟隨\n"
+
+#: src/repl.c:110
+msgid "recurse directories, following all symbolic links\n"
+msgstr "遞迴目錄，並跟隨所有符號連結\n"
+
+#: src/repl.c:112
+msgid "limit directory recursion depth\n"
+msgstr "限制目錄遞迴深度\n"
+
+#: src/repl.c:114
+msgid "skip files whose base name matches GLOB\n"
+msgstr "略過基底名稱符合 GLOB 的檔案\n"
+
+#: src/repl.c:116
+msgid "read exclude globs from FILE, one per line\n"
+msgstr "從 FILE 讀取排除萬用字元，每行一個\n"
+
+#: src/repl.c:118
+msgid "skip directories whose base name matches GLOB\n"
+msgstr "略過基底名稱符合 GLOB 的目錄\n"
+
+#: src/repl.c:120
+msgid "only process files whose base name matches GLOB\n"
+msgstr "僅處理基底名稱符合 GLOB 的檔案\n"
+
+#: src/repl.c:124
+msgid "how to handle directories: repl (default), skip, or recurse\n"
+msgstr "如何處理目錄：repl（預設）、skip 或 recurse\n"
+
+#: src/repl.c:126
+msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
+msgstr "如何處理裝置/FIFO/通訊端：repl（預設）或 skip\n"
+
+#: src/repl.c:128
+msgid "binary (default: stop before non-printable), without-match, or text\n"
+msgstr "binary（預設：在不可列印字元前停止）、without-match 或 text\n"
+
+#: src/repl.c:130
+msgid "same as --binary-files=without-match\n"
+msgstr "等同於 --binary-files=without-match\n"
+
+#: src/repl.c:132
+msgid "treat files as binary; disable the binary heuristic\n"
+msgstr "將檔案視為二進位；停用二進位啟發式偵測\n"
+
+#: src/repl.c:134
+msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
+msgstr "將輸入視為以 NUL 結尾的列，而非換行結尾\n"
+
+#: src/repl.c:136
+msgid "Reporting:\n"
+msgstr "報告：\n"
+
+#: src/repl.c:138
+msgid "suppress the default one-line summary\n"
+msgstr "抑制預設的一行摘要\n"
+
+#: src/repl.c:140
+msgid "print a context diff (diff -c) for each changed file\n"
+msgstr "為每個已變更的檔案列印上下文 diff（diff -c）\n"
+
+#: src/repl.c:142
+msgid "print a unified diff (diff -u) for each changed file\n"
+msgstr "為每個已變更的檔案列印統一 diff（diff -u）\n"
+
+#: src/repl.c:144
+msgid "print a detailed batch summary (files examined/changed, counts)\n"
+msgstr "列印詳細的批次摘要（已檢查/已變更的檔案、計數）\n"
+
+#: src/repl.c:150
+#, c-format
+msgid ""
+"\n"
+"Report bugs to: <%s>\n"
+msgstr ""
+"\n"
+"錯誤回報至：<%s>\n"
+
+#: src/repl.c:275
+#, c-format
+msgid "%s: replace failed: %s\n"
+msgstr "%s：取代失敗：%s\n"
+
+#: src/repl.c:316
+#, c-format
+msgid "%s: %zu replacement(s)\n"
+msgstr "%s：%zu 處取代\n"
+
+#: src/repl.c:472
+#, c-format
+msgid "%s: invalid max-depth\n"
+msgstr "%s：無效的 max-depth\n"
+
+#: src/repl.c:506
+#, c-format
+msgid "%s: invalid --binary-files value\n"
+msgstr "%s：無效的 --binary-files 值\n"
+
+#: src/repl.c:522
+#, c-format
+msgid "%s: invalid --directories action\n"
+msgstr "%s：無效的 --directories 動作\n"
+
+#: src/repl.c:532
+#, c-format
+msgid "%s: invalid --devices action\n"
+msgstr "%s：無效的 --devices 動作\n"
+
+#: src/repl.c:574
+#, c-format
+msgid "%s: missing PATTERN and REPLACEMENT\n"
+msgstr "%s：缺少模式與取代內容\n"
+
+#: src/repl.c:586
+#, c-format
+msgid "%s: missing REPLACEMENT\n"
+msgstr "%s：缺少取代內容\n"
+
+#: src/repl.c:600
+msgid "pattern error"
+msgstr "模式錯誤"
+
+#: src/repl.c:658
+#, c-format
+msgid ""
+"files examined: %zu\n"
+"files changed:  %zu\n"
+"replacements:   %zu\n"
+"binary skipped: %zu\n"
+msgstr ""
+"檢查的檔案：     %zu\n"
+"變更的檔案：     %zu\n"
+"取代次數：       %zu\n"
+"跳過的二進位：   %zu\n"
+
+#: src/repl.c:665
+#, c-format
+msgid "%zu file(s) changed, %zu replacement(s)\n"
+msgstr "變更了 %zu 個檔案，%zu 處取代\n"
+
+#~ msgid "append; -a0 append, -a1 blank then append\n"
+#~ msgstr "附加；-a0 附加，-a1 先空列再附加\n"

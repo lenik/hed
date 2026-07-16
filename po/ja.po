@@ -1,0 +1,369 @@
+# hed translation for Japanese.
+# Copyright (C) 2026 Lenik <hed@bodz.net>
+# This file is distributed under the same license as the hed package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hed 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"PO-Revision-Date: 2026-07-16 14:00+0800\n"
+"Last-Translator: Lenik <hed@bodz.net>\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/insert.c:45
+msgid ""
+"Usage: insert [OPTION]... FILE [SRC]...\n"
+"Insert SRC content into FILE at a line position.\n"
+"With -r, remove lines at the insert point (useful for delete/update).\n"
+msgstr ""
+"使い方: insert [オプション]... ファイル [ソース]...\n"
+"ソースの内容をファイルの行位置に挿入します。\n"
+"-r を指定すると、挿入位置の行を削除します（削除/更新に便利）。\n"
+
+#: src/insert.c:50
+msgid "Source modes:\n"
+msgstr "ソースモード:\n"
+
+#: src/insert.c:52
+msgid "treat each SRC as a string literal\n"
+msgstr "各ソースを文字列リテラルとして扱う\n"
+
+#: src/insert.c:54
+msgid "treat each SRC as a filename\n"
+msgstr "各ソースをファイル名として扱う\n"
+
+#: src/insert.c:56
+msgid "@FILE or string (default)\n"
+msgstr "@ファイルまたは文字列（デフォルト）\n"
+
+#: src/insert.c:58
+msgid "Position:\n"
+msgstr "位置:\n"
+
+#: src/insert.c:60
+msgid "insert before 1-based line NUM (pads empty lines if needed)\n"
+msgstr "1始まりの行番号 NUM の前に挿入（必要なら空行で埋める）\n"
+
+#: src/insert.c:62
+msgid "digit cluster: -1 prepend, -0 prepend+blank, -N before line N\n"
+msgstr "数字クラスタ: -1 先頭に挿入、-0 先頭に挿入+空行、-N 行 N の前\n"
+
+#: src/insert.c:64
+msgid "append; -a0 like >> (end), -a1 insert before last line\n"
+msgstr "末尾に追加; -a0 は >> と同様（末尾）、-a1 は最終行の前に挿入\n"
+
+#: src/insert.c:66
+msgid "prepend to the start\n"
+msgstr "先頭に前置する\n"
+
+#: src/insert.c:68
+msgid "remove NUM lines at the insert point before inserting\n"
+msgstr "挿入前に挿入位置で NUM 行を削除\n"
+
+#: src/insert.c:70
+msgid ""
+"trailing blank lines after each SRC (default: 1 for strings, 0 for files)\n"
+msgstr "各ソースの後の末尾空行（デフォルト: 文字列は1、ファイルは0）\n"
+
+#: src/insert.c:72
+msgid "use TEXT when a source file is missing\n"
+msgstr "ソースファイルがない場合に TEXT を使う\n"
+
+#: src/insert.c:75
+msgid "repeat for more verbose loggings\n"
+msgstr "繰り返すとより詳しいログを出力\n"
+
+#: src/insert.c:77
+msgid "show less logging messages\n"
+msgstr "ログメッセージを減らす\n"
+
+#: src/insert.c:79 src/repl.c:147
+msgid "display this help and exit\n"
+msgstr "このヘルプを表示して終了\n"
+
+#: src/insert.c:81 src/repl.c:149
+msgid "output version information and exit\n"
+msgstr "バージョン情報を出力して終了\n"
+
+#: src/insert.c:83
+#, c-format
+msgid "Report bugs to: <%s>\n"
+msgstr "バグの報告先: <%s>\n"
+
+#: src/insert.c:292
+#, c-format
+msgid "%s: invalid remove count: %s\n"
+msgstr "%s: 無効な削除行数: %s\n"
+
+#: src/insert.c:302
+#, c-format
+msgid "%s: invalid line number: %s\n"
+msgstr "%s: 無効な行番号: %s\n"
+
+#: src/insert.c:314
+#, c-format
+msgid "%s: invalid blank count: %s\n"
+msgstr "%s: 無効な空行数: %s\n"
+
+#: src/insert.c:338 src/repl.c:559
+#, c-format
+msgid "Copyright (C) %d %s\n"
+msgstr "Copyright (C) %d %s\n"
+
+#: src/insert.c:339 src/repl.c:560
+msgid ""
+"License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+msgstr ""
+"ライセンス AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+
+#: src/insert.c:341
+msgid "This is free software: you are free to change and redistribute it.\n"
+msgstr "これはフリーソフトウェアです。改変および再配布は自由です。\n"
+
+#: src/insert.c:343
+msgid "This project opposes AI exploitation and AI hegemony.\n"
+msgstr "本プロジェクトは AI による搾取と AI 覇権に反対します。\n"
+
+#: src/insert.c:344
+msgid ""
+"This project rejects mindless MIT-style licensing and politically naive BSD-"
+"style licensing.\n"
+msgstr ""
+"本プロジェクトは無思慮な MIT 式ライセンスおよび政治的にナイーブな BSD 式ライ"
+"センスを拒否します。\n"
+
+#: src/insert.c:347
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr "法律で認められる範囲で、一切の保証はありません。\n"
+
+#: src/insert.c:372
+#, c-format
+msgid "%s: missing FILE\n"
+msgstr "%s: ファイルがありません\n"
+
+#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#, c-format
+msgid "%s: out of memory\n"
+msgstr "%s: メモリ不足\n"
+
+#: src/repl.c:73
+msgid ""
+"Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
+"       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+"Batch replace PATTERN with REPLACEMENT in files.\n"
+"A file is rewritten only when its contents would change.\n"
+"With no FILE, read standard input and write to standard output.\n"
+msgstr ""
+"使い方: repl [オプション]... パターン 置換文字列 [ファイル]...\n"
+"       repl [オプション]... -e パターン ... 置換文字列 [ファイル]...\n"
+"ファイル内のパターンを置換文字列で一括置換します。\n"
+"内容が変わる場合にのみファイルを書き換えます。\n"
+"ファイルがない場合は標準入力を読み、標準出力に書き込みます。\n"
+
+#: src/repl.c:80
+msgid "Pattern selection (default: fixed strings):\n"
+msgstr "パターン選択（デフォルト: 固定文字列）:\n"
+
+#: src/repl.c:82
+msgid "interpret patterns as fixed strings (default)\n"
+msgstr "パターンを固定文字列として解釈する（デフォルト）\n"
+
+#: src/repl.c:84
+msgid "interpret patterns as POSIX extended regular expressions\n"
+msgstr "パターンを POSIX 拡張正規表現として解釈する\n"
+
+#: src/repl.c:86
+msgid "interpret patterns as POSIX basic regular expressions\n"
+msgstr "パターンを POSIX 基本正規表現として解釈する\n"
+
+#: src/repl.c:88
+msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
+msgstr "パターンを Perl 互換正規表現（PCRE2）として解釈する\n"
+
+#: src/repl.c:90
+msgid "use PATTERNS; may be repeated; combine with -f\n"
+msgstr "PATTERNS を使用する；複数回指定可；-f と併用可\n"
+
+#: src/repl.c:92
+msgid "read patterns from FILE, one per line; - means standard input\n"
+msgstr "FILE からパターンを 1 行ずつ読み込む；- は標準入力を意味する\n"
+
+#: src/repl.c:94
+msgid "ignore case distinctions in patterns and data\n"
+msgstr "パターンとデータで大文字小文字を区別しない\n"
+
+#: src/repl.c:96
+msgid "do not ignore case (default); cancels a prior -i\n"
+msgstr "大文字小文字を区別する（デフォルト）；以前の -i を取り消す\n"
+
+#: src/repl.c:98
+msgid "replace each non-matching line entirely with REPLACEMENT\n"
+msgstr "一致しない各行全体を REPLACEMENT で置き換える\n"
+
+#: src/repl.c:100
+msgid "match only whole words\n"
+msgstr "単語全体にのみ一致する\n"
+
+#: src/repl.c:102
+msgid "match only whole lines\n"
+msgstr "行全体にのみ一致する\n"
+
+#: src/repl.c:104
+msgid "File selection:\n"
+msgstr "ファイル選択:\n"
+
+#: src/repl.c:106
+msgid "recurse directories; follow symlinks only if on the command line\n"
+msgstr ""
+"ディレクトリを再帰処理する；コマンド行にある場合のみシンボリックリンクを辿"
+"る\n"
+
+#: src/repl.c:110
+msgid "recurse directories, following all symbolic links\n"
+msgstr "すべてのシンボリックリンクを辿ってディレクトリを再帰処理する\n"
+
+#: src/repl.c:112
+msgid "limit directory recursion depth\n"
+msgstr "ディレクトリ再帰の深さを制限する\n"
+
+#: src/repl.c:114
+msgid "skip files whose base name matches GLOB\n"
+msgstr "ベース名が GLOB に一致するファイルをスキップする\n"
+
+#: src/repl.c:116
+msgid "read exclude globs from FILE, one per line\n"
+msgstr "除外 GLOB を FILE から 1 行ずつ読み込む\n"
+
+#: src/repl.c:118
+msgid "skip directories whose base name matches GLOB\n"
+msgstr "ベース名が GLOB に一致するディレクトリをスキップする\n"
+
+#: src/repl.c:120
+msgid "only process files whose base name matches GLOB\n"
+msgstr "ベース名が GLOB に一致するファイルのみ処理する\n"
+
+#: src/repl.c:124
+msgid "how to handle directories: repl (default), skip, or recurse\n"
+msgstr "ディレクトリの扱い: repl（デフォルト）、skip、または recurse\n"
+
+#: src/repl.c:126
+msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
+msgstr "デバイス/FIFO/ソケットの扱い: repl（デフォルト）または skip\n"
+
+#: src/repl.c:128
+msgid "binary (default: stop before non-printable), without-match, or text\n"
+msgstr ""
+"binary（デフォルト: 非印字文字の手前で停止）、without-match、または text\n"
+
+#: src/repl.c:130
+msgid "same as --binary-files=without-match\n"
+msgstr "--binary-files=without-match と同じ\n"
+
+#: src/repl.c:132
+msgid "treat files as binary; disable the binary heuristic\n"
+msgstr ""
+"ファイルをバイナリとして扱い、バイナリ判定ヒューリスティクスを無効にする\n"
+
+#: src/repl.c:134
+msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
+msgstr "入力を改行終端ではなく NUL 終端の行として扱う\n"
+
+#: src/repl.c:136
+msgid "Reporting:\n"
+msgstr "報告:\n"
+
+#: src/repl.c:138
+msgid "suppress the default one-line summary\n"
+msgstr "デフォルトの1行要約を抑制する\n"
+
+#: src/repl.c:140
+msgid "print a context diff (diff -c) for each changed file\n"
+msgstr "変更された各ファイルについてコンテキスト差分（diff -c）を表示する\n"
+
+#: src/repl.c:142
+msgid "print a unified diff (diff -u) for each changed file\n"
+msgstr "変更された各ファイルについてユニファイド差分（diff -u）を表示する\n"
+
+#: src/repl.c:144
+msgid "print a detailed batch summary (files examined/changed, counts)\n"
+msgstr "詳細な一括要約を表示する（検査/変更したファイル、件数）\n"
+
+#: src/repl.c:150
+#, c-format
+msgid ""
+"\n"
+"Report bugs to: <%s>\n"
+msgstr ""
+"\n"
+"バグの報告先: <%s>\n"
+
+#: src/repl.c:275
+#, c-format
+msgid "%s: replace failed: %s\n"
+msgstr "%s: 置換に失敗しました: %s\n"
+
+#: src/repl.c:316
+#, c-format
+msgid "%s: %zu replacement(s)\n"
+msgstr "%s: %zu 件の置換\n"
+
+#: src/repl.c:472
+#, c-format
+msgid "%s: invalid max-depth\n"
+msgstr "%s: 無効な max-depth\n"
+
+#: src/repl.c:506
+#, c-format
+msgid "%s: invalid --binary-files value\n"
+msgstr "%s: 無効な --binary-files の値\n"
+
+#: src/repl.c:522
+#, c-format
+msgid "%s: invalid --directories action\n"
+msgstr "%s: 無効な --directories の動作\n"
+
+#: src/repl.c:532
+#, c-format
+msgid "%s: invalid --devices action\n"
+msgstr "%s: 無効な --devices の動作\n"
+
+#: src/repl.c:574
+#, c-format
+msgid "%s: missing PATTERN and REPLACEMENT\n"
+msgstr "%s: パターンと置換文字列がありません\n"
+
+#: src/repl.c:586
+#, c-format
+msgid "%s: missing REPLACEMENT\n"
+msgstr "%s: 置換文字列がありません\n"
+
+#: src/repl.c:600
+msgid "pattern error"
+msgstr "パターンエラー"
+
+#: src/repl.c:658
+#, c-format
+msgid ""
+"files examined: %zu\n"
+"files changed:  %zu\n"
+"replacements:   %zu\n"
+"binary skipped: %zu\n"
+msgstr ""
+"検査したファイル:     %zu\n"
+"変更したファイル:     %zu\n"
+"置換回数:             %zu\n"
+"バイナリをスキップ:   %zu\n"
+
+#: src/repl.c:665
+#, c-format
+msgid "%zu file(s) changed, %zu replacement(s)\n"
+msgstr "%zu 個のファイルを変更、%zu 件の置換\n"
+
+#~ msgid "append; -a0 append, -a1 blank then append\n"
+#~ msgstr "末尾に追加; -a0 追加、-a1 空行の後に追加\n"

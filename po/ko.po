@@ -1,0 +1,366 @@
+# hed translation for Korean.
+# Copyright (C) 2026 Lenik <hed@bodz.net>
+# This file is distributed under the same license as the hed package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hed 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 13:59+0800\n"
+"PO-Revision-Date: 2026-07-16 14:00+0800\n"
+"Last-Translator: Lenik <hed@bodz.net>\n"
+"Language-Team: Korean\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/insert.c:45
+msgid ""
+"Usage: insert [OPTION]... FILE [SRC]...\n"
+"Insert SRC content into FILE at a line position.\n"
+"With -r, remove lines at the insert point (useful for delete/update).\n"
+msgstr ""
+"사용법: insert [옵션]... 파일 [소스]...\n"
+"소스 내용을 파일의 줄 위치에 삽입합니다.\n"
+"-r를 사용하면 삽입 지점의 줄을 제거합니다(삭제/업데이트에 유용).\n"
+
+#: src/insert.c:50
+msgid "Source modes:\n"
+msgstr "소스 모드:\n"
+
+#: src/insert.c:52
+msgid "treat each SRC as a string literal\n"
+msgstr "각 소스를 문자열 리터럴로 취급\n"
+
+#: src/insert.c:54
+msgid "treat each SRC as a filename\n"
+msgstr "각 소스를 파일 이름으로 취급\n"
+
+#: src/insert.c:56
+msgid "@FILE or string (default)\n"
+msgstr "@파일 또는 문자열(기본값)\n"
+
+#: src/insert.c:58
+msgid "Position:\n"
+msgstr "위치:\n"
+
+#: src/insert.c:60
+msgid "insert before 1-based line NUM (pads empty lines if needed)\n"
+msgstr "1부터 시작하는 줄 번호 NUM 앞에 삽입(필요 시 빈 줄로 채움)\n"
+
+#: src/insert.c:62
+msgid "digit cluster: -1 prepend, -0 prepend+blank, -N before line N\n"
+msgstr "숫자 묶음: -1 앞에 삽입, -0 앞에 삽입+빈 줄, -N N번째 줄 앞\n"
+
+#: src/insert.c:64
+msgid "append; -a0 like >> (end), -a1 insert before last line\n"
+msgstr "끝에 추가; -a0은 >>와 같음(끝), -a1은 마지막 줄 앞에 삽입\n"
+
+#: src/insert.c:66
+msgid "prepend to the start\n"
+msgstr "맨 앞에 삽입\n"
+
+#: src/insert.c:68
+msgid "remove NUM lines at the insert point before inserting\n"
+msgstr "삽입 전에 삽입 지점에서 NUM줄 제거\n"
+
+#: src/insert.c:70
+msgid ""
+"trailing blank lines after each SRC (default: 1 for strings, 0 for files)\n"
+msgstr "각 소스 뒤의 끝 빈 줄(기본값: 문자열 1, 파일 0)\n"
+
+#: src/insert.c:72
+msgid "use TEXT when a source file is missing\n"
+msgstr "소스 파일이 없을 때 TEXT 사용\n"
+
+#: src/insert.c:75
+msgid "repeat for more verbose loggings\n"
+msgstr "반복하면 더 자세한 로그 출력\n"
+
+#: src/insert.c:77
+msgid "show less logging messages\n"
+msgstr "로그 메시지를 줄여서 표시\n"
+
+#: src/insert.c:79 src/repl.c:147
+msgid "display this help and exit\n"
+msgstr "이 도움말을 표시하고 종료\n"
+
+#: src/insert.c:81 src/repl.c:149
+msgid "output version information and exit\n"
+msgstr "버전 정보를 출력하고 종료\n"
+
+#: src/insert.c:83
+#, c-format
+msgid "Report bugs to: <%s>\n"
+msgstr "버그 보고: <%s>\n"
+
+#: src/insert.c:292
+#, c-format
+msgid "%s: invalid remove count: %s\n"
+msgstr "%s: 잘못된 제거 줄 수: %s\n"
+
+#: src/insert.c:302
+#, c-format
+msgid "%s: invalid line number: %s\n"
+msgstr "%s: 잘못된 줄 번호: %s\n"
+
+#: src/insert.c:314
+#, c-format
+msgid "%s: invalid blank count: %s\n"
+msgstr "%s: 잘못된 빈 줄 수: %s\n"
+
+#: src/insert.c:338 src/repl.c:559
+#, c-format
+msgid "Copyright (C) %d %s\n"
+msgstr "Copyright (C) %d %s\n"
+
+#: src/insert.c:339 src/repl.c:560
+msgid ""
+"License AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+msgstr ""
+"라이선스 AGPL-3.0-or-later: <https://www.gnu.org/licenses/agpl-3.0.html>\n"
+
+#: src/insert.c:341
+msgid "This is free software: you are free to change and redistribute it.\n"
+msgstr "이것은 자유 소프트웨어입니다. 변경하고 재배포할 수 있습니다.\n"
+
+#: src/insert.c:343
+msgid "This project opposes AI exploitation and AI hegemony.\n"
+msgstr "이 프로젝트는 AI 착취와 AI 패권에 반대합니다.\n"
+
+#: src/insert.c:344
+msgid ""
+"This project rejects mindless MIT-style licensing and politically naive BSD-"
+"style licensing.\n"
+msgstr ""
+"이 프로젝트는 무분별한 MIT 스타일 라이선스와 정치적으로 순진한 BSD 스타일 라"
+"이선스를 거부합니다.\n"
+
+#: src/insert.c:347
+msgid "There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr "법이 허용하는 범위 내에서 어떠한 보증도 없습니다.\n"
+
+#: src/insert.c:372
+#, c-format
+msgid "%s: missing FILE\n"
+msgstr "%s: 파일이 없습니다\n"
+
+#: src/insert.c:413 src/insert.c:427 src/insert.c:526
+#, c-format
+msgid "%s: out of memory\n"
+msgstr "%s: 메모리 부족\n"
+
+#: src/repl.c:73
+msgid ""
+"Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
+"       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+"Batch replace PATTERN with REPLACEMENT in files.\n"
+"A file is rewritten only when its contents would change.\n"
+"With no FILE, read standard input and write to standard output.\n"
+msgstr ""
+"사용법: repl [옵션]... 패턴 치환문자열 [파일]...\n"
+"       repl [옵션]... -e 패턴 ... 치환문자열 [파일]...\n"
+"파일에서 패턴을 치환문자열로 일괄 치환합니다.\n"
+"내용이 바뀔 때만 파일을 다시 씁니다.\n"
+"파일이 없으면 표준 입력을 읽고 표준 출력에 씁니다.\n"
+
+#: src/repl.c:80
+msgid "Pattern selection (default: fixed strings):\n"
+msgstr "패턴 선택(기본값: 고정 문자열):\n"
+
+#: src/repl.c:82
+msgid "interpret patterns as fixed strings (default)\n"
+msgstr "패턴을 고정 문자열로 해석합니다(기본값)\n"
+
+#: src/repl.c:84
+msgid "interpret patterns as POSIX extended regular expressions\n"
+msgstr "패턴을 POSIX 확장 정규 표현식으로 해석합니다\n"
+
+#: src/repl.c:86
+msgid "interpret patterns as POSIX basic regular expressions\n"
+msgstr "패턴을 POSIX 기본 정규 표현식으로 해석합니다\n"
+
+#: src/repl.c:88
+msgid "interpret patterns as Perl-compatible regular expressions (PCRE2)\n"
+msgstr "패턴을 Perl 호환 정규 표현식(PCRE2)으로 해석합니다\n"
+
+#: src/repl.c:90
+msgid "use PATTERNS; may be repeated; combine with -f\n"
+msgstr "PATTERNS를 사용합니다; 반복 가능; -f와 함께 사용 가능\n"
+
+#: src/repl.c:92
+msgid "read patterns from FILE, one per line; - means standard input\n"
+msgstr "FILE에서 패턴을 한 줄에 하나씩 읽습니다; -는 표준 입력\n"
+
+#: src/repl.c:94
+msgid "ignore case distinctions in patterns and data\n"
+msgstr "패턴과 데이터에서 대소문자를 구분하지 않습니다\n"
+
+#: src/repl.c:96
+msgid "do not ignore case (default); cancels a prior -i\n"
+msgstr "대소문자를 구분합니다(기본값); 이전 -i를 취소합니다\n"
+
+#: src/repl.c:98
+msgid "replace each non-matching line entirely with REPLACEMENT\n"
+msgstr "일치하지 않는 각 줄 전체를 REPLACEMENT로 바꿉니다\n"
+
+#: src/repl.c:100
+msgid "match only whole words\n"
+msgstr "전체 단어에만 일치합니다\n"
+
+#: src/repl.c:102
+msgid "match only whole lines\n"
+msgstr "전체 줄에만 일치합니다\n"
+
+#: src/repl.c:104
+msgid "File selection:\n"
+msgstr "파일 선택:\n"
+
+#: src/repl.c:106
+msgid "recurse directories; follow symlinks only if on the command line\n"
+msgstr ""
+"디렉터리를 재귀적으로 처리합니다; 명령줄에 있을 때만 심볼릭 링크를 따릅니다\n"
+
+#: src/repl.c:110
+msgid "recurse directories, following all symbolic links\n"
+msgstr "모든 심볼릭 링크를 따라 디렉터리를 재귀적으로 처리합니다\n"
+
+#: src/repl.c:112
+msgid "limit directory recursion depth\n"
+msgstr "디렉터리 재귀 깊이를 제한합니다\n"
+
+#: src/repl.c:114
+msgid "skip files whose base name matches GLOB\n"
+msgstr "기본 이름이 GLOB과 일치하는 파일을 건너뜁니다\n"
+
+#: src/repl.c:116
+msgid "read exclude globs from FILE, one per line\n"
+msgstr "제외 GLOB을 FILE에서 한 줄에 하나씩 읽습니다\n"
+
+#: src/repl.c:118
+msgid "skip directories whose base name matches GLOB\n"
+msgstr "기본 이름이 GLOB과 일치하는 디렉터리를 건너뜁니다\n"
+
+#: src/repl.c:120
+msgid "only process files whose base name matches GLOB\n"
+msgstr "기본 이름이 GLOB과 일치하는 파일만 처리합니다\n"
+
+#: src/repl.c:124
+msgid "how to handle directories: repl (default), skip, or recurse\n"
+msgstr "디렉터리 처리 방식: repl(기본값), skip 또는 recurse\n"
+
+#: src/repl.c:126
+msgid "how to handle devices/FIFOs/sockets: repl (default) or skip\n"
+msgstr "장치/FIFO/소켓 처리 방식: repl(기본값) 또는 skip\n"
+
+#: src/repl.c:128
+msgid "binary (default: stop before non-printable), without-match, or text\n"
+msgstr "binary(기본값: 비가시 문자 앞에서 중지), without-match 또는 text\n"
+
+#: src/repl.c:130
+msgid "same as --binary-files=without-match\n"
+msgstr "--binary-files=without-match와 같습니다\n"
+
+#: src/repl.c:132
+msgid "treat files as binary; disable the binary heuristic\n"
+msgstr "파일을 바이너리로 취급하고 바이너리 휴리스틱을 비활성화합니다\n"
+
+#: src/repl.c:134
+msgid "treat input as NUL-terminated lines instead of newline-terminated\n"
+msgstr "입력을 개행 종료가 아닌 NUL 종료 줄로 취급합니다\n"
+
+#: src/repl.c:136
+msgid "Reporting:\n"
+msgstr "보고:\n"
+
+#: src/repl.c:138
+msgid "suppress the default one-line summary\n"
+msgstr "기본 한 줄 요약을 표시하지 않습니다\n"
+
+#: src/repl.c:140
+msgid "print a context diff (diff -c) for each changed file\n"
+msgstr "변경된 각 파일에 대해 컨텍스트 diff(diff -c)를 출력합니다\n"
+
+#: src/repl.c:142
+msgid "print a unified diff (diff -u) for each changed file\n"
+msgstr "변경된 각 파일에 대해 통합 diff(diff -u)를 출력합니다\n"
+
+#: src/repl.c:144
+msgid "print a detailed batch summary (files examined/changed, counts)\n"
+msgstr "상세 일괄 요약을 출력합니다(검사/변경된 파일, 횟수)\n"
+
+#: src/repl.c:150
+#, c-format
+msgid ""
+"\n"
+"Report bugs to: <%s>\n"
+msgstr ""
+"\n"
+"버그 보고: <%s>\n"
+
+#: src/repl.c:275
+#, c-format
+msgid "%s: replace failed: %s\n"
+msgstr "%s: 치환 실패: %s\n"
+
+#: src/repl.c:316
+#, c-format
+msgid "%s: %zu replacement(s)\n"
+msgstr "%s: 치환 %zu회\n"
+
+#: src/repl.c:472
+#, c-format
+msgid "%s: invalid max-depth\n"
+msgstr "%s: 잘못된 max-depth\n"
+
+#: src/repl.c:506
+#, c-format
+msgid "%s: invalid --binary-files value\n"
+msgstr "%s: 잘못된 --binary-files 값\n"
+
+#: src/repl.c:522
+#, c-format
+msgid "%s: invalid --directories action\n"
+msgstr "%s: 잘못된 --directories 동작\n"
+
+#: src/repl.c:532
+#, c-format
+msgid "%s: invalid --devices action\n"
+msgstr "%s: 잘못된 --devices 동작\n"
+
+#: src/repl.c:574
+#, c-format
+msgid "%s: missing PATTERN and REPLACEMENT\n"
+msgstr "%s: 패턴과 치환문자열이 없습니다\n"
+
+#: src/repl.c:586
+#, c-format
+msgid "%s: missing REPLACEMENT\n"
+msgstr "%s: 치환문자열이 없습니다\n"
+
+#: src/repl.c:600
+msgid "pattern error"
+msgstr "패턴 오류"
+
+#: src/repl.c:658
+#, c-format
+msgid ""
+"files examined: %zu\n"
+"files changed:  %zu\n"
+"replacements:   %zu\n"
+"binary skipped: %zu\n"
+msgstr ""
+"검사한 파일:       %zu\n"
+"변경된 파일:       %zu\n"
+"치환 횟수:         %zu\n"
+"바이너리 건너뜀:   %zu\n"
+
+#: src/repl.c:665
+#, c-format
+msgid "%zu file(s) changed, %zu replacement(s)\n"
+msgstr "파일 %zu개 변경, 치환 %zu회\n"
+
+#~ msgid "append; -a0 append, -a1 blank then append\n"
+#~ msgstr "끝에 추가; -a0 추가, -a1 빈 줄 후 추가\n"
