@@ -39,6 +39,8 @@ enum {
     OPT_BINARY_FILES,
     OPT_NO_IGNORE_CASE,
     OPT_REGEXP,
+    OPT_COLOR,
+    OPT_PALETTE,
 };
 
 enum binary_mode {
@@ -46,6 +48,21 @@ enum binary_mode {
     BIN_WITHOUT_MATCH,
     BIN_TEXT,
 };
+
+enum color_when {
+    COLOR_NEVER = 0,
+    COLOR_ALWAYS,
+    COLOR_AUTO,
+};
+
+/* SGR substrings, GNU diff --palette compatible (rs/hd/ad/de/ln). */
+typedef struct palette {
+    char rs[64];
+    char hd[64];
+    char ad[64];
+    char de[64];
+    char ln[64];
+} palette_t;
 
 typedef struct repl_stats {
     size_t files_seen;
@@ -62,8 +79,12 @@ typedef struct repl_ctx {
     int force_binary; /* -U */
     int quiet;
     int summary;
+    int dryrun;       /* -n: report only, do not rewrite files */
     int context_diff; /* -c */
     int unified_diff; /* -u */
+    enum color_when color_when;
+    int use_color; /* resolved for this run */
+    palette_t palette;
     walk_opts_t walk;
     repl_stats_t stats;
     int had_error;
@@ -134,6 +155,9 @@ void usage(FILE *out) {
     fputs(_("treat input as NUL-terminated lines instead of newline-terminated\n"), out);
     fputs("\n", out);
     fputs(_("Reporting:\n"), out);
+    fputs("  -n, --dryrun            ", out);
+    fputs(_("show what would change; with -u/-c print diffs, but do not update files\n"),
+          out);
     fputs("  -q, --quiet, --silent   ", out);
     fputs(_("suppress the default one-line summary\n"), out);
     fputs("  -c, --context           ", out);
@@ -142,6 +166,13 @@ void usage(FILE *out) {
     fputs(_("print a unified diff (diff -u) for each changed file\n"), out);
     fputs("  -s, --summary           ", out);
     fputs(_("print a detailed batch summary (files examined/changed, counts)\n"), out);
+    fputs("      --color[=WHEN]      ", out);
+    fputs(_("color diffs; WHEN is never, always, or auto (default with --color: auto)\n"),
+          out);
+    fputs("      --palette=PALETTE   ", out);
+    fputs(_("colors when --color is active; colon-separated terminfo/SGR list "
+            "(rs:hd:ad:de:ln)\n"),
+          out);
     fputs("\n", out);
     fputs("  -h, --help              ", out);
     fputs(_("display this help and exit\n"), out);
@@ -172,14 +203,115 @@ static void list_free(char **list, size_t n) {
     free(list);
 }
 
-static int print_diff(const char *path, const char *old, size_t old_len, const char *neu,
-                      size_t neu_len, int unified) {
+static void palette_set_defaults(palette_t *p) {
+    /* Like GNU diff; hd uses reverse so the filename banner has a background. */
+    snprintf(p->rs, sizeof p->rs, "%s", "0");
+    snprintf(p->hd, sizeof p->hd, "%s", "1;7");
+    snprintf(p->ad, sizeof p->ad, "%s", "32");
+    snprintf(p->de, sizeof p->de, "%s", "31");
+    snprintf(p->ln, sizeof p->ln, "%s", "36");
+}
+
+static int palette_parse(palette_t *p, const char *spec) {
+    char *copy;
+    char *tok;
+    char *save = NULL;
+
+    if (!spec) {
+        return -1;
+    }
+    copy = strdup(spec);
+    if (!copy) {
+        return -1;
+    }
+    for (tok = strtok_r(copy, ":", &save); tok; tok = strtok_r(NULL, ":", &save)) {
+        char *eq = strchr(tok, '=');
+        char *key;
+        char *val;
+        size_t klen;
+
+        if (!eq || eq == tok) {
+            free(copy);
+            return -1;
+        }
+        *eq = '\0';
+        key = tok;
+        val = eq + 1;
+        klen = strlen(key);
+        if (klen == 2 && key[0] == 'r' && key[1] == 's') {
+            snprintf(p->rs, sizeof p->rs, "%s", val);
+        } else if (klen == 2 && key[0] == 'h' && key[1] == 'd') {
+            snprintf(p->hd, sizeof p->hd, "%s", val);
+        } else if (klen == 2 && key[0] == 'a' && key[1] == 'd') {
+            snprintf(p->ad, sizeof p->ad, "%s", val);
+        } else if (klen == 2 && key[0] == 'd' && key[1] == 'e') {
+            snprintf(p->de, sizeof p->de, "%s", val);
+        } else if (klen == 2 && key[0] == 'l' && key[1] == 'n') {
+            snprintf(p->ln, sizeof p->ln, "%s", val);
+        } else {
+            free(copy);
+            return -1;
+        }
+    }
+    free(copy);
+    return 0;
+}
+
+static void sgr_begin(FILE *out, int use_color, const char *sgr) {
+    if (use_color && sgr && sgr[0]) {
+        fprintf(out, "\033[%sm", sgr);
+    }
+}
+
+static void sgr_end(FILE *out, int use_color, const char *rs) {
+    if (use_color) {
+        fprintf(out, "\033[%sm", (rs && rs[0]) ? rs : "0");
+    }
+}
+
+static int is_diff_file_header(const char *line) {
+    /* GNU diff file headers: "--- path\ttime" / "+++ path\ttime" / "*** path\ttime" */
+    if ((strncmp(line, "--- ", 4) == 0 || strncmp(line, "+++ ", 4) == 0 ||
+         strncmp(line, "*** ", 4) == 0) &&
+        strchr(line, '\t') != NULL) {
+        return 1;
+    }
+    return 0;
+}
+
+static const char *line_sgr(const palette_t *p, const char *line) {
+    if (line[0] == '@' || strcmp(line, "***************") == 0 ||
+        (strncmp(line, "*** ", 4) == 0 && strchr(line, '\t') == NULL) ||
+        (strncmp(line, "--- ", 4) == 0 && strchr(line, '\t') == NULL) ||
+        (strncmp(line, "+++ ", 4) == 0 && strchr(line, '\t') == NULL)) {
+        return p->ln;
+    }
+    if (line[0] == '+' && strncmp(line, "+++", 3) != 0) {
+        return p->ad;
+    }
+    if (line[0] == '-' && strncmp(line, "---", 3) != 0) {
+        return p->de;
+    }
+    if (line[0] == '!') {
+        return p->de;
+    }
+    return NULL;
+}
+
+static int print_diff(const repl_ctx_t *ctx, const char *path, const char *old, size_t old_len,
+                      const char *neu, size_t neu_len, int unified) {
     char t1[] = "/tmp/hed-repl-a-XXXXXX";
     char t2[] = "/tmp/hed-repl-b-XXXXXX";
     int fd1, fd2;
     FILE *f;
+    int pipefd[2];
     pid_t pid;
     int status;
+    FILE *in;
+    char *line = NULL;
+    size_t cap = 0;
+    ssize_t nr;
+    int skipped_headers = 0;
 
     fd1 = mkstemp(t1);
     fd2 = mkstemp(t2);
@@ -208,8 +340,19 @@ static int print_diff(const char *path, const char *old, size_t old_len, const c
         return -1;
     }
 
+    if (pipe(pipefd) != 0) {
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+
     pid = fork();
     if (pid == 0) {
+        close(pipefd[0]);
+        if (dup2(pipefd[1], STDOUT_FILENO) < 0) {
+            _exit(127);
+        }
+        close(pipefd[1]);
         if (unified) {
             execlp("diff", "diff", "-u", t1, t2, (char *)NULL);
         } else {
@@ -217,10 +360,47 @@ static int print_diff(const char *path, const char *old, size_t old_len, const c
         }
         _exit(127);
     }
-    if (pid > 0) {
-        waitpid(pid, &status, 0);
+    close(pipefd[1]);
+    if (pid < 0) {
+        close(pipefd[0]);
+        unlink(t1);
+        unlink(t2);
+        return -1;
     }
-    (void)path;
+
+    in = fdopen(pipefd[0], "r");
+    if (!in) {
+        close(pipefd[0]);
+        waitpid(pid, &status, 0);
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+
+    sgr_begin(stdout, ctx->use_color, ctx->palette.hd);
+    printf("::: %s :::", path);
+    sgr_end(stdout, ctx->use_color, ctx->palette.rs);
+    fputc('\n', stdout);
+
+    while ((nr = getline(&line, &cap, in)) != -1) {
+        if (nr > 0 && line[nr - 1] == '\n') {
+            line[nr - 1] = '\0';
+        }
+        if (skipped_headers < 2 && is_diff_file_header(line)) {
+            skipped_headers++;
+            continue;
+        }
+        {
+            const char *sgr = line_sgr(&ctx->palette, line);
+            sgr_begin(stdout, ctx->use_color && sgr, sgr);
+            fputs(line, stdout);
+            sgr_end(stdout, ctx->use_color && sgr, ctx->palette.rs);
+            fputc('\n', stdout);
+        }
+    }
+    free(line);
+    fclose(in);
+    waitpid(pid, &status, 0);
     unlink(t1);
     unlink(t2);
     return 0;
@@ -301,7 +481,20 @@ static int process_file(const char *path, void *userdata) {
     }
 
     if (ctx->context_diff || ctx->unified_diff) {
-        print_diff(path, old, old_len, neu, neu_len, ctx->unified_diff);
+        print_diff(ctx, path, old, old_len, neu, neu_len, ctx->unified_diff);
+    }
+
+    if (ctx->dryrun) {
+        ctx->stats.files_changed++;
+        ctx->stats.replacements += n_repl;
+        if (!ctx->quiet && !ctx->context_diff && !ctx->unified_diff) {
+            printf(_("would change: %s (%zu replacement(s))\n"), path, n_repl);
+        } else if (ctx->summary && !ctx->quiet) {
+            printf(_("%s: %zu replacement(s)\n"), path, n_repl);
+        }
+        free(neu);
+        free(old);
+        return 0;
     }
 
     rc = replace_file_if_changed(path, old, old_len, neu, neu_len, mode);
@@ -344,6 +537,8 @@ int main(int argc, char **argv) {
     memset(&ctx, 0, sizeof ctx);
     ctx.prog = exe;
     ctx.binary = BIN_BINARY;
+    ctx.color_when = COLOR_NEVER;
+    palette_set_defaults(&ctx.palette);
     ctx.walk.max_depth = -1;
     ctx.walk.dir_action = 0;
     ctx.walk.device_action = 0;
@@ -374,18 +569,22 @@ int main(int argc, char **argv) {
         {"devices", required_argument, NULL, 'D'},
         {"binary", no_argument, NULL, 'U'},
         {"null-data", no_argument, NULL, 'z'},
+        {"dryrun", no_argument, NULL, 'n'},
+        {"dry-run", no_argument, NULL, 'n'},
         {"quiet", no_argument, NULL, 'q'},
         {"silent", no_argument, NULL, 'q'},
         {"context", no_argument, NULL, 'c'},
         {"unified", no_argument, NULL, 'u'},
         {"summary", no_argument, NULL, 's'},
+        {"color", optional_argument, NULL, OPT_COLOR},
+        {"palette", required_argument, NULL, OPT_PALETTE},
         {"help", no_argument, NULL, 'h'},
         {"version", no_argument, NULL, OPT_VERSION},
         {NULL, 0, NULL, 0},
     };
 
     for (;;) {
-        int c = getopt_long(argc, argv, "EFGPe:f:ivwxrRd:D:IUzqcusVh", long_opts, NULL);
+        int c = getopt_long(argc, argv, "EFGPe:f:ivwxrRd:D:IUznqcusVh", long_opts, NULL);
         if (c == -1) {
             break;
         }
@@ -539,6 +738,9 @@ int main(int argc, char **argv) {
         case 'z':
             mopts.line_sep = '\0';
             break;
+        case 'n':
+            ctx.dryrun = 1;
+            break;
         case 'q':
             ctx.quiet = 1;
             break;
@@ -550,6 +752,25 @@ int main(int argc, char **argv) {
             break;
         case 's':
             ctx.summary = 1;
+            break;
+        case OPT_COLOR:
+            if (!optarg || strcmp(optarg, "auto") == 0) {
+                ctx.color_when = COLOR_AUTO;
+            } else if (strcmp(optarg, "always") == 0) {
+                ctx.color_when = COLOR_ALWAYS;
+            } else if (strcmp(optarg, "never") == 0) {
+                ctx.color_when = COLOR_NEVER;
+            } else {
+                fprintf(stderr, _("%s: invalid --color value (use never, always, or auto)\n"),
+                        exe);
+                return 1;
+            }
+            break;
+        case OPT_PALETTE:
+            if (palette_parse(&ctx.palette, optarg) != 0) {
+                fprintf(stderr, _("%s: invalid --palette\n"), exe);
+                return 1;
+            }
             break;
         case 'h':
             usage(stdout);
@@ -611,6 +832,14 @@ int main(int argc, char **argv) {
     ctx.walk.include = (const char **)include;
     ctx.walk.n_include = n_include;
 
+    if (ctx.color_when == COLOR_ALWAYS) {
+        ctx.use_color = 1;
+    } else if (ctx.color_when == COLOR_AUTO) {
+        ctx.use_color = isatty(STDOUT_FILENO);
+    } else {
+        ctx.use_color = 0;
+    }
+
     if (argc == 0) {
         /* read stdin, write stdout */
         char *data = NULL;
@@ -655,12 +884,24 @@ int main(int argc, char **argv) {
 
     if (!ctx.quiet) {
         if (ctx.summary) {
-            printf(_("files examined: %zu\n"
-                     "files changed:  %zu\n"
-                     "replacements:   %zu\n"
-                     "binary skipped: %zu\n"),
-                   ctx.stats.files_seen, ctx.stats.files_changed, ctx.stats.replacements,
-                   ctx.stats.files_skipped_binary);
+            if (ctx.dryrun) {
+                printf(_("files examined:     %zu\n"
+                         "files would change: %zu\n"
+                         "replacements:       %zu\n"
+                         "binary skipped:     %zu\n"),
+                       ctx.stats.files_seen, ctx.stats.files_changed, ctx.stats.replacements,
+                       ctx.stats.files_skipped_binary);
+            } else {
+                printf(_("files examined: %zu\n"
+                         "files changed:  %zu\n"
+                         "replacements:   %zu\n"
+                         "binary skipped: %zu\n"),
+                       ctx.stats.files_seen, ctx.stats.files_changed, ctx.stats.replacements,
+                       ctx.stats.files_skipped_binary);
+            }
+        } else if (ctx.dryrun) {
+            printf(_("%zu file(s) would change, %zu replacement(s)\n"), ctx.stats.files_changed,
+                   ctx.stats.replacements);
         } else {
             printf(_("%zu file(s) changed, %zu replacement(s)\n"), ctx.stats.files_changed,
                    ctx.stats.replacements);
