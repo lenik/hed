@@ -1,3 +1,16 @@
+hed (1.2.0) testing; urgency=medium
+
+  * repl(1): add -l/--line to expand match to entire line (default: matched only).
+  * repl(1): add -g/--global (default) and -1/--first for occurrence control.
+  * repl(1): add --range=N..M to replace N-th through M-th occurrences per line.
+  * repl(1): line-based replacement logic with occurrence counting.
+  * insert(1): fix -r behavior at prepend: -0 -r3 removes 2 lines (keep from line 3),
+    -1 -r3 removes 3 lines (keep from line 4), consistent with 1-based indexing.
+  * insert: update man page to clarify -r behavior difference between -0 and -1.
+  * catq: anothor cat but silently ignore missing filenames.
+
+ -- Lenik (谢继雷) <lenik@bodz.net>  Thu, 16 Jul 2026 15:48:00 +0800
+
 hed (1.1.0) testing; urgency=medium
 
   * repl(1): add -n/--dryrun to preview changes without rewriting files;
