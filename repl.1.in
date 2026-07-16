@@ -202,20 +202,88 @@ and
 .BR \-x .
 .SS Reporting
 .TP
+.BR \-n ", " \-\-dryrun ", " \-\-dry\-run
+Show what would change without rewriting files.
+Without
+.B \-u
+or
+.BR \-c ,
+print a
+.B would change
+line for each file that would be modified.
+With
+.B \-u
+or
+.BR \-c ,
+print the corresponding diffs but leave files untouched.
+.TP
 .BR \-q ", " \-\-quiet ", " \-\-silent
 Do not print the default one-line summary of how many files changed.
 .TP
 .BR \-c ", " \-\-context
-For each changed file, print a context diff as from
-.BR "diff \-c" .
+For each changed file, print a context-style patch
+(derived from
+.BR "diff \-c" ).
+Temporary path headers from
+.B diff
+are replaced by a single banner line
+.BI ::: " FILE " ::: .
 .TP
 .BR \-u ", " \-\-unified
-For each changed file, print a unified diff as from
-.BR "diff \-u" .
+For each changed file, print a unified-style patch
+(derived from
+.BR "diff \-u" ),
+with the same
+.BI ::: " FILE " :::
+banner instead of
+.B \-\-\-
+/
+.B +++
+path headers.
 .TP
 .BR \-s ", " \-\-summary
 Print a detailed batch summary: files examined, files changed,
 replacement count, and binary files skipped.
+.TP
+.B \-\-color[=\fIWHEN\fR]
+Colorize patch output.
+.I WHEN
+may be
+.BR never ,
+.BR always ,
+or
+.BR auto
+(the default when
+.B \-\-color
+is given with no value).
+With
+.BR auto ,
+color is used when standard output is a terminal.
+.TP
+.B \-\-palette=\fIPALETTE\fR
+Colors to use when
+.B \-\-color
+is active.
+.I PALETTE
+is a colon-separated list of capabilities in the style of
+.BR "diff \-\-palette" ,
+each
+.IB name = SGR
+(Select Graphic Rendition numbers).
+Supported names:
+.BR rs
+(reset),
+.BR hd
+(file banner),
+.BR ad
+(added lines),
+.BR de
+(deleted lines),
+.BR ln
+(hunk/line-number headers).
+The default is
+.BR rs=0:hd=1;7:ad=32:de=31:ln=36
+(reverse-video file banner, green adds, red deletes, cyan hunk headers).
 .TP
 .BR \-h ", " \-\-help
 Print a usage message and exit.
