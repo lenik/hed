@@ -18,7 +18,6 @@
 #include <bas/log/deflog.h>
 #include <bas/proc/env.h>
 
-#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +40,7 @@ enum {
     OPT_REGEXP,
     OPT_COLOR,
     OPT_PALETTE,
+    OPT_RANGE,
 };
 
 enum binary_mode {
@@ -121,6 +121,14 @@ void usage(FILE *out) {
     fputs(_("match only whole words\n"), out);
     fputs("  -x, --line-regexp       ", out);
     fputs(_("match only whole lines\n"), out);
+    fputs("  -l, --line              ", out);
+    fputs(_("expand match to entire line (default: matched only)\n"), out);
+    fputs("  -g, --global            ", out);
+    fputs(_("replace all occurrences in a single line (default)\n"), out);
+    fputs("  -1, --first             ", out);
+    fputs(_("replace first occurrence in a single line\n"), out);
+    fputs("      --range=N..M        ", out);
+    fputs(_("replace N-th to M-th occurrences per line (1-based, .. = 1..inf)\n"), out);
     fputs("\n", out);
     fputs(_("File selection:\n"), out);
     fputs("  -r, --recursive         ", out);
@@ -537,7 +545,7 @@ int main(int argc, char **argv) {
     memset(&ctx, 0, sizeof ctx);
     ctx.prog = exe;
     ctx.binary = BIN_BINARY;
-    ctx.color_when = COLOR_NEVER;
+    ctx.color_when = COLOR_AUTO;
     palette_set_defaults(&ctx.palette);
     ctx.walk.max_depth = -1;
     ctx.walk.dir_action = 0;
@@ -557,6 +565,10 @@ int main(int argc, char **argv) {
         {"invert-match", no_argument, NULL, 'v'},
         {"word-regexp", no_argument, NULL, 'w'},
         {"line-regexp", no_argument, NULL, 'x'},
+        {"line", no_argument, NULL, 'l'},
+        {"global", no_argument, NULL, 'g'},
+        {"first", no_argument, NULL, '1'},
+        {"range", required_argument, NULL, OPT_RANGE},
         {"recursive", no_argument, NULL, 'r'},
         {"dereference-recursive", no_argument, NULL, 'R'},
         {"max-depth", required_argument, NULL, OPT_MAX_DEPTH},
@@ -584,7 +596,7 @@ int main(int argc, char **argv) {
     };
 
     for (;;) {
-        int c = getopt_long(argc, argv, "EFGPe:f:ivwxrRd:D:IUznqcusVh", long_opts, NULL);
+        int c = getopt_long(argc, argv, "EFGPe:f:ivwxlg1rRd:D:IUznqcusVh", long_opts, NULL);
         if (c == -1) {
             break;
         }
@@ -655,6 +667,46 @@ int main(int argc, char **argv) {
         case 'x':
             mopts.line_regexp = 1;
             break;
+        case 'l':
+            mopts.line_mode = 1;
+            break;
+        case 'g':
+            mopts.replace_mode = 0; /* global (default) */
+            break;
+        case '1':
+            mopts.replace_mode = 1; /* first only */
+            break;
+        case OPT_RANGE: {
+            char *dot = strchr(optarg, '.');
+            if (dot && dot[1] == '.') {
+                /* N..M format */
+                char *end = NULL;
+                mopts.range_n = (int)strtol(optarg, &end, 10);
+                if (end != dot) {
+                    fprintf(stderr, _("%s: invalid --range format\n"), exe);
+                    return 1;
+                }
+                if (dot[2] != '\0') {
+                    mopts.range_m = (int)strtol(dot + 2, &end, 10);
+                    if (*end != '\0') {
+                        fprintf(stderr, _("%s: invalid --range format\n"), exe);
+                        return 1;
+                    }
+                } else {
+                    mopts.range_m = -1; /* infinity */
+                }
+            } else {
+                /* single number N */
+                char *end = NULL;
+                mopts.range_n = (int)strtol(optarg, &end, 10);
+                if (*end != '\0') {
+                    fprintf(stderr, _("%s: invalid --range format\n"), exe);
+                    return 1;
+                }
+                mopts.range_m = mopts.range_n; /* single occurrence */
+            }
+            break;
+        }
         case 'r':
             ctx.walk.recursive = 1;
             ctx.walk.dir_action = 2;

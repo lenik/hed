@@ -525,6 +525,167 @@ static char *replace_invert(const match_engine_t *eng, const char *data, size_t 
     return out;
 }
 
+static char *replace_line_based(const match_engine_t *eng, const char *data, size_t len,
+                                const char *replacement, size_t *out_len, size_t *n_repl) {
+    char *out = NULL;
+    size_t out_l = 0, out_c = 0;
+    size_t i = 0;
+    size_t total_n = 0;
+    size_t rlen = strlen(replacement);
+    char sep = eng->opts.line_sep;
+    int range_n = eng->opts.range_n > 0 ? eng->opts.range_n : 1;
+    int range_m = eng->opts.range_m > 0 ? eng->opts.range_m : -1;
+
+    while (i <= len) {
+        size_t line_start = i;
+        size_t line_end = i;
+        int has_sep = 0;
+
+        while (line_end < len && data[line_end] != sep) {
+            line_end++;
+        }
+        if (line_end < len && data[line_end] == sep) {
+            has_sep = 1;
+        }
+
+        /* empty file: one empty line consideration */
+        if (line_start == len && len > 0) {
+            break;
+        }
+
+        {
+            size_t llen = line_end - line_start;
+            char *line_out = NULL;
+            size_t line_out_l = 0, line_out_c = 0;
+            size_t pos = 0;
+            size_t line_occurrence = 0;
+
+            while (pos <= llen) {
+                size_t m_off, m_len;
+                if (!find_any(eng, data + line_start, llen, pos, &m_off, &m_len)) {
+                    if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                  data + line_start + pos, llen - pos) != 0) {
+                        free(line_out);
+                        free(out);
+                        return NULL;
+                    }
+                    break;
+                }
+
+                line_occurrence++;
+                int should_replace = 0;
+                
+                if (eng->opts.replace_mode == 1) {
+                    /* -1: first only */
+                    should_replace = (line_occurrence == 1);
+                } else {
+                    /* global (default): check range */
+                    should_replace = (line_occurrence >= range_n && 
+                                     (range_m < 0 || line_occurrence <= range_m));
+                }
+
+                if (should_replace) {
+                    if (eng->opts.line_mode) {
+                        /* -l: expand to entire line */
+                        if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                      replacement, rlen) != 0) {
+                            free(line_out);
+                            free(out);
+                            return NULL;
+                        }
+                        total_n++;
+                        pos = llen; /* skip rest of line */
+                        break;
+                    } else {
+                        if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                      data + line_start + pos, m_off - pos) != 0) {
+                            free(line_out);
+                            free(out);
+                            return NULL;
+                        }
+                        if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                      replacement, rlen) != 0) {
+                            free(line_out);
+                            free(out);
+                            return NULL;
+                        }
+                        total_n++;
+                    }
+                } else {
+                    if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                  data + line_start + pos, m_off - pos) != 0) {
+                        free(line_out);
+                        free(out);
+                        return NULL;
+                    }
+                    if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                  data + line_start + m_off, m_len) != 0) {
+                        free(line_out);
+                        free(out);
+                        return NULL;
+                    }
+                }
+
+                if (m_len == 0) {
+                    if (m_off < llen) {
+                        if (buf_append(&line_out, &line_out_l, &line_out_c, 
+                                      data + line_start + m_off, 1) != 0) {
+                            free(line_out);
+                            free(out);
+                            return NULL;
+                        }
+                        pos = m_off + 1;
+                    } else {
+                        break;
+                    }
+                } else {
+                    pos = m_off + m_len;
+                }
+                if (pos > llen) {
+                    break;
+                }
+                if (pos == llen) {
+                    break;
+                }
+            }
+
+            if (buf_append(&out, &out_l, &out_c, line_out, line_out_l) != 0) {
+                free(line_out);
+                free(out);
+                return NULL;
+            }
+            free(line_out);
+
+            if (has_sep) {
+                if (buf_append_ch(&out, &out_l, &out_c, sep, 1) != 0) {
+                    free(out);
+                    return NULL;
+                }
+                i = line_end + 1;
+            } else {
+                break;
+            }
+        }
+        if (line_start == len) {
+            break;
+        }
+    }
+
+    if (n_repl) {
+        *n_repl = total_n;
+    }
+    if (out_len) {
+        *out_len = out_l;
+    }
+    if (!out) {
+        out = malloc(1);
+        if (out) {
+            out[0] = '\0';
+        }
+    }
+    return out;
+}
+
 char *match_replace(const match_engine_t *eng, const char *data, size_t len,
                     const char *replacement, size_t *out_len, size_t *n_repl) {
     char *out = NULL;
@@ -540,6 +701,12 @@ char *match_replace(const match_engine_t *eng, const char *data, size_t len,
 
     if (eng->opts.invert_match) {
         return replace_invert(eng, data, len, replacement, out_len, n_repl);
+    }
+
+    /* Use line-based replacement if any of the new options are set */
+    if (eng->opts.line_mode || eng->opts.replace_mode == 1 || 
+        eng->opts.range_n > 0 || eng->opts.range_m > 0) {
+        return replace_line_based(eng, data, len, replacement, out_len, n_repl);
     }
 
     if (eng->n == 0) {

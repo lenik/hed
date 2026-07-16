@@ -17,6 +17,10 @@ typedef struct match_opts {
     int line_regexp;   /* -x */
     int invert_match;  /* -v: replace non-matching lines entirely */
     char line_sep;     /* '\n' or '\0' for -z */
+    int line_mode;     /* -l: expand match to entire line */
+    int replace_mode;  /* 0=global (default), 1=first only (-1) */
+    int range_n;       /* -n N: start from N-th occurrence (1-based) */
+    int range_m;       /* -n N..M: end at M-th occurrence (-1 for inf) */
 } match_opts_t;
 
 typedef struct match_engine match_engine_t;

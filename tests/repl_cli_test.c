@@ -326,6 +326,103 @@ START_TEST(test_cli_unified_banner_dryrun) {
 }
 END_TEST
 
+START_TEST(test_cli_line_option) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char path[128];
+    char *out;
+    char *argv[8];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/t.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("foo bar baz\n", f);
+        fclose(f);
+    }
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "-l";
+    argv[3] = "bar";
+    argv[4] = "REPLACED";
+    argv[5] = path;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "REPLACED\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_first_option) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char path[128];
+    char *out;
+    char *argv[8];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/t.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("foo bar foo\n", f);
+        fclose(f);
+    }
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "-1";
+    argv[3] = "foo";
+    argv[4] = "X";
+    argv[5] = path;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "X bar foo\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_range_option) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char path[128];
+    char *out;
+    char *argv[9];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/t.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("a/b/c/d/e\n", f);
+        fclose(f);
+    }
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "--range=2..3";
+    argv[3] = "-P";
+    argv[4] = "\\w";
+    argv[5] = ".";
+    argv[6] = path;
+    argv[7] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "a/././d/e\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
 static Suite *suite(void) {
     Suite *s = suite_create("repl_cli");
     TCase *tc = tcase_create("cli");
@@ -338,6 +435,9 @@ static Suite *suite(void) {
     tcase_add_test(tc, test_cli_ere);
     tcase_add_test(tc, test_cli_dryrun_no_write);
     tcase_add_test(tc, test_cli_unified_banner_dryrun);
+    tcase_add_test(tc, test_cli_line_option);
+    tcase_add_test(tc, test_cli_first_option);
+    tcase_add_test(tc, test_cli_range_option);
     suite_add_tcase(s, tc);
     return s;
 }

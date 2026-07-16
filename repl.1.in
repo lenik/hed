@@ -109,6 +109,21 @@ Select only matches that span an entire line
 .B ^
 and
 .BR $ ).
+.TP
+.BR \-l ", " \-\-line
+Expand the match to the entire line.
+By default, only the matched portion is replaced.
+.TP
+.BR \-g ", " \-\-global
+Replace all occurrences in a single line (default).
+.TP
+.BR \-1 ", " \-\-first
+Replace only the first occurrence in a single line.
+.TP
+.B \-\-range=\fIN\fR..\fIM\fR
+Replace the N-th through M-th occurrences per line (1-based).
+If M is omitted, replace from N to the end.
+If the argument is "..", this is equivalent to "1..inf" (replace all).
 .SS File selection
 .TP
 .BR \-r ", " \-\-recursive
@@ -315,6 +330,14 @@ Extended regexp digit wipe:
 .nf
 repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
 .fi
+.PP
+Replace 2nd and 3rd word characters in each line:
+.PP
+.nf
+repl \-n 2..3 \-P \[aq]\[aq]\[aq]w\[aq] . path/to/file
+.fi
+.PP
+With the above, a line like "a/b/c/d/e" becomes "a/././d/e".
 .SH ENVIRONMENT
 .TP
 .B LANGUAGE
