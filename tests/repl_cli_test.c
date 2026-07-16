@@ -47,6 +47,24 @@ static int run_repl(char *const argv[]) {
     return -1;
 }
 
+/* Run repl with stdout redirected to out_path; return exit status. */
+static int run_repl_capture(char *const argv[], const char *out_path) {
+    pid_t pid = fork();
+    int status;
+
+    ck_assert_int_ge(pid, 0);
+    if (pid == 0) {
+        freopen(out_path, "w", stdout);
+        execv(argv[0], argv);
+        _exit(127);
+    }
+    waitpid(pid, &status, 0);
+    if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    }
+    return -1;
+}
+
 START_TEST(test_cli_fixed_replace) {
     char dir[] = "/tmp/hed-repl-XXXXXX";
     char path[128];
@@ -210,6 +228,104 @@ START_TEST(test_cli_ere) {
 }
 END_TEST
 
+START_TEST(test_cli_dryrun_no_write) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char path[128];
+    char outp[128];
+    char *file;
+    char *out;
+    char *argv[8];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/t.txt", dir);
+    snprintf(outp, sizeof outp, "%s/out.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("orig\n", f);
+        fclose(f);
+    }
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-n";
+    argv[2] = "-q";
+    argv[3] = "orig";
+    argv[4] = "modified";
+    argv[5] = path;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    file = read_all(path);
+    ck_assert_str_eq(file, "orig\n");
+    free(file);
+
+    argv[1] = "-n";
+    argv[2] = "orig";
+    argv[3] = "modified";
+    argv[4] = path;
+    argv[5] = NULL;
+    ck_assert_int_eq(run_repl_capture(argv, outp), 0);
+    out = read_all(outp);
+    ck_assert_ptr_nonnull(strstr(out, "would change:"));
+    ck_assert_ptr_nonnull(strstr(out, path));
+    free(out);
+
+    file = read_all(path);
+    ck_assert_str_eq(file, "orig\n");
+    free(file);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_unified_banner_dryrun) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char path[128];
+    char outp[128];
+    char banner[160];
+    char *file;
+    char *out;
+    char *argv[10];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/t.txt", dir);
+    snprintf(outp, sizeof outp, "%s/out.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("orig\n", f);
+        fclose(f);
+    }
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-n";
+    argv[2] = "-u";
+    argv[3] = "-q";
+    argv[4] = "--color=always";
+    argv[5] = "orig";
+    argv[6] = "modified";
+    argv[7] = path;
+    argv[8] = NULL;
+    ck_assert_int_eq(run_repl_capture(argv, outp), 0);
+
+    file = read_all(path);
+    ck_assert_str_eq(file, "orig\n");
+    free(file);
+
+    out = read_all(outp);
+    snprintf(banner, sizeof banner, "::: %s :::", path);
+    ck_assert_ptr_nonnull(strstr(out, banner));
+    ck_assert_ptr_null(strstr(out, "/tmp/hed-repl-a-"));
+    ck_assert_ptr_nonnull(strstr(out, "-orig"));
+    ck_assert_ptr_nonnull(strstr(out, "+modified"));
+    /* reverse-video / SGR present when --color=always */
+    ck_assert_ptr_nonnull(strstr(out, "\033["));
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
 static Suite *suite(void) {
     Suite *s = suite_create("repl_cli");
     TCase *tc = tcase_create("cli");
@@ -220,6 +336,8 @@ static Suite *suite(void) {
     tcase_add_test(tc, test_cli_ignore_case);
     tcase_add_test(tc, test_cli_recursive);
     tcase_add_test(tc, test_cli_ere);
+    tcase_add_test(tc, test_cli_dryrun_no_write);
+    tcase_add_test(tc, test_cli_unified_banner_dryrun);
     suite_add_tcase(s, tc);
     return s;
 }
