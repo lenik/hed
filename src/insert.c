@@ -17,7 +17,6 @@
 #include <bas/log/deflog.h>
 #include <bas/proc/env.h>
 
-#include <errno.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -476,12 +475,18 @@ int main(int argc, char **argv) {
         keep_from = skip_lines(old, old_len, insert_at, remove_num);
 
         /*
-         * Empty delete at prepend: -rN keeps from 1-based line N onward
-         * (e.g. insert -0 -r3 FILE on a/b/c/d/e => c/d/e).
+         * Empty delete at prepend: -rN removes N lines from the beginning
+         * -0 -r3 on a/b/c/d/e => c/d/e (remove lines 1-2, keep from line 3)
+         * -1 -r3 on a/b/c/d/e => d/e (remove lines 1-3, keep from line 4)
+         * The difference is that -0 has blank_after=1, which affects the offset.
          * Suppress -0 trailing blank when there is no insert payload.
          */
         if (payload_len == 0 && remove_num > 0 && posmode == POS_PREPEND) {
-            keep_from = line_byte_offset(old, old_len, remove_num, '\n');
+            long offset = remove_num;
+            if (blank_after == 0) {
+                offset = remove_num + 1;
+            }
+            keep_from = line_byte_offset(old, old_len, offset, '\n');
             insert_at = 0;
             blank_after = 0;
             lead_blanks = 0;

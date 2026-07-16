@@ -142,8 +142,9 @@ When no
 .I SRC
 is given at prepend (\fB\-p\fR, \fB\-1\fR, \fB\-0\fR),
 .I NUM
-selects the first line to keep (1-based); earlier lines are deleted
-(for example \fBinsert \-0 \-r3 FILE\fR on \fIa/b/c/d/e\fR yields \fIc/d/e\fR).
+specifies how many lines to remove from the beginning (1-based).
+With \fB\-0\fR, the count is relative to the blank line (e.g. \fBinsert \-0 \-r3 FILE\fR on \fIa/b/c/d/e\fR yields \fIc/d/e\fR).
+With \fB\-1\fR, the count is exact (e.g. \fBinsert \-1 \-r3 FILE\fR on \fIa/b/c/d/e\fR yields \fId/e\fR).
 .SS Source formatting
 .TP
 .BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
