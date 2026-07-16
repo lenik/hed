@@ -58,7 +58,7 @@ configure_file(
     configuration: config_h,
 )
 
-bas_c_dep = dependency('bas-c', required: true)
+bas_c_dep = dependency('bas-c-static', required: true)
 pcre2_dep = dependency('libpcre2-8', required: true)
 
 nowarn = cpp.get_supported_arguments(['-w', '/w'])
@@ -99,6 +99,10 @@ repl_sources = [
     'src/walk.c',
 ] + common_edit
 
+catq_sources = [
+    'src/catq.c',
+]
+
 insert_exe = executable(
     'insert',
     insert_sources,
@@ -121,9 +125,21 @@ repl_exe = executable(
     install_dir: bindir,
 )
 
+catq_exe = executable(
+    'catq',
+    catq_sources,
+    c_args: c_args,
+    c_pch: c_pch,
+    include_directories: src_inc,
+    dependencies: [bas_c_dep],
+    install: true,
+    install_dir: bindir,
+)
+
 bash_files = [
     'insert.bash',
     'repl.bash',
+    'catq.bash',
 ]
 
 foreach file : bash_files
@@ -166,8 +182,16 @@ configure_file(
     install_dir: mandir / 'man1',
 )
 
+configure_file(
+    input: 'catq.1.in',
+    output: 'catq.1',
+    configuration: config_man,
+    install: true,
+    install_dir: mandir / 'man1',
+)
+
 manpage_langs = ['de', 'eo', 'fr', 'it', 'ja', 'ko', 'th', 'vi', 'zh_CN', 'zh_TW']
-manpage_names = ['insert', 'repl']
+manpage_names = ['insert', 'repl', 'catq']
 foreach lang : manpage_langs
     foreach name : manpage_names
         manin = 'man' / lang / (name + '.1.in')
@@ -214,10 +238,13 @@ run_target(
 
             sudo ln -sfn "@BUILD_ROOT@/insert" "$bindir/insert"
             sudo ln -sfn "@BUILD_ROOT@/repl" "$bindir/repl"
+            sudo ln -sfn "@BUILD_ROOT@/catq" "$bindir/catq"
             sudo ln -sfn "@BUILD_ROOT@/insert.1" "$mandir/man1/insert.1"
             sudo ln -sfn "@BUILD_ROOT@/repl.1" "$mandir/man1/repl.1"
+            sudo ln -sfn "@BUILD_ROOT@/catq.1" "$mandir/man1/catq.1"
             sudo ln -sfn "@SOURCE_ROOT@/insert.bash" "$datadir/bash-completion/completions/insert"
             sudo ln -sfn "@SOURCE_ROOT@/repl.bash" "$datadir/bash-completion/completions/repl"
+            sudo ln -sfn "@SOURCE_ROOT@/catq.bash" "$datadir/bash-completion/completions/catq"
 
             printf "Symlinks installed under %s\n" "$prefix"
         '''.format(
@@ -244,10 +271,13 @@ run_target(
             for p in \
                 "$bindir/insert" \
                 "$bindir/repl" \
+                "$bindir/catq" \
                 "$mandir/man1/insert.1" \
                 "$mandir/man1/repl.1" \
+                "$mandir/man1/catq.1" \
                 "$datadir/bash-completion/completions/insert" \
-                "$datadir/bash-completion/completions/repl"
+                "$datadir/bash-completion/completions/repl" \
+                "$datadir/bash-completion/completions/catq"
             do
                 if [ -L "$p" ]; then
                     sudo rm -f "$p"

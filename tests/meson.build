@@ -73,3 +73,19 @@ test(
     env: {'HED_REPL': repl_exe.full_path()},
     depends: [repl_exe],
 )
+
+catq_cli = executable(
+    'catq_cli',
+    'catq_cli_test.c',
+    c_args: c_args,
+    c_pch: c_pch,
+    include_directories: src_inc,
+    dependencies: [bas_c_dep, check_dep],
+    install: false,
+)
+test(
+    'catq_cli',
+    catq_cli,
+    env: {'HED_CATQ': catq_exe.full_path()},
+    depends: [catq_exe],
+)
