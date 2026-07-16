@@ -1,0 +1,272 @@
+.TH REPL 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "ユーザコマンド"
+.SH NAME
+repl \- ファイル内のテキストを一括置換する（人間向けエディタ）
+.SH SYNOPSIS
+.B repl
+[\fIOPTION\fR]... \fIPATTERN\fR \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+[\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.SH DESCRIPTION
+.B repl
+は、指定した各
+.I FILE
+内で
+.I PATTERN
+を検索し、一致した部分を
+.I REPLACEMENT
+に置き換えます。
+ストリームエディタとは異なり、
+.B repl
+はファイルをその場で編集します。
+結果が元の内容と異なる場合にのみファイルを書き換えます
+（対象の隣に作成する一時ファイルを介した原子的な書き込み）。
+.PP
+.I FILE
+引数が指定されない場合、
+.B repl
+は標準入力を読み込み、置換結果を標準出力に書き込みます。
+.PP
+.B \-e
+または
+.B \-f
+（あるいは両方）でパターンを与えた場合、残りの最初の非オプション引数が
+.I REPLACEMENT
+となり、それ以降の引数はすべてファイルとして扱われます。
+それ以外の場合、最初の 2 つの非オプション引数が
+.I PATTERN
+と
+.I REPLACEMENT
+になります。
+.PP
+パターンの照合は
+.BR grep (1)
+の規則に従います。
+既定のパターン種別は固定文字列（\fB\-F\fR）です。
+.SH OPTIONS
+.SS Pattern selection
+.TP
+.BR \-F ", " \-\-fixed\-strings
+パターンを固定文字列として解釈します。
+これが既定です。
+.TP
+.BR \-E ", " \-\-extended\-regexp
+パターンを POSIX 拡張正規表現（ERE）として解釈します。
+.TP
+.BR \-G ", " \-\-basic\-regexp
+パターンを POSIX 基本正規表現（BRE）として解釈します。
+.TP
+.BR \-P ", " \-\-perl\-regexp
+パターンを PCRE2 を用いた Perl 互換正規表現として解釈します。
+.TP
+.BR \-e " \fIPATTERNS\fR, " \-\-regexp=\fIPATTERNS\fR
+.I PATTERNS
+をパターンとして使用します。
+複数回指定でき、
+.B \-f
+と組み合わせることもできます。
+.B \-
+で始まるパターンを保護するのに便利です。
+.TP
+.BR \-f " \fIFILE\fR, " \-\-file=\fIFILE\fR
+.I FILE
+からパターンを 1 行ごとに読み込みます。
+空のファイルはパターンを 0 個与えたことになります（何にも一致しません）。
+.B \-
+を使うと標準入力からパターンを読み込みます。
+.TP
+.BR \-i ", " \-\-ignore\-case
+パターンおよび入力データにおける大文字小文字の違いを無視します。
+.TP
+.B \-\-no\-ignore\-case
+大文字小文字を無視しません（既定）。
+以前に指定した
+.B \-i
+を打ち消すためにスクリプトで便利です。
+.TP
+.BR \-v ", " \-\-invert\-match
+一致の意味を反転させます:
+.I PATTERN
+に一致
+.B しない
+各行全体が
+.I REPLACEMENT
+に置き換えられます。
+一致する行はそのまま変更されません。
+.TP
+.BR \-w ", " \-\-word\-regexp
+単語全体を形成する一致のみを選択します
+（非単語文字または行の端で区切られたもの）。
+単語文字とは、文字、数字、およびアンダースコアです。
+.B \-x
+も指定されている場合は効果がありません。
+.TP
+.BR \-x ", " \-\-line\-regexp
+行全体に及ぶ一致のみを選択します
+（パターンが
+.B ^
+と
+.B $
+で固定されているかのように）。
+.SS File selection
+.TP
+.BR \-r ", " \-\-recursive
+各ディレクトリの下にあるすべてのファイルを再帰的に読み込みます。
+コマンドライン上に現れたシンボリックリンクのみをたどります。
+.TP
+.BR \-R ", " \-\-dereference\-recursive
+.B \-r
+と同様ですが、見つかったすべてのシンボリックリンクをたどります。
+.TP
+.B \-\-max\-depth=\fINUM\fR
+ディレクトリの再帰の深さを制限します。
+深さ 0 は開始ディレクトリの項目のみを意味します。
+.TP
+.B \-\-exclude=\fIGLOB\fR
+ベース名が
+.I GLOB
+に一致するファイルをスキップします
+（シェル形式、
+.BR fnmatch (3)
+と同様）。
+.TP
+.B \-\-exclude\-from=\fIFILE\fR
+.I FILE
+から除外グロブを 1 行ごとに読み込みます。
+.TP
+.B \-\-exclude\-dir=\fIGLOB\fR
+ベース名が
+.I GLOB
+に一致するディレクトリをスキップします。
+.TP
+.B \-\-include=\fIGLOB\fR
+ベース名が
+.I GLOB
+に一致するファイルのみを処理します。
+.B \-\-include
+オプションが指定されている場合、ファイルは少なくとも 1 つの include グロブに一致しなければなりません。
+.TP
+.BR \-d ", " \-\-directories=\fIACTION\fR
+コマンドラインで指定されたディレクトリの扱い方:
+.RS
+.TP
+.B repl
+ディレクトリを通常のファイルとして扱います（既定；通常は失敗します）。
+.TP
+.B skip
+ディレクトリを黙ってスキップします。
+.TP
+.B recurse
+.B \-r
+と同様に、各ディレクトリの下のファイルを再帰的に処理します。
+.RE
+.TP
+.BR \-D ", " \-\-devices=\fIACTION\fR
+デバイスノード、FIFO、およびソケットの扱い方:
+.B repl
+（既定）または
+.BR skip 。
+.TP
+.B \-\-binary\-files=\fITYPE\fR
+バイナリファイルの扱いを制御します:
+.RS
+.TP
+.B binary
+既定。
+ファイルの先頭のテキスト部分でのみ置換を行い、
+最初の印字不可能なバイトの前で停止します
+（タブ、改行、キャリッジリターン、およびフォームフィードは許可されます）。
+.TP
+.B without\-match
+バイナリファイルを完全に除外します（変更しません）。
+.TP
+.B text
+ファイルをテキストとして扱い、ファイル全体を処理します。
+.RE
+.TP
+.B \-I
+.BR \-\-binary\-files=without\-match
+と同じです。
+.TP
+.BR \-U ", " \-\-binary
+ファイルをバイナリとして扱い、印字可能プレフィックスの推定を無効にします
+（バッファ全体を処理します）。
+.TP
+.BR \-z ", " \-\-null\-data
+入力および出力を、改行の代わりに NUL バイトで終端された行の並びとして扱います。
+.B \-v
+や
+.B \-x
+のような行単位のオプションに影響します。
+.SS Reporting
+.TP
+.BR \-q ", " \-\-quiet ", " \-\-silent
+変更されたファイル数を示す既定の 1 行の概要を表示しません。
+.TP
+.BR \-c ", " \-\-context
+変更された各ファイルについて、
+.B "diff \-c"
+と同様のコンテキスト diff を表示します。
+.TP
+.BR \-u ", " \-\-unified
+変更された各ファイルについて、
+.B "diff \-u"
+と同様の統一 diff を表示します。
+.TP
+.BR \-s ", " \-\-summary
+詳細な一括処理の概要（検査したファイル数、変更したファイル数、
+置換件数、およびスキップしたバイナリファイル数）を表示します。
+.TP
+.BR \-h ", " \-\-help
+使用法メッセージを表示して終了します。
+.TP
+.B \-\-version
+バージョン情報を表示して終了します。
+.SH EXIT STATUS
+.TP
+.B 0
+成功（変更が不要だった場合を含む）。
+.TP
+.B 1
+使用法の誤りが発生した、パターンのコンパイルに失敗した、
+またはファイルを処理できなかった場合。
+.SH EXAMPLES
+1 つのファイル内の固定文字列を置換する:
+.PP
+.nf
+repl foo bar notes.txt
+.fi
+.PP
+ディレクトリツリー全体で大文字小文字を区別せずに名前を変更する:
+.PP
+.nf
+repl \-i \-r OldName NewName src/
+.fi
+.PP
+拡張正規表現で数字を消去する:
+.PP
+.nf
+repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+利用可能な場合、メッセージおよび翻訳済みマニュアルページの言語を選択します。
+.SH AUTHOR
+@PROJECT_AUTHOR@ によって作成されました。
+.SH REPORTING BUGS
+バグは <@PROJECT_EMAIL@> に報告してください。
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR grep (1),
+.BR sed (1),
+.BR diff (1),
+.BR insert (1)

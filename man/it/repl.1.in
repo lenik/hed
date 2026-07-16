@@ -1,0 +1,269 @@
+.TH REPL 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Comandi utente"
+.SH NAME
+repl \- sostituisce testo in blocco nei file (editor umano)
+.SH SYNOPSIS
+.B repl
+[\fIOPTION\fR]... \fIPATTERN\fR \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+[\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.SH DESCRIPTION
+.B repl
+cerca
+.I PATTERN
+in ciascun
+.I FILE
+indicato e sostituisce le corrispondenze con
+.IR REPLACEMENT .
+A differenza di un editor di flusso,
+.B repl
+modifica i file sul posto.
+Un file viene riscritto solo quando il risultato differisce dal contenuto originale
+(scrittura atomica tramite un file temporaneo accanto alla destinazione).
+.PP
+Senza argomenti
+.IR FILE ,
+.B repl
+legge dallo standard input e scrive il risultato sostituito sullo standard output.
+.PP
+Quando
+.B \-e
+e/o
+.B \-f
+forniscono i pattern, il primo argomento non-opzione rimanente è
+.I REPLACEMENT
+ed eventuali ulteriori argomenti sono file.
+Altrimenti i primi due argomenti non-opzione sono
+.I PATTERN
+e
+.IR REPLACEMENT .
+.PP
+La corrispondenza dei pattern segue le convenzioni di
+.BR grep (1).
+Il tipo di pattern predefinito è le stringhe fisse (\fB\-F\fR).
+.SH OPTIONS
+.SS Pattern selection
+.TP
+.BR \-F ", " \-\-fixed\-strings
+Interpretare i pattern come stringhe fisse.
+Questo è il comportamento predefinito.
+.TP
+.BR \-E ", " \-\-extended\-regexp
+Interpretare i pattern come espressioni regolari estese POSIX (ERE).
+.TP
+.BR \-G ", " \-\-basic\-regexp
+Interpretare i pattern come espressioni regolari di base POSIX (BRE).
+.TP
+.BR \-P ", " \-\-perl\-regexp
+Interpretare i pattern come espressioni regolari compatibili con Perl tramite PCRE2.
+.TP
+.BR \-e " \fIPATTERNS\fR, " \-\-regexp=\fIPATTERNS\fR
+Usare
+.I PATTERNS
+come pattern.
+Può essere specificato più volte e combinato con
+.BR \-f .
+Utile per proteggere un pattern che inizia con
+.BR \- .
+.TP
+.BR \-f " \fIFILE\fR, " \-\-file=\fIFILE\fR
+Ottenere i pattern da
+.IR FILE ,
+uno per riga.
+Un file vuoto fornisce zero pattern (nulla corrisponde).
+Usare
+.B \-
+per leggere i pattern dallo standard input.
+.TP
+.BR \-i ", " \-\-ignore\-case
+Ignorare le distinzioni tra maiuscole e minuscole nei pattern e nei dati di input.
+.TP
+.B \-\-no\-ignore\-case
+Non ignorare le maiuscole/minuscole (predefinito).
+Utile negli script per annullare un precedente
+.BR \-i .
+.TP
+.BR \-v ", " \-\-invert\-match
+Invertire il senso della corrispondenza:
+ogni riga che
+.B non
+corrisponde a
+.I PATTERN
+viene sostituita interamente con
+.IR REPLACEMENT .
+Le righe corrispondenti rimangono invariate.
+.TP
+.BR \-w ", " \-\-word\-regexp
+Selezionare solo le corrispondenze che formano parole intere
+(delimitate da caratteri non alfanumerici o dagli estremi della riga).
+I caratteri di parola sono lettere, cifre e underscore.
+Non ha effetto se
+.B \-x
+è anch'essa specificata.
+.TP
+.BR \-x ", " \-\-line\-regexp
+Selezionare solo le corrispondenze che coprono un'intera riga
+(come se il pattern fosse ancorato con
+.B ^
+e
+.BR $ ).
+.SS File selection
+.TP
+.BR \-r ", " \-\-recursive
+Leggere tutti i file sotto ciascuna directory, ricorsivamente.
+Seguire i link simbolici solo quando appaiono sulla riga di comando.
+.TP
+.BR \-R ", " \-\-dereference\-recursive
+Come
+.BR \-r ,
+ma segue i link simbolici ovunque si trovino.
+.TP
+.B \-\-max\-depth=\fINUM\fR
+Limitare la profondità della ricorsione nelle directory.
+Profondità 0 significa solo le voci della directory di partenza.
+.TP
+.B \-\-exclude=\fIGLOB\fR
+Saltare i file il cui nome base corrisponde a
+.IR GLOB
+(stile shell, come in
+.BR fnmatch (3)).
+.TP
+.B \-\-exclude\-from=\fIFILE\fR
+Leggere i pattern di esclusione da
+.IR FILE ,
+uno per riga.
+.TP
+.B \-\-exclude\-dir=\fIGLOB\fR
+Saltare le directory il cui nome base corrisponde a
+.IR GLOB .
+.TP
+.B \-\-include=\fIGLOB\fR
+Elaborare solo i file il cui nome base corrisponde a
+.IR GLOB .
+Se viene specificata almeno un'opzione
+.BR \-\-include ,
+un file deve corrispondere ad almeno un pattern di inclusione.
+.TP
+.BR \-d ", " \-\-directories=\fIACTION\fR
+Come gestire le directory indicate sulla riga di comando:
+.RS
+.TP
+.B repl
+Trattare la directory come un file ordinario (predefinito; solitamente fallisce).
+.TP
+.B skip
+Saltare le directory silenziosamente.
+.TP
+.B recurse
+Come
+.BR \-r :
+elaborare i file sotto ciascuna directory ricorsivamente.
+.RE
+.TP
+.BR \-D ", " \-\-devices=\fIACTION\fR
+Come gestire i device, i FIFO e i socket:
+.B repl
+(predefinito) o
+.BR skip .
+.TP
+.B \-\-binary\-files=\fITYPE\fR
+Controllare la gestione dei file binari:
+.RS
+.TP
+.B binary
+Predefinito.
+Eseguire la sostituzione solo nella parte di testo iniziale del file,
+interrompendosi prima del primo byte non stampabile
+(tabulazione, nuova riga, ritorno a capo e avanzamento pagina sono consentiti).
+.TP
+.B without\-match
+Omettere completamente i file binari (non modificarli).
+.TP
+.B text
+Trattare il file come testo; elaborare l'intero file.
+.RE
+.TP
+.B \-I
+Come
+.BR \-\-binary\-files=without\-match .
+.TP
+.BR \-U ", " \-\-binary
+Trattare i file come binari e disabilitare l'euristica del prefisso stampabile
+(elaborare l'intero buffer).
+.TP
+.BR \-z ", " \-\-null\-data
+Trattare input e output come sequenze di righe terminate da un byte NUL
+invece che da una nuova riga.
+Influisce sulle opzioni orientate alla riga come
+.B \-v
+e
+.BR \-x .
+.SS Reporting
+.TP
+.BR \-q ", " \-\-quiet ", " \-\-silent
+Non stampare il riepilogo predefinito di una riga sul numero di file modificati.
+.TP
+.BR \-c ", " \-\-context
+Per ciascun file modificato, stampare un diff contestuale come da
+.BR "diff \-c" .
+.TP
+.BR \-u ", " \-\-unified
+Per ciascun file modificato, stampare un diff unificato come da
+.BR "diff \-u" .
+.TP
+.BR \-s ", " \-\-summary
+Stampare un riepilogo dettagliato dell'elaborazione: file esaminati, file modificati,
+numero di sostituzioni e file binari saltati.
+.TP
+.BR \-h ", " \-\-help
+Stampare un messaggio d'uso e uscire.
+.TP
+.B \-\-version
+Stampare le informazioni di versione e uscire.
+.SH EXIT STATUS
+.TP
+.B 0
+Successo (anche quando nessun file ha avuto bisogno di modifiche).
+.TP
+.B 1
+Si è verificato un errore d'uso, un pattern non è stato compilato, oppure un file non ha potuto essere elaborato.
+.SH EXAMPLES
+Sostituire una stringa fissa in un file:
+.PP
+.nf
+repl foo bar notes.txt
+.fi
+.PP
+Rinomina senza distinzione tra maiuscole e minuscole in un albero di directory:
+.PP
+.nf
+repl \-i \-r OldName NewName src/
+.fi
+.PP
+Rimozione di cifre con espressione regolare estesa:
+.PP
+.nf
+repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Selezionare la lingua per i messaggi e le pagine di manuale tradotte, quando disponibili.
+.SH AUTHOR
+Scritto da @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Segnalare i bug a <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR grep (1),
+.BR sed (1),
+.BR diff (1),
+.BR insert (1)

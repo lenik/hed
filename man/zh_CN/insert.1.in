@@ -1,0 +1,246 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "用户命令"
+.SH NAME
+insert \- 在文件的指定行位置插入文本或文件内容
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+将每个
+.I SRC
+的内容拼接到目标
+.I FILE
+的选定行位置。
+仅当结果与原内容不同时才重写目标
+（通过目标旁的临时文件进行原子写入）。
+.PP
+默认情况下，每个
+.I SRC
+都是
+.B 扩展
+源（\fB\-e\fR）：
+若以
+.BR @ ,
+开头，则其余部分为要读取的文件名；
+否则该参数视为字符串字面量。
+.PP
+未给出位置选项时，
+.B insert
+追加到文件末尾。
+.SH OPTIONS
+.SS Source modes
+这些选项互斥；后者覆盖前者。
+.TP
+.BR \-l ", " \-\-strings
+将每个
+.I SRC
+视为字符串字面量（原始字节，加上
+.BR \-\-blank
+产生的任何尾随换行）。
+.TP
+.BR \-f ", " \-\-filenames
+将每个
+.I SRC
+视为要读取的路径。
+.TP
+.BR \-e ", " \-\-extended
+扩展源（默认）：
+.BI @ FILE
+从
+.IR FILE
+读取；
+其他参数视为字符串字面量。
+.SS Position
+.TP
+.BI \-n " NUM"
+在以 1 为起始的第
+.IR NUM
+行之前插入。
+若文件行数少于
+.I NUM
+行，则在文件末尾追加空行
+（如缺少末尾换行则先补上），
+使插入内容落在第
+.IR NUM
+行。
+.TP
+.BR \-0 " .. " \-9
+数字短选项，累加为十进制数
+（例如
+.B \-20
+是
+.B 2
+然后
+.BR 0 ）。
+.RS
+.TP
+.B \-1
+等同于
+.BR \-\-prepend 。
+.TP
+.B \-0
+先插入内容，再插入一个空行
+（内容出现在原文件开头之前，并以空行分隔）。
+.TP
+.B \-N
+（当
+.IR N " \(>= 2)"
+时）
+等同于
+.BI \-n " N"
+（在第
+.IR N
+行之前插入，必要时在文件末尾填充空行）。
+.TP
+在
+.B \-a
+之后，
+数字选择追加方式：
+.B 0
+追加到末尾；
+.B 1
+或更大则在距末尾第 N 行之前插入。
+.RE
+.TP
+.BR \-a ", " \-\-append
+面向追加的位置。
+.B \-a
+或
+.B \-a0
+追加到文件末尾（类似 shell 的
+.BR >> ）。
+.B \-a1
+在最后一行之前插入；
+.BI \-a N
+（当
+.IR N " \(>= 1)"
+时）在距末尾第
+.IR N
+行之前插入。
+.TP
+.BR \-p ", " \-\-prepend
+插入到文件开头。
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+在插入前于插入点删除
+.I NUM
+行。
+无
+.I SRC
+参数时即删除这些行。
+示例：
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+删除第 3、4 行。
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+替换 shebang。
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+替换最后一行（页脚）。
+.RE
+当使用
+.B \-r
+且无插入内容、而行位置超出文件末尾时，
+不会填充空行；仅尝试删除（在 EOF 处通常无操作）。
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+在每个
+.IR SRC
+之后追加
+.I NUM
+个换行符。
+省略该选项时，默认对字符串字面量为
+.B 1 ，
+对文件名为
+.B 0
+（在
+.BR \-e
+下：字符串参数与
+.BI @ FILE ）。
+若给出
+.B \-b ，
+则同一
+.I NUM
+适用于每个
+.IR SRC 。
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+若无法读取文件名源，则使用
+.I TEXT
+而不报错失败。
+缺失文本按字符串处理
+.B \-\-blank
+默认值。
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+提高日志详细程度（可重复）。
+.TP
+.BR \-q ", " \-\-quiet
+降低日志详细程度。
+.TP
+.BR \-h ", " \-\-help
+打印用法信息并退出。
+.TP
+.B \-\-version
+打印版本信息并退出。
+.SH EXIT STATUS
+.TP
+.B 0
+成功。
+.TP
+.B 1
+用法错误、缺少目标、I/O 失败或内存不足。
+.SH EXAMPLES
+在开头插入标题行（字符串默认会追加尾随换行）：
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+在第 20 行前插入文件片段（文件较短时会填充）：
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+删除第 3–4 行：
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+替换 shebang：
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+替换页脚行：
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+在可用时选择消息与已翻译手册页的语言。
+.SH AUTHOR
+由 @PROJECT_AUTHOR@ 编写。
+.SH REPORTING BUGS
+将缺陷报告至 <@PROJECT_EMAIL@>。
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

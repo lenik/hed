@@ -1,0 +1,244 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "사용자 명령"
+.SH NAME
+insert \- 파일의 지정한 줄 위치에 텍스트나 파일 내용을 삽입한다
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+는 각
+.I SRC
+의 내용을 대상
+.I FILE
+의 선택한 줄 위치에 이어 붙인다.
+결과가 원본과 다를 때만 대상 파일을 다시 쓴다
+(대상 옆에 만든 임시 파일을 통한 원자적 쓰기).
+.PP
+기본적으로 각
+.I SRC
+는
+.B 확장
+소스(\fB\-e\fR)로 취급된다:
+.BR @
+로 시작하면 나머지 부분이 읽어들일 파일 이름이 되고,
+그렇지 않으면 해당 인자는 문자열 리터럴로 취급된다.
+.PP
+위치 옵션이 지정되지 않으면
+.B insert
+는 파일 끝에 추가한다.
+.SH OPTIONS
+.SS Source modes
+이 옵션들은 서로 배타적이며, 마지막에 지정한 것이 적용된다.
+.TP
+.BR \-l ", " \-\-strings
+각
+.I SRC
+를 문자열 리터럴(원시 바이트, 그리고
+.BR \-\-blank
+로 인한 후행 개행 문자 포함)로 취급한다.
+.TP
+.BR \-f ", " \-\-filenames
+각
+.I SRC
+를 읽어들일 경로로 취급한다.
+.TP
+.BR \-e ", " \-\-extended
+확장 소스(기본값):
+.BI @ FILE
+는
+.IR FILE
+에서 읽어들이며,
+그 외의 인자는 문자열 리터럴로 취급된다.
+.SS Position
+.TP
+.BI \-n " NUM"
+1부터 시작하는 줄
+.IR NUM
+앞에 삽입한다.
+파일의 줄 수가
+.I NUM
+보다 적으면 파일 끝에 빈 줄이 추가되어
+(필요하면 먼저 누락된 마지막 개행 문자를 추가한 뒤)
+삽입한 내용이 줄
+.IR NUM
+에 위치하게 된다.
+.TP
+.BR \-0 " .. " \-9
+숫자를 누적하여 십진수를 구성하는 숫자 단문자 옵션이다
+(예를 들어
+.B \-20
+은
+.B 2
+다음
+.BR 0 이다).
+.RS
+.TP
+.B \-1
+.BR \-\-prepend
+와 같다.
+.TP
+.B \-0
+내용을 먼저 삽입한 뒤 빈 줄을 하나 삽입한다
+(내용이 원래 시작 부분보다 앞에 나타나며, 빈 줄로 구분된다).
+.TP
+.B \-N
+(
+.IR N " \(>= 2)"
+인 경우)
+.BI \-n " N"
+과 같다
+(줄
+.IR N
+앞에 삽입하며, 필요하면 파일 끝을 빈 줄로 채운다).
+.TP
+.B \-a
+뒤에 오는 숫자는 추가 방식을 고른다:
+.B 0
+은 끝에 추가;
+.B 1
+이상은 끝에서 N번째 줄 앞에 삽입.
+.RE
+.TP
+.BR \-a ", " \-\-append
+추가 지향 위치.
+.B \-a
+또는
+.B \-a0
+은 파일 끝에 추가한다(셸
+.BR >>
+와 같음).
+.B \-a1
+은 마지막 줄 앞에 삽입;
+.BI \-a N
+(
+.IR N " \(>= 1)"
+일 때)은 끝에서
+.IR N
+번째 줄 앞에 삽입한다.
+.TP
+.BR \-p ", " \-\-prepend
+파일 시작 부분에 삽입한다.
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+삽입 전에 삽입 지점에서
+.I NUM
+줄을 제거한다.
+.I SRC
+인자가 없으면 해당 줄을 삭제한다.
+예:
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+3번째와 4번째 줄을 삭제.
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+셔뱅을 교체.
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+마지막 줄(꼬리말)을 교체.
+.RE
+.B \-r
+를 삽입 내용 없이 쓰고 줄 위치가 파일 끝을 지나면
+빈 줄을 채우지 않으며, 삭제만 시도한다(EOF에서는 종종 아무 일도 없음).
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+각
+.I SRC
+뒤에
+.I NUM
+개의 개행 문자를 추가한다.
+이 옵션을 생략하면 기본값은 문자열 리터럴의 경우
+.B 1
+, 파일 이름의 경우
+.B 0
+이다
+(
+.BR \-e
+아래에서 문자열 인자와
+.BI @ FILE
+의 차이에 대응한다).
+.B \-b
+가 지정되면 동일한
+.I NUM
+이 모든
+.I SRC
+에 적용된다.
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+파일 이름 소스를 읽을 수 없는 경우 실패하는 대신
+.I TEXT
+를 사용한다.
+누락 텍스트는
+.B \-\-blank
+기본값 계산에서 문자열처럼 취급된다.
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+로그 상세도를 높인다(반복 지정 가능).
+.TP
+.BR \-q ", " \-\-quiet
+로그 상세도를 낮춘다.
+.TP
+.BR \-h ", " \-\-help
+사용법 메시지를 출력하고 종료한다.
+.TP
+.B \-\-version
+버전 정보를 출력하고 종료한다.
+.SH EXIT STATUS
+.TP
+.B 0
+성공.
+.TP
+.B 1
+사용법 오류, 대상 누락, I/O 실패, 또는 메모리 부족.
+.SH EXAMPLES
+헤더 줄을 앞에 삽입한다(문자열 기본값은 후행 개행 문자를 추가한다):
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+20번째 줄 앞에 파일 조각을 삽입한다(파일이 더 짧으면 채운다):
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+3–4번째 줄 삭제:
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+셔뱅 교체:
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+꼬리말 줄 교체:
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+사용 가능한 경우 메시지와 번역된 매뉴얼 페이지의 언어를 선택한다.
+.SH AUTHOR
+@PROJECT_AUTHOR@ 가 작성했다.
+.SH REPORTING BUGS
+버그는 <@PROJECT_EMAIL@> 로 보고한다.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

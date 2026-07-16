@@ -1,0 +1,279 @@
+.TH REPL 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Benutzerbefehle"
+.SH NAME
+repl \- Text in Dateien stapelweise ersetzen (menschlicher Editor)
+.SH SYNOPSIS
+.B repl
+[\fIOPTION\fR]... \fIPATTERN\fR \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+[\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.SH DESCRIPTION
+.B repl
+sucht nach
+.I PATTERN
+in jeder genannten
+.I FILE
+und ersetzt Treffer durch
+.IR REPLACEMENT .
+Anders als ein Stream-Editor
+bearbeitet
+.B repl
+Dateien direkt an Ort und Stelle.
+Eine Datei wird nur neu geschrieben, wenn sich das Ergebnis vom ursprünglichen Inhalt unterscheidet
+(atomares Schreiben über eine temporäre Datei neben dem Ziel).
+.PP
+Ohne
+.I FILE
+\-Argumente
+liest
+.B repl
+von der Standardeingabe und schreibt das Ersetzungsergebnis auf die Standardausgabe.
+.PP
+Wenn
+.B \-e
+und/oder
+.B \-f
+Muster liefern, ist das erste verbleibende Nicht-Options-Argument
+.I REPLACEMENT
+und alle weiteren Argumente sind Dateien.
+Andernfalls sind die ersten beiden Nicht-Options-Argumente
+.I PATTERN
+und
+.IR REPLACEMENT .
+.PP
+Die Musterübereinstimmung folgt den Konventionen von
+.BR grep (1).
+Der Standard-Mustertyp ist feste Zeichenketten (\fB\-F\fR).
+.SH OPTIONS
+.SS Pattern selection
+.TP
+.BR \-F ", " \-\-fixed\-strings
+Muster als feste Zeichenketten interpretieren.
+Dies ist der Standard.
+.TP
+.BR \-E ", " \-\-extended\-regexp
+Muster als POSIX extended regular expressions (ERE) interpretieren.
+.TP
+.BR \-G ", " \-\-basic\-regexp
+Muster als POSIX basic regular expressions (BRE) interpretieren.
+.TP
+.BR \-P ", " \-\-perl\-regexp
+Muster als Perl-kompatible reguläre Ausdrücke mittels PCRE2 interpretieren.
+.TP
+.BR \-e " \fIPATTERNS\fR, " \-\-regexp=\fIPATTERNS\fR
+.I PATTERNS
+als Muster verwenden.
+Kann mehrfach angegeben und mit
+.B \-f
+kombiniert werden.
+Nützlich, um ein mit
+.B \-
+beginnendes Muster zu schützen.
+.TP
+.BR \-f " \fIFILE\fR, " \-\-file=\fIFILE\fR
+Muster aus
+.I FILE
+beziehen, eines pro Zeile.
+Eine leere Datei liefert null Muster (nichts passt).
+Mit
+.B \-
+werden Muster von der Standardeingabe gelesen.
+.TP
+.BR \-i ", " \-\-ignore\-case
+Groß-/Kleinschreibung in Mustern und Eingabedaten ignorieren.
+.TP
+.B \-\-no\-ignore\-case
+Groß-/Kleinschreibung nicht ignorieren (Standard).
+Nützlich in Skripten, um ein vorheriges
+.B \-i
+aufzuheben.
+.TP
+.BR \-v ", " \-\-invert\-match
+Die Bedeutung der Übereinstimmung umkehren:
+Jede Zeile, die
+.I PATTERN
+.B nicht
+entspricht, wird vollständig durch
+.I REPLACEMENT
+ersetzt.
+Passende Zeilen bleiben unverändert.
+.TP
+.BR \-w ", " \-\-word\-regexp
+Nur Treffer auswählen, die ganze Wörter bilden
+(begrenzt durch Nicht-Wortzeichen oder die Zeilenenden).
+Wortzeichen sind Buchstaben, Ziffern und der Unterstrich.
+Hat keine Wirkung, wenn
+.B \-x
+ebenfalls angegeben ist.
+.TP
+.BR \-x ", " \-\-line\-regexp
+Nur Treffer auswählen, die eine ganze Zeile umfassen
+(als wäre das Muster mit
+.B ^
+und
+.B $
+verankert).
+.SS File selection
+.TP
+.BR \-r ", " \-\-recursive
+Alle Dateien unter jedem Verzeichnis rekursiv lesen.
+Symbolischen Links nur folgen, wenn sie auf der Befehlszeile angegeben sind.
+.TP
+.BR \-R ", " \-\-dereference\-recursive
+Wie
+.BR \-r ,
+folgt aber symbolischen Links, wo immer sie gefunden werden.
+.TP
+.B \-\-max\-depth=\fINUM\fR
+Begrenzt, wie tief die Verzeichnisrekursion gehen darf.
+Tiefe 0 bedeutet nur die Einträge des Startverzeichnisses.
+.TP
+.B \-\-exclude=\fIGLOB\fR
+Dateien überspringen, deren Basisname
+.I GLOB
+entspricht (Shell-Stil, wie in
+.BR fnmatch (3)).
+.TP
+.B \-\-exclude\-from=\fIFILE\fR
+Ausschluss-Globs aus
+.I FILE
+lesen, eines pro Zeile.
+.TP
+.B \-\-exclude\-dir=\fIGLOB\fR
+Verzeichnisse überspringen, deren Basisname
+.I GLOB
+entspricht.
+.TP
+.B \-\-include=\fIGLOB\fR
+Nur Dateien verarbeiten, deren Basisname
+.I GLOB
+entspricht.
+Ist mindestens eine
+.B \-\-include
+Option angegeben, muss eine Datei mindestens einem Include-Glob entsprechen.
+.TP
+.BR \-d ", " \-\-directories=\fIACTION\fR
+Wie mit auf der Befehlszeile genannten Verzeichnissen umgegangen wird:
+.RS
+.TP
+.B repl
+Das Verzeichnis wie eine normale Datei behandeln (Standard; schlägt meist fehl).
+.TP
+.B skip
+Verzeichnisse stillschweigend überspringen.
+.TP
+.B recurse
+Wie
+.BR \-r :
+Dateien unter jedem Verzeichnis rekursiv verarbeiten.
+.RE
+.TP
+.BR \-D ", " \-\-devices=\fIACTION\fR
+Wie mit Gerätedateien, FIFOs und Sockets umgegangen wird:
+.B repl
+(Standard) oder
+.BR skip .
+.TP
+.B \-\-binary\-files=\fITYPE\fR
+Steuert die Behandlung von Binärdateien:
+.RS
+.TP
+.B binary
+Standard.
+Ersetzung nur im führenden Textabschnitt der Datei durchführen,
+gestoppt vor dem ersten nicht druckbaren Byte
+(Tabulator, Zeilenumbruch, Wagenrücklauf und Seitenvorschub sind erlaubt).
+.TP
+.B without\-match
+Binärdateien vollständig auslassen (nicht verändern).
+.TP
+.B text
+Die Datei als Text behandeln; die gesamte Datei verarbeiten.
+.RE
+.TP
+.B \-I
+Wie
+.BR \-\-binary\-files=without\-match .
+.TP
+.BR \-U ", " \-\-binary
+Dateien als binär behandeln und die Heuristik für den druckbaren Präfix deaktivieren
+(den gesamten Puffer verarbeiten).
+.TP
+.BR \-z ", " \-\-null\-data
+Ein- und Ausgabe als Folgen von Zeilen behandeln, die durch ein NUL-Byte
+statt einen Zeilenumbruch abgeschlossen werden.
+Betrifft zeilenorientierte Optionen wie
+.B \-v
+und
+.BR \-x .
+.SS Reporting
+.TP
+.BR \-q ", " \-\-quiet ", " \-\-silent
+Die standardmäßige einzeilige Zusammenfassung, wie viele Dateien geändert wurden, nicht ausgeben.
+.TP
+.BR \-c ", " \-\-context
+Für jede geänderte Datei einen Kontext-Diff wie von
+.B "diff \-c"
+ausgeben.
+.TP
+.BR \-u ", " \-\-unified
+Für jede geänderte Datei einen Unified-Diff wie von
+.B "diff \-u"
+ausgeben.
+.TP
+.BR \-s ", " \-\-summary
+Eine detaillierte Stapel-Zusammenfassung ausgeben: untersuchte Dateien, geänderte Dateien,
+Anzahl der Ersetzungen und übersprungene Binärdateien.
+.TP
+.BR \-h ", " \-\-help
+Eine Benutzungsmeldung ausgeben und beenden.
+.TP
+.B \-\-version
+Versionsinformationen ausgeben und beenden.
+.SH EXIT STATUS
+.TP
+.B 0
+Erfolg (auch wenn keine Datei geändert werden musste).
+.TP
+.B 1
+Ein Benutzungsfehler ist aufgetreten, ein Muster ließ sich nicht kompilieren, oder eine Datei konnte nicht verarbeitet werden.
+.SH EXAMPLES
+Eine feste Zeichenkette in einer Datei ersetzen:
+.PP
+.nf
+repl foo bar notes.txt
+.fi
+.PP
+Umbenennung ohne Berücksichtigung der Groß-/Kleinschreibung in einem Baum:
+.PP
+.nf
+repl \-i \-r OldName NewName src/
+.fi
+.PP
+Erweiterter regulärer Ausdruck zum Löschen von Ziffern:
+.PP
+.nf
+repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Wählt, sofern verfügbar, die Sprache für Meldungen und übersetzte Handbuchseiten.
+.SH AUTHOR
+Geschrieben von @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Fehler melden an <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR grep (1),
+.BR sed (1),
+.BR diff (1),
+.BR insert (1)

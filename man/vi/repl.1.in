@@ -1,0 +1,270 @@
+.TH REPL 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Lệnh người dùng"
+.SH NAME
+repl \- thay thế văn bản theo lô trong các tập tin (trình soạn thảo cho con người)
+.SH SYNOPSIS
+.B repl
+[\fIOPTION\fR]... \fIPATTERN\fR \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+[\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.SH DESCRIPTION
+.B repl
+tìm kiếm
+.I PATTERN
+trong mỗi
+.I FILE
+được đặt tên và thay thế các kết quả khớp bằng
+.IR REPLACEMENT .
+Khác với một trình soạn thảo luồng,
+.B repl
+sửa các tập tin ngay tại chỗ.
+Một tập tin chỉ được viết lại khi kết quả khác với nội dung ban đầu
+(ghi nguyên tử qua một tập tin tạm bên cạnh tập tin đích).
+.PP
+Không có đối số
+.IR FILE ,
+.B repl
+đọc từ đầu vào chuẩn và ghi kết quả đã thay thế ra đầu ra chuẩn.
+.PP
+Khi
+.B \-e
+và/hoặc
+.B \-f
+cung cấp các mẫu, đối số không phải tùy chọn còn lại đầu tiên là
+.I REPLACEMENT
+và mọi đối số tiếp theo là các tập tin.
+Nếu không, hai đối số không phải tùy chọn đầu tiên là
+.I PATTERN
+và
+.IR REPLACEMENT .
+.PP
+Việc khớp mẫu tuân theo các quy ước của
+.BR grep (1).
+Kiểu mẫu mặc định là chuỗi cố định (\fB\-F\fR).
+.SH OPTIONS
+.SS Pattern selection
+.TP
+.BR \-F ", " \-\-fixed\-strings
+Diễn giải các mẫu là chuỗi cố định.
+Đây là mặc định.
+.TP
+.BR \-E ", " \-\-extended\-regexp
+Diễn giải các mẫu là biểu thức chính quy mở rộng POSIX (ERE).
+.TP
+.BR \-G ", " \-\-basic\-regexp
+Diễn giải các mẫu là biểu thức chính quy cơ bản POSIX (BRE).
+.TP
+.BR \-P ", " \-\-perl\-regexp
+Diễn giải các mẫu là biểu thức chính quy tương thích Perl dùng PCRE2.
+.TP
+.BR \-e " \fIPATTERNS\fR, " \-\-regexp=\fIPATTERNS\fR
+Dùng
+.I PATTERNS
+làm (các) mẫu.
+Có thể đưa ra nhiều lần và kết hợp với
+.BR \-f .
+Hữu ích để bảo vệ một mẫu bắt đầu bằng
+.BR \- .
+.TP
+.BR \-f " \fIFILE\fR, " \-\-file=\fIFILE\fR
+Lấy các mẫu từ
+.IR FILE ,
+mỗi dòng một mẫu.
+Một tập tin trống cung cấp không mẫu nào (không gì khớp).
+Dùng
+.B \-
+để đọc các mẫu từ đầu vào chuẩn.
+.TP
+.BR \-i ", " \-\-ignore\-case
+Bỏ qua sự phân biệt hoa/thường trong các mẫu và dữ liệu đầu vào.
+.TP
+.B \-\-no\-ignore\-case
+Không bỏ qua chữ hoa/thường (mặc định).
+Hữu ích trong các tập lệnh để hủy một
+.B \-i
+trước đó.
+.TP
+.BR \-v ", " \-\-invert\-match
+Đảo ngược ý nghĩa của việc khớp:
+mỗi dòng
+.B không
+khớp với
+.I PATTERN
+sẽ được thay thế hoàn toàn bằng
+.IR REPLACEMENT .
+Các dòng khớp được giữ nguyên.
+.TP
+.BR \-w ", " \-\-word\-regexp
+Chỉ chọn các kết quả khớp tạo thành từ hoàn chỉnh
+(được giới hạn bởi ký tự không phải từ hoặc các đầu mút của dòng).
+Ký tự từ là chữ cái, chữ số, và gạch dưới.
+Không có tác dụng nếu
+.B \-x
+cũng được đưa ra.
+.TP
+.BR \-x ", " \-\-line\-regexp
+Chỉ chọn các kết quả khớp trải dài toàn bộ một dòng
+(như thể mẫu được cố định bằng
+.B ^
+và
+.BR $ ).
+.SS File selection
+.TP
+.BR \-r ", " \-\-recursive
+Đọc tất cả các tập tin dưới mỗi thư mục, một cách đệ quy.
+Chỉ theo các liên kết mềm khi chúng xuất hiện trên dòng lệnh.
+.TP
+.BR \-R ", " \-\-dereference\-recursive
+Giống như
+.BR \-r ,
+nhưng theo các liên kết mềm ở bất cứ nơi nào tìm thấy chúng.
+.TP
+.B \-\-max\-depth=\fINUM\fR
+Giới hạn độ sâu mà việc đệ quy thư mục có thể đi tới.
+Độ sâu 0 có nghĩa là chỉ các mục trong thư mục bắt đầu.
+.TP
+.B \-\-exclude=\fIGLOB\fR
+Bỏ qua các tập tin có tên cơ sở khớp với
+.IR GLOB
+(kiểu shell, như trong
+.BR fnmatch (3)).
+.TP
+.B \-\-exclude\-from=\fIFILE\fR
+Đọc các mẫu loại trừ từ
+.IR FILE ,
+mỗi dòng một mẫu.
+.TP
+.B \-\-exclude\-dir=\fIGLOB\fR
+Bỏ qua các thư mục có tên cơ sở khớp với
+.IR GLOB .
+.TP
+.B \-\-include=\fIGLOB\fR
+Chỉ xử lý các tập tin có tên cơ sở khớp với
+.IR GLOB .
+Nếu có bất kỳ tùy chọn
+.B \-\-include
+nào được đưa ra, một tập tin phải khớp với ít nhất một mẫu bao gồm.
+.TP
+.BR \-d ", " \-\-directories=\fIACTION\fR
+Cách xử lý các thư mục được đặt tên trên dòng lệnh:
+.RS
+.TP
+.B repl
+Coi thư mục như một tập tin thông thường (mặc định; thường thất bại).
+.TP
+.B skip
+Bỏ qua các thư mục một cách âm thầm.
+.TP
+.B recurse
+Giống như
+.BR \-r :
+xử lý các tập tin dưới mỗi thư mục một cách đệ quy.
+.RE
+.TP
+.BR \-D ", " \-\-devices=\fIACTION\fR
+Cách xử lý các nút thiết bị, FIFO, và socket:
+.B repl
+(mặc định) hoặc
+.BR skip .
+.TP
+.B \-\-binary\-files=\fITYPE\fR
+Kiểm soát cách xử lý tập tin nhị phân:
+.RS
+.TP
+.B binary
+Mặc định.
+Chỉ thực hiện thay thế trong phần văn bản đầu của tập tin,
+dừng trước byte không in được đầu tiên
+(tab, xuống dòng, về đầu dòng, và sang trang được cho phép).
+.TP
+.B without\-match
+Bỏ qua hoàn toàn các tập tin nhị phân (không sửa đổi chúng).
+.TP
+.B text
+Coi tập tin là văn bản; xử lý toàn bộ tập tin.
+.RE
+.TP
+.B \-I
+Giống như
+.BR \-\-binary\-files=without\-match .
+.TP
+.BR \-U ", " \-\-binary
+Coi các tập tin là nhị phân và tắt phương pháp suy đoán tiền tố in được
+(xử lý toàn bộ vùng đệm).
+.TP
+.BR \-z ", " \-\-null\-data
+Coi đầu vào và đầu ra là các chuỗi dòng kết thúc bằng một byte NUL
+thay vì một dấu xuống dòng.
+Ảnh hưởng đến các tùy chọn theo hướng dòng như
+.B \-v
+và
+.BR \-x .
+.SS Reporting
+.TP
+.BR \-q ", " \-\-quiet ", " \-\-silent
+Không in bản tóm tắt một dòng mặc định về số tập tin đã thay đổi.
+.TP
+.BR \-c ", " \-\-context
+Với mỗi tập tin đã thay đổi, in một diff ngữ cảnh như từ
+.BR "diff \-c" .
+.TP
+.BR \-u ", " \-\-unified
+Với mỗi tập tin đã thay đổi, in một diff hợp nhất như từ
+.BR "diff \-u" .
+.TP
+.BR \-s ", " \-\-summary
+In một bản tóm tắt lô chi tiết: số tập tin đã xem xét, số tập tin đã thay đổi,
+số lần thay thế, và số tập tin nhị phân bị bỏ qua.
+.TP
+.BR \-h ", " \-\-help
+In thông báo cách dùng rồi thoát.
+.TP
+.B \-\-version
+In thông tin phiên bản rồi thoát.
+.SH EXIT STATUS
+.TP
+.B 0
+Thành công (kể cả khi không tập tin nào cần thay đổi).
+.TP
+.B 1
+Đã xảy ra lỗi cách dùng, một mẫu không biên dịch được, hoặc một tập tin không thể xử lý được.
+.SH EXAMPLES
+Thay thế một chuỗi cố định trong một tập tin:
+.PP
+.nf
+repl foo bar notes.txt
+.fi
+.PP
+Đổi tên không phân biệt hoa/thường trong toàn bộ cây thư mục:
+.PP
+.nf
+repl \-i \-r OldName NewName src/
+.fi
+.PP
+Xóa chữ số bằng biểu thức chính quy mở rộng:
+.PP
+.nf
+repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Chọn ngôn ngữ cho các thông báo và trang hướng dẫn đã được dịch, khi có sẵn.
+.SH AUTHOR
+Được viết bởi @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Báo lỗi tới <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR grep (1),
+.BR sed (1),
+.BR diff (1),
+.BR insert (1)

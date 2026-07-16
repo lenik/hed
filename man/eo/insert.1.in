@@ -1,0 +1,240 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Uzantokomandoj"
+.SH NAME
+insert \- enmeti tekston aŭ dosieran enhavon en dosieron je linia pozicio
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+enkunigas la enhavon de ĉiu
+.I SRC
+en la celan
+.I FILE
+je elektita linia pozicio.
+La celo estas reskribita nur kiam la rezulto diferencas
+(atoma skribo per provizora dosiero apud la celo).
+.PP
+Defaŭlte ĉiu
+.I SRC
+estas
+.B etendita
+fonto (\fB\-e\fR):
+se ĝi komenciĝas per
+.BR @ ,
+la resto estas dosiernomo por legi;
+alie la argumento estas laŭvorta signoĉeno.
+.PP
+Kiam neniu poziciopcio estas donita,
+.B insert
+apendas al la fino de la dosiero.
+.SH OPTIONS
+.SS Source modes
+Ĉi tiuj opcioj reciproke ekskludas unu la alian; la lasta donita gajnas.
+.TP
+.BR \-l ", " \-\-strings
+Trakti ĉiun
+.I SRC
+kiel laŭvortan signoĉenon (krudaj bajtoj, plus ĉiuj sekvaj novlinioj de
+.BR \-\-blank ).
+.TP
+.BR \-f ", " \-\-filenames
+Trakti ĉiun
+.I SRC
+kiel padon por legi.
+.TP
+.BR \-e ", " \-\-extended
+Etenditaj fontoj (defaŭlte):
+.BI @ FILE
+legas el
+.IR FILE ;
+ĉiu alia argumento estas laŭvorta signoĉeno.
+.SS Position
+.TP
+.BI \-n " NUM"
+Enmeti antaŭ la (numerado ekde 1) linio
+.IR NUM .
+Se la dosiero havas malpli da linioj ol
+.IR NUM ,
+malplenaj linioj estas apendataj post la fino de la dosiero
+(kaj mankanta fina novlinio unue estas aldonita, se necese),
+tiel ke la enmetita enhavo trafas linion
+.IR NUM .
+.TP
+.BR \-0 " .. " \-9
+Ciferaj mallongaj opcioj, kiuj akumuliĝas en dekuman nombron
+(ekzemple
+.B \-20
+estas
+.B 2
+kaj poste
+.BR 0 ).
+.RS
+.TP
+.B \-1
+Same kiel
+.BR \-\-prepend .
+.TP
+.B \-0
+Antaŭmeti la enhavon kaj poste unu malplenan linion
+(la enhavo aperas antaŭ la origina komenco, apartigita per malplena linio).
+.TP
+.B \-N
+(kun
+.IR N " \(>= 2)"
+Same kiel
+.BI \-n " N"
+(enmeti antaŭ linio
+.IR N ,
+kun kompletigo ĉe la fino de la dosiero, se necese).
+.TP
+Post
+.B \-a
+ciferoj elektas la apendan stilon:
+.B 0
+apendas ĉe fino;
+.B 1
+aŭ pli granda enmetas antaŭ la N-a linio de la fino.
+.RE
+.TP
+.BR \-a ", " \-\-append
+Apend-orientita pozicio.
+.B \-a
+aŭ
+.B \-a0
+apendas ĉe la fino de la dosiero (kiel ŝela
+.BR >> ).
+.B \-a1
+enmetas antaŭ la lasta linio;
+.BI \-a N
+(kun
+.IR N " \(>= 1)"
+enmetas antaŭ la
+.IR N -a
+linio de la fino.
+.TP
+.BR \-p ", " \-\-prepend
+Antaŭmeti al la komenco de la dosiero.
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+Forigi
+.I NUM
+liniojn ĉe la enmetpunkto antaŭ enmeto.
+Sen
+.I SRC
+argumentoj tio forigas tiujn liniojn.
+Ekzemploj:
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+Forigi liniojn 3 kaj 4.
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+Anstataŭigi la ŝibangon.
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+Anstataŭigi la lastan linion (piedlinion).
+.RE
+Kiam
+.B \-r
+estas uzata sen enmeta enhavo kaj la linia pozicio estas preter la fino de la dosiero,
+neniuj malplenaj linioj estas plenigitaj; nur forigo estas provita (ofte senefika ĉe EOF).
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+Aldoni
+.I NUM
+novliniajn signojn post ĉiu
+.IR SRC .
+Kiam ĉi tiu opcio estas preterlasita, la defaŭlto estas
+.B 1
+por laŭvortaj signoĉenoj kaj
+.B 0
+por dosiernomoj
+(sub
+.BR \-e :
+signoĉenaj argumentoj kontraŭ
+.BI @ FILE ).
+Kiam
+.B \-b
+estas donita, la sama
+.I NUM
+validas por ĉiu
+.IR SRC .
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+Se dosiernoma fonto ne povas esti legita, uzi
+.I TEXT
+anstataŭ malsukcesi.
+Manka teksto estas traktata kiel signoĉeno por la
+.B \-\-blank
+defaŭltoj.
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+Pliigi protokolan detalecon (povas ripetiĝi).
+.TP
+.BR \-q ", " \-\-quiet
+Malpliigi protokolan detalecon.
+.TP
+.BR \-h ", " \-\-help
+Presi uzmesaĝon kaj eliri.
+.TP
+.B \-\-version
+Presi versioinformon kaj eliri.
+.SH EXIT STATUS
+.TP
+.B 0
+Sukceso.
+.TP
+.B 1
+Uzoeraro, manka celo, eneleiga malsukceso, aŭ manko de memoro.
+.SH EXAMPLES
+Antaŭmeti kaplinion (laŭvorta defaŭlto aldonas finan novlinion):
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+Enmeti dosieran fragmenton antaŭ linio 20 (kompletigas se la dosiero estas pli mallonga):
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+Forigi liniojn 3–4:
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+Anstataŭigi la ŝibangon:
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+Anstataŭigi la piedlinion:
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Elekti la lingvon por mesaĝoj kaj tradukitaj manlibropaĝoj, kiam disponeblaj.
+.SH AUTHOR
+Verkita de @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Raportu erarojn al <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

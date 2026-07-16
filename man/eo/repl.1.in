@@ -1,0 +1,270 @@
+.TH REPL 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Uzantokomandoj"
+.SH NAME
+repl \- amase anstataŭigi tekston en dosieroj (homa redaktilo)
+.SH SYNOPSIS
+.B repl
+[\fIOPTION\fR]... \fIPATTERN\fR \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+[\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.SH DESCRIPTION
+.B repl
+serĉas
+.I PATTERN
+en ĉiu nomita
+.I FILE
+kaj anstataŭigas kongruojn per
+.IR REPLACEMENT .
+Malsame al fluredaktilo,
+.B repl
+redaktas dosierojn surloke.
+Dosiero estas reskribita nur kiam la rezulto diferencas de la origina enhavo
+(atoma skribo per provizora dosiero apud la celo).
+.PP
+Sen
+.I FILE
+argumentoj,
+.B repl
+legas la ĉefenigon kaj skribas la anstataŭigitan rezulton al la ĉefeligo.
+.PP
+Kiam
+.B \-e
+kaj/aŭ
+.B \-f
+provizas ŝablonojn, la unua restanta ne-opcia argumento estas
+.I REPLACEMENT
+kaj ĉiuj pluaj argumentoj estas dosieroj.
+Alie la unuaj du ne-opciaj argumentoj estas
+.I PATTERN
+kaj
+.IR REPLACEMENT .
+.PP
+Ŝablona kongruo sekvas la konvenciojn de
+.BR grep (1).
+La defaŭlta ŝablontipo estas fiksaj signoĉenoj (\fB\-F\fR).
+.SH OPTIONS
+.SS Pattern selection
+.TP
+.BR \-F ", " \-\-fixed\-strings
+Interpreti ŝablonojn kiel fiksajn signoĉenojn.
+Tio estas la defaŭlto.
+.TP
+.BR \-E ", " \-\-extended\-regexp
+Interpreti ŝablonojn kiel POSIX etenditajn regulajn esprimojn (ERE).
+.TP
+.BR \-G ", " \-\-basic\-regexp
+Interpreti ŝablonojn kiel POSIX bazajn regulajn esprimojn (BRE).
+.TP
+.BR \-P ", " \-\-perl\-regexp
+Interpreti ŝablonojn kiel Perl-kongruajn regulajn esprimojn per PCRE2.
+.TP
+.BR \-e " \fIPATTERNS\fR, " \-\-regexp=\fIPATTERNS\fR
+Uzi
+.I PATTERNS
+kiel la ŝablono(j)n.
+Povas esti donita plurfoje kaj kombinita kun
+.BR \-f .
+Utila por protekti ŝablonon kiu komenciĝas per
+.BR \- .
+.TP
+.BR \-f " \fIFILE\fR, " \-\-file=\fIFILE\fR
+Akiri ŝablonojn el
+.IR FILE ,
+unu po linio.
+Malplena dosiero donas nul ŝablonojn (nenio kongruas).
+Uzi
+.B \-
+por legi ŝablonojn el la ĉefenigo.
+.TP
+.BR \-i ", " \-\-ignore\-case
+Ignori usklecajn distingojn en ŝablonoj kaj enigaj datumoj.
+.TP
+.B \-\-no\-ignore\-case
+Ne ignori usklecon (la defaŭlto).
+Utila en skriptoj por malfari antaŭan
+.BR \-i .
+.TP
+.BR \-v ", " \-\-invert\-match
+Inversigi la sencon de kongruo:
+ĉiu linio kiu
+.B ne
+kongruas kun
+.I PATTERN
+estas anstataŭigita tute per
+.IR REPLACEMENT .
+Kongruaj linioj restas neŝanĝitaj.
+.TP
+.BR \-w ", " \-\-word\-regexp
+Elekti nur kongruojn kiuj formas plenajn vortojn
+(limigitajn de ne-vortaj signoj aŭ la finoj de la linio).
+Vortaj signoj estas literoj, ciferoj, kaj substreko.
+Ne havas efikon se
+.B \-x
+ankaŭ estas donita.
+.TP
+.BR \-x ", " \-\-line\-regexp
+Elekti nur kongruojn kiuj kovras tutan linion
+(kvazaŭ la ŝablono estus ankrita per
+.B ^
+kaj
+.BR $ ).
+.SS File selection
+.TP
+.BR \-r ", " \-\-recursive
+Legi ĉiujn dosierojn sub ĉiu dosierujo, rekursie.
+Sekvi simbolajn ligilojn nur kiam ili aperas sur la komandlinio.
+.TP
+.BR \-R ", " \-\-dereference\-recursive
+Kiel
+.BR \-r ,
+sed sekvas simbolajn ligilojn kie ajn ili troviĝas.
+.TP
+.B \-\-max\-depth=\fINUM\fR
+Limigi kiom profunde dosieruja rekursio povas iri.
+Profundo 0 signifas nur la erojn de la komenca dosierujo.
+.TP
+.B \-\-exclude=\fIGLOB\fR
+Preterlasi dosierojn kies baznomo kongruas kun
+.IR GLOB
+(ŝelstile, kiel en
+.BR fnmatch (3)).
+.TP
+.B \-\-exclude\-from=\fIFILE\fR
+Legi ekskludajn ŝablonojn el
+.IR FILE ,
+unu po linio.
+.TP
+.B \-\-exclude\-dir=\fIGLOB\fR
+Preterlasi dosierujojn kies baznomo kongruas kun
+.IR GLOB .
+.TP
+.B \-\-include=\fIGLOB\fR
+Prilabori nur dosierojn kies baznomo kongruas kun
+.IR GLOB .
+Se iu ajn
+.B \-\-include
+opcio estas donita, dosiero devas kongrui kun almenaŭ unu inkluda ŝablono.
+.TP
+.BR \-d ", " \-\-directories=\fIACTION\fR
+Kiel trakti dosierujojn nomitajn sur la komandlinio:
+.RS
+.TP
+.B repl
+Trakti la dosierujon kiel ordinaran dosieron (defaŭlte; kutime malsukcesas).
+.TP
+.B skip
+Preterlasi dosierujojn silente.
+.TP
+.B recurse
+Same kiel
+.BR \-r :
+prilabori dosierojn sub ĉiu dosierujo rekursie.
+.RE
+.TP
+.BR \-D ", " \-\-devices=\fIACTION\fR
+Kiel trakti aparatajn nodojn, FIFO-jn, kaj kontaktingojn:
+.B repl
+(defaŭlte) aŭ
+.BR skip .
+.TP
+.B \-\-binary\-files=\fITYPE\fR
+Regi la traktadon de duumaj dosieroj:
+.RS
+.TP
+.B binary
+Defaŭlto.
+Fari anstataŭigon nur en la komenca teksta parto de la dosiero,
+ĉesante antaŭ la unua nepresebla bajto
+(tabo, novlinio, ĉaretreveno, kaj formatavanco estas permesataj).
+.TP
+.B without\-match
+Tute preterlasi duumajn dosierojn (ne modifi ilin).
+.TP
+.B text
+Trakti la dosieron kiel tekston; prilabori la tutan dosieron.
+.RE
+.TP
+.B \-I
+Same kiel
+.BR \-\-binary\-files=without\-match .
+.TP
+.BR \-U ", " \-\-binary
+Trakti dosierojn kiel duumajn kaj malŝalti la heŭristikon de presebla prefikso
+(prilabori la tutan bufron).
+.TP
+.BR \-z ", " \-\-null\-data
+Trakti enigon kaj eligon kiel sekvencojn de linioj finitajn per NUL-bajto
+anstataŭ novlinio.
+Influas linio-orientitajn opciojn kiel
+.B \-v
+kaj
+.BR \-x .
+.SS Reporting
+.TP
+.BR \-q ", " \-\-quiet ", " \-\-silent
+Ne presi la defaŭltan unulinian resumon pri kiom da dosieroj ŝanĝiĝis.
+.TP
+.BR \-c ", " \-\-context
+Por ĉiu ŝanĝita dosiero, presi kuntekstan diferencon kiel de
+.BR "diff \-c" .
+.TP
+.BR \-u ", " \-\-unified
+Por ĉiu ŝanĝita dosiero, presi unuigitan diferencon kiel de
+.BR "diff \-u" .
+.TP
+.BR \-s ", " \-\-summary
+Presi detalan aran resumon: ekzamenitaj dosieroj, ŝanĝitaj dosieroj,
+nombro de anstataŭigoj, kaj preterlasitaj duumaj dosieroj.
+.TP
+.BR \-h ", " \-\-help
+Presi uzmesaĝon kaj eliri.
+.TP
+.B \-\-version
+Presi versioinformon kaj eliri.
+.SH EXIT STATUS
+.TP
+.B 0
+Sukceso (ankaŭ kiam neniu dosiero bezonis ŝanĝon).
+.TP
+.B 1
+Okazis uzoeraro, ŝablono malsukcesis kompiliĝi, aŭ dosiero ne povis esti prilaborita.
+.SH EXAMPLES
+Anstataŭigi fiksan signoĉenon en unu dosiero:
+.PP
+.nf
+repl foo bar notes.txt
+.fi
+.PP
+Uskleco-nesenta renomado tra arbo:
+.PP
+.nf
+repl \-i \-r OldName NewName src/
+.fi
+.PP
+Etendita regulesprima cifereca forviŝo:
+.PP
+.nf
+repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Elekti la lingvon por mesaĝoj kaj tradukitaj manlibropaĝoj, kiam disponeblaj.
+.SH AUTHOR
+Verkita de @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Raportu erarojn al <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR grep (1),
+.BR sed (1),
+.BR diff (1),
+.BR insert (1)

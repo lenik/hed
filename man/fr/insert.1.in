@@ -1,0 +1,241 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Commandes utilisateur"
+.SH NAME
+insert \- insérer du texte ou le contenu d'un fichier dans un fichier à une position de ligne
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+insère le contenu de chaque
+.I SRC
+dans le fichier cible
+.I FILE
+à une position de ligne choisie.
+La cible n'est réécrite que si le résultat diffère
+(écriture atomique via un fichier temporaire à côté de la cible).
+.PP
+Par défaut, chaque
+.I SRC
+est une source
+.B étendue
+(\fB\-e\fR) :
+si elle commence par
+.BR @ ,
+le reste est un nom de fichier à lire ;
+sinon l'argument est un littéral de chaîne.
+.PP
+Lorsqu'aucune option de position n'est donnée,
+.B insert
+ajoute à la fin du fichier.
+.SH OPTIONS
+.SS Source modes
+Ces options s'excluent mutuellement ; la dernière donnée l'emporte.
+.TP
+.BR \-l ", " \-\-strings
+Traiter chaque
+.I SRC
+comme un littéral de chaîne (octets bruts, plus tout saut de ligne final provenant de
+.BR \-\-blank ).
+.TP
+.BR \-f ", " \-\-filenames
+Traiter chaque
+.I SRC
+comme un chemin à lire.
+.TP
+.BR \-e ", " \-\-extended
+Sources étendues (par défaut) :
+.BI @ FILE
+lit depuis
+.IR FILE ;
+tout autre argument est un littéral de chaîne.
+.SS Position
+.TP
+.BI \-n " NUM"
+Insérer avant la ligne
+.I NUM
+(numérotée à partir de 1).
+Si le fichier compte moins de
+.I NUM
+lignes, des lignes vides sont ajoutées à la fin du fichier
+(et un saut de ligne final manquant est d'abord ajouté si nécessaire)
+afin que le contenu inséré tombe sur la ligne
+.IR NUM .
+.TP
+.BR \-0 " .. " \-9
+Options courtes numériques qui s'accumulent en un nombre décimal
+(par exemple
+.B \-20
+correspond à
+.B 2
+puis
+.BR 0 ).
+.RS
+.TP
+.B \-1
+Identique à
+.BR \-\-prepend .
+.TP
+.B \-0
+Préfixer le contenu puis insérer une ligne vide
+(le contenu apparaît avant le début d'origine, séparé par une ligne vide).
+.TP
+.B \-N
+(avec
+.IR N " \(>= 2)"
+Identique à
+.BI \-n " N"
+(insérer avant la ligne
+.IR N ,
+avec un remplissage de fin de fichier si nécessaire).
+.TP
+Après
+.B \-a
+les chiffres sélectionnent le mode d'ajout :
+.B 0
+ajoute à la fin ;
+.B 1
+ou plus insère avant la N-ième ligne depuis la fin.
+.RE
+.TP
+.BR \-a ", " \-\-append
+Position orientée ajout.
+.B \-a
+ou
+.B \-a0
+ajoute à la fin du fichier (comme le
+.BR >>
+du shell).
+.B \-a1
+insère avant la dernière ligne ;
+.BI \-a N
+(avec
+.IR N " \(>= 1)"
+insère avant la
+.IR N e
+ligne depuis la fin.
+.TP
+.BR \-p ", " \-\-prepend
+Préfixer au début du fichier.
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+Supprimer
+.I NUM
+lignes au point d'insertion avant d'insérer.
+Sans arguments
+.I SRC
+cela supprime ces lignes.
+Exemples :
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+Supprimer les lignes 3 et 4.
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+Remplacer le shebang.
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+Remplacer la dernière ligne (pied de page).
+.RE
+Lorsque
+.B \-r
+est utilisé sans contenu à insérer et que la position de ligne dépasse la fin du fichier,
+aucune ligne vide n'est ajoutée ; seule la suppression est tentée (souvent sans effet en fin de fichier).
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+Ajouter
+.I NUM
+caractères de saut de ligne après chaque
+.IR SRC .
+Lorsque cette option est omise, la valeur par défaut est
+.B 1
+pour les littéraux de chaîne et
+.B 0
+pour les noms de fichier
+(sous
+.BR \-e :
+arguments de chaîne par rapport à
+.BI @ FILE ).
+Lorsque
+.B \-b
+est donné, la même
+.I NUM
+s'applique à chaque
+.IR SRC .
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+Si une source de type nom de fichier ne peut pas être lue, utiliser
+.I TEXT
+au lieu d'échouer.
+Le texte de remplacement est traité comme une chaîne pour les valeurs par défaut de
+.BR \-\-blank .
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+Augmenter le niveau de détail des journaux (peut être répété).
+.TP
+.BR \-q ", " \-\-quiet
+Diminuer le niveau de détail des journaux.
+.TP
+.BR \-h ", " \-\-help
+Afficher un message d'utilisation et quitter.
+.TP
+.B \-\-version
+Afficher les informations de version et quitter.
+.SH EXIT STATUS
+.TP
+.B 0
+Succès.
+.TP
+.B 1
+Erreur d'utilisation, cible manquante, échec d'E/S, ou mémoire insuffisante.
+.SH EXAMPLES
+Préfixer une ligne d'en-tête (le littéral par défaut ajoute un saut de ligne final) :
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+Insérer un extrait de fichier avant la ligne 20 (complète si le fichier est plus court) :
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+Supprimer les lignes 3–4 :
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+Remplacer le shebang :
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+Remplacer la ligne de pied de page :
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Sélectionner la langue des messages et des pages de manuel traduites, lorsque disponible.
+.SH AUTHOR
+Écrit par @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Signaler les bogues à <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

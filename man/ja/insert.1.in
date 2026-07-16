@@ -1,0 +1,244 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "ユーザコマンド"
+.SH NAME
+insert \- ファイルの指定行位置にテキストまたはファイルの内容を挿入する
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+は各
+.I SRC
+の内容を、対象となる
+.I FILE
+の選択した行位置に継ぎ合わせます。
+結果が異なる場合にのみ対象ファイルを書き換えます
+（対象の隣に作成する一時ファイルを介した原子的な書き込み）。
+.PP
+既定では、各
+.I SRC
+は
+.B 拡張
+ソース（\fB\-e\fR）として扱われます:
+.BR @
+で始まる場合、残りの部分は読み込むファイル名になります。
+そうでない場合、その引数は文字列リテラルとして扱われます。
+.PP
+位置オプションが指定されない場合、
+.B insert
+はファイルの末尾に追加します。
+.SH OPTIONS
+.SS Source modes
+これらのオプションは互いに排他的であり、最後に指定したものが有効になります。
+.TP
+.BR \-l ", " \-\-strings
+各
+.I SRC
+を文字列リテラル（生のバイト列、および
+.BR \-\-blank
+による末尾の改行）として扱います。
+.TP
+.BR \-f ", " \-\-filenames
+各
+.I SRC
+を読み込むパスとして扱います。
+.TP
+.BR \-e ", " \-\-extended
+拡張ソース（既定）:
+.BI @ FILE
+は
+.IR FILE
+から読み込みます；
+それ以外の引数は文字列リテラルとして扱われます。
+.SS Position
+.TP
+.BI \-n " NUM"
+1 始まりの行
+.IR NUM
+の前に挿入します。
+ファイルの行数が
+.I NUM
+より少ない場合、ファイルの末尾に空行が追加され
+（必要であれば、まず末尾の改行を補います）、
+挿入内容が行
+.IR NUM
+に配置されるようにします。
+.TP
+.BR \-0 " .. " \-9
+数字を蓄積して十進数を構成する短いオプションです
+（例えば
+.B \-20
+は
+.B 2
+の後に
+.BR 0 ）。
+.RS
+.TP
+.B \-1
+.BR \-\-prepend
+と同じです。
+.TP
+.B \-0
+内容を先頭に挿入した後、空行を 1 行挿入します
+（内容は元の先頭より前に現れ、空行で区切られます）。
+.TP
+.B \-N
+（
+.IR N " \(>= 2)"
+の場合）
+.BI \-n " N"
+と同じです
+（行
+.IR N
+の前に挿入し、必要な場合はファイル末尾を空行で埋めます）。
+.TP
+.B \-a
+の後に続く数字は追加の様式を選びます:
+.B 0
+は末尾に追加;
+.B 1
+以上は末尾から数えて N 行目の前に挿入。
+.RE
+.TP
+.BR \-a ", " \-\-append
+追加向きの位置指定。
+.B \-a
+または
+.B \-a0
+はファイル末尾に追加します（シェルの
+.BR >>
+と同様）。
+.B \-a1
+は最終行の前に挿入;
+.BI \-a N
+（
+.IR N " \(>= 1)"
+のとき）は末尾から
+.IR N
+行目の前に挿入します。
+.TP
+.BR \-p ", " \-\-prepend
+ファイルの先頭に挿入します。
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+挿入前に挿入位置で
+.I NUM
+行を削除します。
+.I SRC
+引数がない場合、それらの行を削除します。
+例:
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+3 行目と 4 行目を削除。
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+シバンを置き換え。
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+最終行（フッタ）を置き換え。
+.RE
+.B \-r
+を挿入内容なしで使い、行位置がファイル末尾を超えている場合、
+空行は埋めません; 削除のみを試みます（EOF ではしばしば何もしません）。
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+各
+.I SRC
+の後に
+.I NUM
+個の改行文字を追加します。
+このオプションを省略した場合、既定値は文字列リテラルでは
+.B 1
+、ファイル名では
+.B 0
+です
+（
+.BR \-e
+の下では、文字列引数と
+.BI @ FILE
+との違いに対応します）。
+.B \-b
+が指定された場合、同じ
+.I NUM
+がすべての
+.I SRC
+に適用されます。
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+ファイル名ソースを読み込めない場合、失敗する代わりに
+.I TEXT
+を使用します。
+欠落テキストは
+.B \-\-blank
+の既定値に関しては文字列として扱われます。
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+ログの詳細度を上げます（繰り返し指定可能）。
+.TP
+.BR \-q ", " \-\-quiet
+ログの詳細度を下げます。
+.TP
+.BR \-h ", " \-\-help
+使用法メッセージを表示して終了します。
+.TP
+.B \-\-version
+バージョン情報を表示して終了します。
+.SH EXIT STATUS
+.TP
+.B 0
+成功。
+.TP
+.B 1
+使用法の誤り、対象の欠落、I/O エラー、またはメモリ不足。
+.SH EXAMPLES
+ヘッダ行を先頭に挿入する（文字列の既定動作では末尾に改行が追加されます）:
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+行 20 の前にファイルの断片を挿入する（ファイルが短い場合は埋めます）:
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+行 3–4 を削除:
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+シバンを置き換え:
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+フッタ行を置き換え:
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+利用可能な場合、メッセージおよび翻訳済みマニュアルページの言語を選択します。
+.SH AUTHOR
+@PROJECT_AUTHOR@ によって作成されました。
+.SH REPORTING BUGS
+バグは <@PROJECT_EMAIL@> に報告してください。
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

@@ -1,0 +1,241 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Lệnh người dùng"
+.SH NAME
+insert \- chèn văn bản hoặc nội dung tập tin vào một tập tin tại một vị trí dòng
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+ghép nội dung của mỗi
+.I SRC
+vào tập tin đích
+.I FILE
+tại một vị trí dòng đã chọn.
+Tập tin đích chỉ được viết lại khi kết quả khác với nội dung ban đầu
+(ghi nguyên tử qua một tập tin tạm bên cạnh tập tin đích).
+.PP
+Theo mặc định, mỗi
+.I SRC
+là một nguồn
+.B mở rộng
+(\fB\-e\fR):
+nếu nó bắt đầu bằng
+.BR @ ,
+phần còn lại là tên tập tin cần đọc;
+nếu không, đối số được coi là một chuỗi ký tự nghĩa đen.
+.PP
+Khi không có tùy chọn vị trí nào được đưa ra,
+.B insert
+sẽ nối vào cuối tập tin.
+.SH OPTIONS
+.SS Source modes
+Các tùy chọn này loại trừ lẫn nhau; tùy chọn cuối cùng được đưa ra sẽ thắng.
+.TP
+.BR \-l ", " \-\-strings
+Coi mỗi
+.I SRC
+là một chuỗi ký tự nghĩa đen (byte thô, cùng với bất kỳ dấu xuống dòng cuối nào từ
+.BR \-\-blank ).
+.TP
+.BR \-f ", " \-\-filenames
+Coi mỗi
+.I SRC
+là một đường dẫn cần đọc.
+.TP
+.BR \-e ", " \-\-extended
+Nguồn mở rộng (mặc định):
+.BI @ FILE
+đọc từ
+.IR FILE ;
+mọi đối số khác là một chuỗi ký tự nghĩa đen.
+.SS Position
+.TP
+.BI \-n " NUM"
+Chèn trước dòng
+.I NUM
+(đánh số từ 1).
+Nếu tập tin có ít hơn
+.I NUM
+dòng, các dòng trống sẽ được nối vào cuối tập tin
+(và nếu thiếu dấu xuống dòng cuối cùng thì sẽ được thêm vào trước, nếu cần)
+để nội dung chèn vào rơi đúng vào dòng
+.IR NUM .
+.TP
+.BR \-0 " .. " \-9
+Các tùy chọn ngắn dạng chữ số, tích lũy thành một số thập phân
+(ví dụ
+.B \-20
+là
+.B 2
+rồi
+.BR 0 ).
+.RS
+.TP
+.B \-1
+Giống như
+.BR \-\-prepend .
+.TP
+.B \-0
+Chèn nội dung vào đầu rồi thêm một dòng trống
+(nội dung xuất hiện trước phần đầu ban đầu, ngăn cách bởi một dòng trống).
+.TP
+.B \-N
+(với
+.IR N " \(>= 2)"
+Giống như
+.BI \-n " N"
+(chèn trước dòng
+.IR N ,
+có đệm thêm ở cuối tập tin nếu cần).
+.TP
+Sau
+.B \-a
+các chữ số chọn kiểu nối vào:
+.B 0
+nối vào cuối;
+.B 1
+hoặc lớn hơn chèn trước dòng thứ N từ cuối.
+.RE
+.TP
+.BR \-a ", " \-\-append
+Vị trí hướng nối vào.
+.B \-a
+hoặc
+.B \-a0
+nối vào cuối tập tin (như
+.BR >>
+của shell).
+.B \-a1
+chèn trước dòng cuối;
+.BI \-a N
+(với
+.IR N " \(>= 1)"
+chèn trước dòng thứ
+.IR N
+từ cuối.
+.TP
+.BR \-p ", " \-\-prepend
+Chèn vào đầu tập tin.
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+Xóa
+.I NUM
+dòng tại điểm chèn trước khi chèn.
+Không có đối số
+.I SRC
+thì xóa các dòng đó.
+Ví dụ:
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+Xóa dòng 3 và 4.
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+Thay shebang.
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+Thay dòng cuối (chân trang).
+.RE
+Khi
+.B \-r
+được dùng không có nội dung chèn và vị trí dòng vượt quá cuối tập tin,
+không đệm dòng trống; chỉ thử xóa (thường không làm gì ở EOF).
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+Thêm
+.I NUM
+ký tự xuống dòng sau mỗi
+.IR SRC .
+Khi tùy chọn này bị bỏ qua, giá trị mặc định là
+.B 1
+đối với chuỗi ký tự nghĩa đen và
+.B 0
+đối với tên tập tin
+(dưới
+.BR \-e :
+đối số chuỗi so với
+.BI @ FILE ).
+Khi
+.B \-b
+được đưa ra, cùng một
+.I NUM
+áp dụng cho mọi
+.IR SRC .
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+Nếu không thể đọc được một nguồn tên tập tin, dùng
+.I TEXT
+thay vì báo lỗi.
+Văn bản thay thế khi thiếu được coi như một chuỗi đối với các giá trị mặc định của
+.BR \-\-blank .
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+Tăng mức độ chi tiết của nhật ký (có thể lặp lại).
+.TP
+.BR \-q ", " \-\-quiet
+Giảm mức độ chi tiết của nhật ký.
+.TP
+.BR \-h ", " \-\-help
+In thông báo cách dùng rồi thoát.
+.TP
+.B \-\-version
+In thông tin phiên bản rồi thoát.
+.SH EXIT STATUS
+.TP
+.B 0
+Thành công.
+.TP
+.B 1
+Lỗi cách dùng, thiếu tập tin đích, lỗi vào/ra, hoặc hết bộ nhớ.
+.SH EXAMPLES
+Chèn một dòng đầu đề vào đầu tập tin (chuỗi mặc định sẽ thêm một dấu xuống dòng cuối):
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+Chèn một đoạn tập tin trước dòng 20 (đệm thêm nếu tập tin ngắn hơn):
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+Xóa dòng 3–4:
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+Thay shebang:
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+Thay dòng chân trang:
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Chọn ngôn ngữ cho các thông báo và trang hướng dẫn đã được dịch, khi có sẵn.
+.SH AUTHOR
+Được viết bởi @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Báo lỗi tới <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

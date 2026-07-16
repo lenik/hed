@@ -1,0 +1,242 @@
+.TH INSERT 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Benutzerbefehle"
+.SH NAME
+insert \- Text oder Dateiinhalt an einer Zeilenposition in eine Datei einfügen
+.SH SYNOPSIS
+.B insert
+[\fIOPTION\fR]... \fIFILE\fR [\fISRC\fR]...
+.SH DESCRIPTION
+.B insert
+fügt den Inhalt jeder
+.I SRC
+in die Zieldatei
+.I FILE
+an einer gewählten Zeilenposition ein.
+Das Ziel wird nur neu geschrieben, wenn sich das Ergebnis unterscheidet
+(atomares Schreiben über eine temporäre Datei neben dem Ziel).
+.PP
+Standardmäßig ist jede
+.I SRC
+eine
+.B erweiterte
+Quelle (\fB\-e\fR):
+Beginnt sie mit
+.BR @ ,
+so ist der Rest ein zu lesender Dateiname;
+andernfalls wird das Argument als String-Literal behandelt.
+.PP
+Wird keine Positionsoption angegeben,
+hängt
+.B insert
+den Inhalt an das Ende der Datei an.
+.SH OPTIONS
+.SS Source modes
+Diese Optionen schließen sich gegenseitig aus; die zuletzt angegebene gewinnt.
+.TP
+.BR \-l ", " \-\-strings
+Jede
+.I SRC
+als String-Literal behandeln (Rohbytes, plus alle abschließenden Zeilenumbrüche von
+.BR \-\-blank ).
+.TP
+.BR \-f ", " \-\-filenames
+Jede
+.I SRC
+als zu lesenden Pfad behandeln.
+.TP
+.BR \-e ", " \-\-extended
+Erweiterte Quellen (Standard):
+.BI @ FILE
+liest aus
+.IR FILE ;
+jedes andere Argument ist ein String-Literal.
+.SS Position
+.TP
+.BI \-n " NUM"
+Vor der (bei 1 beginnenden) Zeile
+.I NUM
+einfügen.
+Hat die Datei weniger als
+.I NUM
+Zeilen, werden leere Zeilen am Ende der Datei angehängt
+(fehlt ein abschließender Zeilenumbruch, wird er zuerst ergänzt),
+sodass der eingefügte Inhalt in Zeile
+.I NUM
+landet.
+.TP
+.BR \-0 " .. " \-9
+Ziffern-Kurzoptionen, die sich zu einer Dezimalzahl summieren
+(zum Beispiel ist
+.B \-20
+gleich
+.B 2
+dann
+.BR 0 ).
+.RS
+.TP
+.B \-1
+Wie
+.BR \-\-prepend .
+.TP
+.B \-0
+Den Inhalt voranstellen und danach eine Leerzeile einfügen
+(der Inhalt erscheint vor dem ursprünglichen Anfang, getrennt durch eine Leerzeile).
+.TP
+.B \-N
+(mit
+.IR N " \(>= 2)"
+Wie
+.BI \-n " N"
+(vor Zeile
+.I N
+einfügen, mit Auffüllen am Dateiende falls nötig).
+.TP
+Nach
+.B \-a
+wählen Ziffern den Anhängemodus:
+.B 0
+hängt am Ende an;
+.B 1
+oder größer fügt vor der N-ten Zeile vom Ende ein.
+.RE
+.TP
+.BR \-a ", " \-\-append
+Anhängeorientierte Position.
+.B \-a
+oder
+.B \-a0
+hängt am Ende der Datei an (wie die Shell
+.BR >> ).
+.B \-a1
+fügt vor der letzten Zeile ein;
+.BI \-a N
+(mit
+.IR N " \(>= 1)"
+fügt vor der
+.IR N .
+Zeile vom Ende ein.
+.TP
+.BR \-p ", " \-\-prepend
+An den Anfang der Datei voranstellen.
+.TP
+.BI \-r " NUM" "\fR, \fB\-\-remove=" NUM
+.I NUM
+Zeilen an der Einfügeposition vor dem Einfügen entfernen.
+Ohne
+.I SRC
+Argumente werden diese Zeilen gelöscht.
+Beispiele:
+.RS
+.TP
+.B insert \-3 \-r2 FILE
+Zeilen 3 und 4 löschen.
+.TP
+.B insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+Shebang ersetzen.
+.TP
+.B insert \-a1 \-r1 FILE newfoot
+Die letzte Zeile (Fußzeile) ersetzen.
+.RE
+Wenn
+.B \-r
+ohne Einfügeinhalt verwendet wird und die Zeilenposition hinter dem Dateiende liegt,
+werden keine leeren Zeilen aufgefüllt; es wird nur gelöscht (oft wirkungslos am EOF).
+.SS Source formatting
+.TP
+.BI \-b " NUM" "\fR, \fB\-\-blank=" NUM
+.I NUM
+Zeilenumbrüche nach jeder
+.I SRC
+anhängen.
+Wird diese Option weggelassen, ist der Standardwert
+.B 1
+für String-Literale und
+.B 0
+für Dateinamen
+(unter
+.BR \-e :
+String-Argumente gegenüber
+.BI @ FILE ).
+Wird
+.B \-b
+angegeben, gilt dieselbe
+.I NUM
+für jede
+.IR SRC .
+.TP
+.BI \-m " TEXT" "\fR, \fB\-\-missing=" TEXT
+Kann eine Dateinamensquelle nicht gelesen werden, wird
+.I TEXT
+verwendet statt fehlzuschlagen.
+Fehlender Text wird für die
+.B \-\-blank
+Standardwerte wie ein String behandelt.
+.SS Common
+.TP
+.BR \-v ", " \-\-verbose
+Protokollierungsausführlichkeit erhöhen (kann mehrfach angegeben werden).
+.TP
+.BR \-q ", " \-\-quiet
+Protokollierungsausführlichkeit verringern.
+.TP
+.BR \-h ", " \-\-help
+Eine Benutzungsmeldung ausgeben und beenden.
+.TP
+.B \-\-version
+Versionsinformationen ausgeben und beenden.
+.SH EXIT STATUS
+.TP
+.B 0
+Erfolg.
+.TP
+.B 1
+Benutzungsfehler, fehlendes Ziel, E/A-Fehler oder Speichermangel.
+.SH EXAMPLES
+Eine Kopfzeile voranstellen (String-Standard fügt einen abschließenden Zeilenumbruch hinzu):
+.PP
+.nf
+insert \-p notes.txt Header
+.fi
+.PP
+Einen Dateiausschnitt vor Zeile 20 einfügen (füllt auf, falls die Datei kürzer ist):
+.PP
+.nf
+insert \-20 notes.txt @snippet.txt
+.fi
+.PP
+Zeilen 3–4 löschen:
+.PP
+.nf
+insert \-3 \-r2 notes.txt
+.fi
+.PP
+Shebang ersetzen:
+.PP
+.nf
+insert \-p \-r1 script.sh \[aq]#!/bin/whale\[aq]
+.fi
+.PP
+Fußzeile ersetzen:
+.PP
+.nf
+insert \-a1 \-r1 notes.txt newfoot
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Wählt, sofern verfügbar, die Sprache für Meldungen und übersetzte Handbuchseiten.
+.SH AUTHOR
+Geschrieben von @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Fehler melden an <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR repl (1),
+.BR sed (1)

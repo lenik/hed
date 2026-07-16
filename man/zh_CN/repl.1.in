@@ -1,0 +1,279 @@
+.TH REPL 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "用户命令"
+.SH NAME
+repl \- 批量替换文件中的文本（面向人类的编辑器）
+.SH SYNOPSIS
+.B repl
+[\fIOPTION\fR]... \fIPATTERN\fR \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+[\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.SH DESCRIPTION
+.B repl
+在每个指定的
+.I FILE
+中搜索
+.I PATTERN
+，并将匹配项替换为
+.IR REPLACEMENT 。
+与流编辑器不同，
+.B repl
+就地编辑文件。
+仅当结果与原内容不同时才重写文件
+（通过目标旁的临时文件进行原子写入）。
+.PP
+若未提供任何
+.I FILE
+参数，
+.B repl
+读取标准输入，并将替换后的结果写入标准输出。
+.PP
+当
+.B \-e
+和／或
+.B \-f
+提供了模式时，剩余的第一个非选项参数即为
+.IR REPLACEMENT ，
+其后的所有参数均视为文件。
+否则，前两个非选项参数即为
+.I PATTERN
+和
+.IR REPLACEMENT 。
+.PP
+模式匹配遵循
+.BR grep (1)
+的约定。
+默认模式类型为固定字符串（\fB\-F\fR）。
+.SH OPTIONS
+.SS Pattern selection
+.TP
+.BR \-F ", " \-\-fixed\-strings
+将模式解释为固定字符串。
+这是默认值。
+.TP
+.BR \-E ", " \-\-extended\-regexp
+将模式解释为 POSIX 扩展正则表达式（ERE）。
+.TP
+.BR \-G ", " \-\-basic\-regexp
+将模式解释为 POSIX 基本正则表达式（BRE）。
+.TP
+.BR \-P ", " \-\-perl\-regexp
+使用 PCRE2 将模式解释为 Perl 兼容正则表达式。
+.TP
+.BR \-e " \fIPATTERNS\fR, " \-\-regexp=\fIPATTERNS\fR
+使用
+.I PATTERNS
+作为模式。
+可多次指定，并可与
+.B \-f
+组合使用。
+适合用于保护以
+.B \-
+开头的模式。
+.TP
+.BR \-f " \fIFILE\fR, " \-\-file=\fIFILE\fR
+从
+.I FILE
+逐行读取模式。
+空文件相当于提供了零个模式（不匹配任何内容）。
+使用
+.B \-
+可从标准输入读取模式。
+.TP
+.BR \-i ", " \-\-ignore\-case
+忽略模式和输入数据中的大小写差异。
+.TP
+.B \-\-no\-ignore\-case
+不忽略大小写（默认）。
+可在脚本中用于取消之前的
+.BR \-i 。
+.TP
+.BR \-v ", " \-\-invert\-match
+反转匹配的含义：
+每一行若
+.B 不
+匹配
+.I PATTERN
+，则整行都会被
+.I REPLACEMENT
+替换。
+匹配的行保持不变。
+.TP
+.BR \-w ", " \-\-word\-regexp
+仅选择构成完整单词的匹配项
+（以非单词字符或行的两端为边界）。
+单词字符指字母、数字和下划线。
+若同时给出
+.BR \-x ，则此选项无效。
+.TP
+.BR \-x ", " \-\-line\-regexp
+仅选择跨越整行的匹配项
+（如同模式以
+.B ^
+和
+.B $
+锚定）。
+.SS File selection
+.TP
+.BR \-r ", " \-\-recursive
+递归读取每个目录下的所有文件。
+仅跟踪出现在命令行上的符号链接。
+.TP
+.BR \-R ", " \-\-dereference\-recursive
+与
+.B \-r
+相同，但会跟踪找到的所有符号链接。
+.TP
+.B \-\-max\-depth=\fINUM\fR
+限制目录递归的深度。
+深度为 0 表示仅处理起始目录中的条目。
+.TP
+.B \-\-exclude=\fIGLOB\fR
+跳过基本名匹配
+.I GLOB
+的文件
+（shell 风格，如
+.BR fnmatch (3)
+所述）。
+.TP
+.B \-\-exclude\-from=\fIFILE\fR
+从
+.I FILE
+逐行读取要排除的通配模式。
+.TP
+.B \-\-exclude\-dir=\fIGLOB\fR
+跳过基本名匹配
+.I GLOB
+的目录。
+.TP
+.B \-\-include=\fIGLOB\fR
+仅处理基本名匹配
+.I GLOB
+的文件。
+若给出了任何
+.B \-\-include
+选项，文件必须至少匹配一个 include 通配模式。
+.TP
+.BR \-d ", " \-\-directories=\fIACTION\fR
+如何处理命令行中指定的目录：
+.RS
+.TP
+.B repl
+将目录视为普通文件（默认；通常会失败）。
+.TP
+.B skip
+静默跳过目录。
+.TP
+.B recurse
+与
+.B \-r
+相同：递归处理每个目录下的文件。
+.RE
+.TP
+.BR \-D ", " \-\-devices=\fIACTION\fR
+如何处理设备节点、FIFO 和套接字：
+.B repl
+（默认）或
+.BR skip 。
+.TP
+.B \-\-binary\-files=\fITYPE\fR
+控制二进制文件的处理方式：
+.RS
+.TP
+.B binary
+默认值。
+仅在文件开头的文本部分执行替换，
+在第一个不可打印字节之前停止
+（允许 tab、换行、回车和换页符）。
+.TP
+.B without\-match
+完全忽略二进制文件（不作修改）。
+.TP
+.B text
+将文件视为文本，处理整个文件。
+.RE
+.TP
+.B \-I
+等同于
+.BR \-\-binary\-files=without\-match 。
+.TP
+.BR \-U ", " \-\-binary
+将文件视为二进制，并禁用可打印前缀的启发式判断
+（处理整个缓冲区）。
+.TP
+.BR \-z ", " \-\-null\-data
+将输入和输出视为以 NUL 字节而非换行符终止的一系列行。
+会影响面向行的选项，例如
+.B \-v
+和
+.BR \-x 。
+.SS Reporting
+.TP
+.BR \-q ", " \-\-quiet ", " \-\-silent
+不打印默认的单行摘要，说明有多少文件已更改。
+.TP
+.BR \-c ", " \-\-context
+对每个已更改的文件，打印如
+.B "diff \-c"
+所产生的上下文差异。
+.TP
+.BR \-u ", " \-\-unified
+对每个已更改的文件，打印如
+.B "diff \-u"
+所产生的统一差异。
+.TP
+.BR \-s ", " \-\-summary
+打印详细的批处理摘要：已检查的文件数、已更改的文件数、
+替换次数，以及跳过的二进制文件数。
+.TP
+.BR \-h ", " \-\-help
+打印用法信息并退出。
+.TP
+.B \-\-version
+打印版本信息并退出。
+.SH EXIT STATUS
+.TP
+.B 0
+成功（包括无需更改任何文件的情况）。
+.TP
+.B 1
+发生用法错误、模式编译失败，或无法处理某个文件。
+.SH EXAMPLES
+在一个文件中替换固定字符串：
+.PP
+.nf
+repl foo bar notes.txt
+.fi
+.PP
+在整个目录树中不区分大小写地重命名：
+.PP
+.nf
+repl \-i \-r OldName NewName src/
+.fi
+.PP
+使用扩展正则表达式清除数字：
+.PP
+.nf
+repl \-E \[aq][0\-9]+\[aq] \[aq]#\[aq] data.txt
+.fi
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+在可用时选择消息与已翻译手册页的语言。
+.SH AUTHOR
+由 @PROJECT_AUTHOR@ 编写。
+.SH REPORTING BUGS
+将缺陷报告至 <@PROJECT_EMAIL@>。
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or\-later.
+.SH SEE ALSO
+.BR grep (1),
+.BR sed (1),
+.BR diff (1),
+.BR insert (1)
