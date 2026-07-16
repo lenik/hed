@@ -1,0 +1,103 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Comandi utente"
+.SH NAME
+catq \- concatena file e stampa sullo standard output (silenzioso sui file mancanti)
+.SH SYNOPSIS
+.B catq
+[\fIOPTIONE\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+concatena
+.I FILE
+e li stampa sullo standard output.
+Senza
+.I FILE
+o quando
+.I FILE
+è \-, legge lo standard input.
+.PP
+A differenza di
+.BR cat (1),
+.B catq
+ignora silenziosamente i file mancanti senza stampare un messaggio di errore.
+Ciò è utile quando si desidera concatenare più file ma alcuni potrebbero non esistere.
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+equivalente a \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+numera le righe di output non vuote, sovrascrive \-n
+.TP
+.BR \-e
+equivalente a \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+mostra $ alla fine di ogni riga
+.TP
+.BR \-n ", " \-\-number
+numera tutte le righe di output
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+sopprime le righe vuote ripetute
+.TP
+.BR \-t
+equivalente a \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+mostra i caratteri TAB come ^I
+.TP
+.BR \-u
+(ignorato)
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+usa la notazione ^ e M-, eccetto per LFD e TAB
+.TP
+.B \-\-help
+mostra questo messaggio di aiuto ed esce
+.TP
+.B \-\-version
+stampa le informazioni sulla versione ed esce
+.SH EXAMPLES
+Concatena file, saltando silenziosamente quelli mancanti:
+.PP
+.nf
+catq file1.txt file2.txt file3.txt > combinato.txt
+.fi
+.PP
+Mostra un file con numeri di riga:
+.PP
+.nf
+catq \-n note.txt
+.fi
+.PP
+Mostra caratteri non stampabili:
+.PP
+.nf
+catq \-A dati.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+Successo.
+.TP
+.B 1
+Errore di utilizzo o memoria insufficiente.
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Seleziona la lingua per i messaggi e le pagine man tradotte quando disponibili.
+.SH AUTHOR
+Scritto da @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Segnala bug a <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+Licenza AGPL\-3.0\-or-later.
+.SH SEE ALSO
+.BR cat (1)

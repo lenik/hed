@@ -1,0 +1,103 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Lệnh người dùng"
+.SH NAME
+catq \- nối tệp và in ra đầu ra tiêu chuẩn (im lặng khi tệp bị thiếu)
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+nối
+.I FILE(s)
+và in ra đầu ra tiêu chuẩn.
+Không có
+.I FILE
+hoặc khi
+.I FILE
+là \-, đọc từ đầu vào tiêu chuẩn.
+.PP
+Khác với
+.BR cat (1),
+.B catq
+bỏ qua các tệp bị thiếu một cách im lặng mà không in thông báo lỗi.
+Điều này hữu ích khi bạn muốn nối nhiều tệp nhưng một số tệp có thể không tồn tại.
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+tương đương với \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+đánh số các dòng đầu ra không rỗng, ghi đè \-n
+.TP
+.BR \-e
+tương đương với \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+hiển thị $ ở cuối mỗi dòng
+.TP
+.BR \-n ", " \-\-number
+đánh số tất cả các dòng đầu ra
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+chặn các dòng đầu ra trống lặp lại
+.TP
+.BR \-t
+tương đương với \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+hiển thị ký tự TAB là ^I
+.TP
+.BR \-u
+（bỏ qua）
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+sử dụng ký hiệu ^ và M-, ngoại trừ LFD và TAB
+.TP
+.B \-\-help
+hiển thị thông báo trợ giúp này và thoát
+.TP
+.B \-\-version
+xuất thông tin phiên bản và thoát
+.SH EXAMPLES
+Nối các tệp, bỏ qua các tệp bị thiếu một cách im lặng:
+.PP
+.nf
+catq tệp1.txt tệp2.txt tệp3.txt > kết hợp.txt
+.fi
+.PP
+Hiển thị tệp với số dòng:
+.PP
+.nf
+catq \-n ghi chú.txt
+.fi
+.PP
+Hiển thị ký tự không in được:
+.PP
+.nf
+catq \-A dữ liệu.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+Thành công.
+.TP
+.B 1
+Lỗi sử dụng hoặc thiếu bộ nhớ.
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Chọn ngôn ngữ cho thông báo và trang man đã dịch khi có sẵn.
+.SH AUTHOR
+Viết bởi @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Báo cáo lỗi cho <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Bản quyền \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0-or-later.
+.SH SEE ALSO
+.BR cat (1)

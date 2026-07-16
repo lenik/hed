@@ -1,0 +1,102 @@
+.TH CATQ 1 "@PROJECT version@" "@PROJECT_AUTHOR@" "ユーザーコマンド"
+.SH NAME
+catq \- ファイルを連結して標準出力に出力する（ファイルが見つからない場合は黙って無視）
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+は
+.I FILE(s)
+を連結して標準出力に出力します。
+.I FILE
+がない場合、または
+.I FILE
+が \- の場合は、標準入力から読み込みます。
+.PP
+.BR cat (1)
+と異なり、
+.B catq
+はファイルが見つからない場合にエラーメッセージを出力せずに黙って無視します。
+これは、複数のファイルを連結したいが、その一部が存在しない可能性がある場合に便利です。
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+\-vET と同等
+.TP
+.BR \-b ", " \-\-number\-nonblank
+空でない出力行に行番号を付ける（\-n を上書き）
+.TP
+.BR \-e
+\-vE と同等
+.TP
+.BR \-E ", " \-\-show\-ends
+各行の末尾に $ を表示
+.TP
+.BR \-n ", " \-\-number
+すべての出力行に行番号を付ける
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+連続する空行を抑制
+.TP
+.BR \-t
+\-vT と同等
+.TP
+.BR \-T ", " \-\-show\-tabs
+TAB 文字を ^I として表示
+.TP
+.BR \-u
+（無視）
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+^ と M- 表記を使用（LFD と TAB を除く）
+.TP
+.B \-\-help
+このヘルプメッセージを表示して終了
+.TP
+.B \-\-version
+バージョン情報を出力して終了
+.SH EXAMPLES
+ファイルを連結し、見つからないファイルを黙ってスキップ:
+.PP
+.nf
+catq ファイル1.txt ファイル2.txt ファイル3.txt > 結合.txt
+.fi
+.PP
+行番号を付けてファイルを表示:
+.PP
+.nf
+catq \-n メモ.txt
+.fi
+.PP
+非表示文字を表示:
+.PP
+.nf
+catq \-A データ.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+成功。
+.TP
+.B 1
+使用法エラーまたはメモリ不足。
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+メッセージと翻訳された man ページの言語を選択（利用可能な場合）。
+.SH AUTHOR
+@PROJECT_AUTHOR@ によって作成されました。
+.SH REPORTING BUGS
+バグを <@PROJECT_EMAIL@> に報告してください。
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or-later.
+.SH SEE ALSO
+.BR cat (1)

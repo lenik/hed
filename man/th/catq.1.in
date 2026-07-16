@@ -1,0 +1,103 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "คำสั่งผู้ใช้"
+.SH NAME
+catq \- เชื่อมไฟล์และพิมพ์ไปยังเอาต์พุตมาตรฐาน (เงียบเมื่อไฟล์หายไป)
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+เชื่อม
+.I FILE(s)
+และพิมพ์ไปยังเอาต์พุตมาตรฐาน
+หากไม่มี
+.I FILE
+หรือเมื่อ
+.I FILE
+คือ \- อ่านจากอินพุตมาตรฐาน
+.PP
+แตกต่างจาก
+.BR cat (1)
+.B catq
+จะเพิกเฉยไฟล์ที่หายไปอย่างเงียบๆ โดยไม่พิมพ์ข้อความแสดงข้อผิดพลาด
+นี้มีประโยชน์เมื่อคุณต้องเชื่อมหลายไฟล์แต่บางไฟล์อาจไม่มีอยู่
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+เทียบเท่ากับ \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+หมายเลขบรรทัดเอาต์พุตที่ไม่ว่างเปล่า แทนที่ \-n
+.TP
+.BR \-e
+เทียบเท่ากับ \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+แสดง $ ที่สิ้นสุดของแต่ละบรรทัด
+.TP
+.BR \-n ", " \-\-number
+หมายเลขบรรทัดเอาต์พุตทั้งหมด
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+ยับยั้งบรรทัดเอาต์พุตว่างซ้ำ
+.TP
+.BR \-t
+เทียบเท่ากับ \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+แสดงอักขระ TAB เป็น ^I
+.TP
+.BR \-u
+（ถูกเพิกเฉย）
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+ใช้สัญลักษณ์ ^ และ M- ยกเว้นสำหรับ LFD และ TAB
+.TP
+.B \-\-help
+แสดงข้อความช่วยเหลือนี้และออก
+.TP
+.B \-\-version
+แสดงข้อมูลเวอร์ชันและออก
+.SH EXAMPLES
+เชื่อมไฟล์ข้ามไฟล์ที่หายไปอย่างเงียบ:
+.PP
+.nf
+catq ไฟล์1.txt ไฟล์2.txt ไฟล์3.txt > รวม.txt
+.fi
+.PP
+แสดงไฟล์พร้อมหมายเลขบรรทัด:
+.PP
+.nf
+catq \-n บันทึก.txt
+.fi
+.PP
+แสดงอักขระที่ไม่พิมพ์ได้:
+.PP
+.nf
+catq \-A ข้อมูล.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+สำเร็จ
+.TP
+.B 1
+ข้อผิดพลาดการใช้งานหรือหน่วยความจำไม่เพียงพอ
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+เลือกภาษาสำหรับข้อความและหน้า man ที่แปลเมื่อมีให้ใช้
+.SH AUTHOR
+เขียนโดย @PROJECT_AUTHOR@
+.SH REPORTING BUGS
+รายงานบั๊กไปที่ <@PROJECT_EMAIL@>
+.SH COPYRIGHT
+ลิขสิทธิ์ \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or-later.
+.SH SEE ALSO
+.BR cat (1)

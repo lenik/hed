@@ -1,0 +1,103 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Commandes utilisateur"
+.SH NAME
+catq \- concaténer des fichiers et afficher sur la sortie standard (silencieux sur les fichiers manquants)
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFICHIER\fR]...
+.SH DESCRIPTION
+.B catq
+concatène
+.I FICHIER(s)
+et les affiche sur la sortie standard.
+Sans
+.I FICHIER
+ou lorsque
+.I FICHIER
+est \-, lit l'entrée standard.
+.PP
+Contrairement à
+.BR cat (1),
+.B catq
+ignore silencieusement les fichiers manquants sans message d'erreur.
+Ceci est utile lorsque vous souhaitez concaténer plusieurs fichiers dont certains peuvent ne pas exister.
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+équivalent à \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+numérote les lignes non vides, remplace \-n
+.TP
+.BR \-e
+équivalent à \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+affiche $ à la fin de chaque ligne
+.TP
+.BR \-n ", " \-\-number
+numérote toutes les lignes de sortie
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+supprime les lignes vides répétées
+.TP
+.BR \-t
+équivalent à \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+affiche les caractères TAB comme ^I
+.TP
+.BR \-u
+(ignoré)
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+utilise la notation ^ et M-, sauf pour LFD et TAB
+.TP
+.B \-\-help
+affiche ce message d'aide et quitte
+.TP
+.B \-\-version
+affiche les informations de version et quitte
+.SH EXAMPLES
+Concaténer des fichiers, en sautant silencieusement les manquants :
+.PP
+.nf
+catq fichier1.txt fichier2.txt fichier3.txt > combiné.txt
+.fi
+.PP
+Afficher un fichier avec numéros de ligne :
+.PP
+.nf
+catq \-n notes.txt
+.fi
+.PP
+Afficher les caractères non imprimables :
+.PP
+.nf
+catq \-A données.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+Succès.
+.TP
+.B 1
+Erreur d'utilisation ou manque de mémoire.
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Sélectionne la langue pour les messages et les pages de manuel traduites lorsque disponibles.
+.SH AUTHOR
+Écrit par @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Signaler les bugs à <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+Licence AGPL\-3.0\-or-later.
+.SH SEE ALSO
+.BR cat (1)

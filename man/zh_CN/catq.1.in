@@ -1,0 +1,104 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "用户命令"
+.SH NAME
+catq \- 连接文件并打印到标准输出（对缺失文件静默）
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+连接
+.I FILE(s)
+并打印到标准输出。
+没有
+.I FILE
+或当
+.I FILE
+是 \- 时，从标准输入读取。
+.PP
+与
+.BR cat (1)
+不同，
+.B catq
+静默忽略缺失文件而不打印错误消息。
+当您想要连接多个文件但其中一些可能不存在时，这很有用。
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+等效于 \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+对非空输出行编号，覆盖 \-n
+.TP
+.BR \-e
+等效于 \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+在每行末尾显示 $
+.TP
+.BR \-n ", " \-\-number
+对所有输出行编号
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+抑制重复的空输出行
+.TP
+.BR \-t
+等效于 \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+将 TAB 字符显示为 ^I
+.TP
+.BR \-u
+（忽略）
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+使用 ^ 和 M- 表示法，LFD 和 TAB 除外
+.TP
+.B \-\-help
+显示此帮助信息并退出
+.TP
+.B \-\-version
+输出版本信息并退出
+.SH EXAMPLES
+连接文件，静默跳过缺失的：
+.PP
+.nf
+catq 文件1.txt 文件2.txt 文件3.txt > 合并.txt
+.fi
+.PP
+显示带行号的文件：
+.PP
+.nf
+catq \-n 笔记.txt
+.fi
+.PP
+显示不可打印字符：
+.PP
+.nf
+catq \-A 数据.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+成功。
+.TP
+.B 1
+用法错误或内存不足。
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+选择消息和翻译手册页的语言（如果可用）。
+.SH AUTHOR
+由 @PROJECT_AUTHOR@ 编写。
+.SH REPORTING BUGS
+向 <@PROJECT_EMAIL@> 报告错误。
+.SH COPYRIGHT
+版权所有 \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+许可 AGPL\-3.0-or-later.
+.SH SEE ALSO
+.BR cat (1)

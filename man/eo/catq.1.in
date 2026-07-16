@@ -1,0 +1,103 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Uzantaj Komandoj"
+.SH NAME
+catq \- kunigu dosierojn kaj preskaŭu al norma eliro (silenta pri mankantaj dosieroj)
+.SH SYNOPSIS
+.B catq
+[\fIOPCIO\fR]... [\fIDOSIERO\fR]...
+.SH DESCRIPTION
+.B catq
+kunigas
+.I DOSIERO(jn)
+kaj preskaŭas ilin al la norma eliro.
+Sen
+.I DOSIERO
+aŭ kiam
+.I DOSIERO
+estas \-, legas de la norma eniro.
+.PP
+Malsame ol
+.BR cat (1),
+.B catq
+silentas pri mankantaj dosieroj sen erara mesaĝo.
+Tio estas utila kiam vi volas kunigi plurajn dosierojn, el kiuj kelkaj eble ne ekzistas.
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+ekvivalenta al \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+numeru ne-malplenajn elirajn liniojn, superas \-n
+.TP
+.BR \-e
+ekvivalenta al \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+montru $ ĉe la fino de ĉiu linio
+.TP
+.BR \-n ", " \-\-number
+numeru ĉiujn elirajn liniojn
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+subpremu ripetitajn malplenajn elirajn liniojn
+.TP
+.BR \-t
+ekvivalenta al \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+montru TAB-signojn kiel ^I
+.TP
+.BR \-u
+(ignorita)
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+uzu ^ kaj M- notacion, krom por LFD kaj TAB
+.TP
+.B \-\-help
+montru ĉi tiun helpmesaĝon kaj eliru
+.TP
+.B \-\-version
+eligu versian informon kaj eliru
+.SH EXAMPLES
+Kunigu dosierojn, silentante preterpasante mankantajn:
+.PP
+.nf
+catq dosiero1.txt dosiero2.txt dosiero3.txt > kunigitaj.txt
+.fi
+.PP
+Montru dosieron kun lininumeroj:
+.PP
+.nf
+catq \-n notoj.txt
+.fi
+.PP
+Montru ne-preskaŭeblajn signojn:
+.PP
+.nf
+catq \-A datoj.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+Sukceso.
+.TP
+.B 1
+Uz-eraro aŭ manko de memoro.
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Elektu la lingvon por mesaĝoj kaj tradukitaj manpaĝoj kiam haveblaj.
+.SH AUTHOR
+Skribita de @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Raportu cimojn al <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Kopirajto \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+Licenso AGPL\-3.0\-or-later.
+.SH SEE ALSO
+.BR cat (1)

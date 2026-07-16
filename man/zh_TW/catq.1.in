@@ -1,0 +1,104 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "使用者指令"
+.SH NAME
+catq \- 連接檔案並列印到標準輸出（對缺失檔案靜默）
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+連接
+.I FILE(s)
+並列印到標準輸出。
+沒有
+.I FILE
+或當
+.I FILE
+是 \- 時，從標準輸入讀取。
+.PP
+與
+.BR cat (1)
+不同，
+.B catq
+靜默忽略缺失檔案而不列印錯誤訊息。
+當您想要連接多個檔案但其中一些可能不存在時，這很有用。
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+等同於 \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+對非空輸出行編號，覆蓋 \-n
+.TP
+.BR \-e
+等同於 \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+在每行末尾顯示 $
+.TP
+.BR \-n ", " \-\-number
+對所有輸出行編號
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+抑制重複的空輸出行
+.TP
+.BR \-t
+等同於 \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+將 TAB 字元顯示為 ^I
+.TP
+.BR \-u
+（忽略）
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+使用 ^ 和 M- 表示法，LFD 和 TAB 除外
+.TP
+.B \-\-help
+顯示此說明訊息並退出
+.TP
+.B \-\-version
+輸出版本資訊並退出
+.SH EXAMPLES
+連接檔案，靜默跳過缺失的：
+.PP
+.nf
+catq 檔案1.txt 檔案2.txt 檔案3.txt > 合併.txt
+.fi
+.PP
+顯示帶行號的檔案：
+.PP
+.nf
+catq \-n 筆記.txt
+.fi
+.PP
+顯示不可列印字元：
+.PP
+.nf
+catq \-A 資料.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+成功。
+.TP
+.B 1
+用法錯誤或記憶體不足。
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+選擇訊息和翻譯手冊頁的語言（如果可用）。
+.SH AUTHOR
+由 @PROJECT_AUTHOR@ 編寫。
+.SH REPORTING BUGS
+向 <@PROJECT_EMAIL@> 報告錯誤。
+.SH COPYRIGHT
+版權所有 \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+許可 AGPL\-3.0-or-later.
+.SH SEE ALSO
+.BR cat (1)

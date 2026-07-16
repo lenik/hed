@@ -1,0 +1,104 @@
+.TH CATQ 1 "@PROJECT_VERSION@" "@PROJECT_AUTHOR@" "Benutzerbefehle"
+.SH NAME
+catq \- Dateien verketten und auf der Standardausgabe ausgeben (still bei fehlenden Dateien)
+.SH SYNOPSIS
+.B catq
+[\fIOPTION\fR]... [\fIFILE\fR]...
+.SH DESCRIPTION
+.B catq
+verkettet
+.I DATEI(en)
+und gibt sie auf der Standardausgabe aus.
+Ohne
+.I DATEI
+oder wenn
+.I DATEI
+\- ist, wird von der Standardeingabe gelesen.
+.PP
+Im Gegensatz zu
+.BR cat (1)
+ignoriert
+.B catq
+fehlende Dateien stillschweigend, ohne eine Fehlermeldung auszugeben.
+Dies ist nützlich, wenn Sie mehrere Dateien verketten möchten, von denen einige möglicherweise nicht existieren.
+.SH OPTIONS
+.TP
+.BR \-A ", " \-\-show\-all
+äquivalent zu \-vET
+.TP
+.BR \-b ", " \-\-number\-nonblank
+nicht leere Ausgabezeilen nummerieren, setzt \-n außer Kraft
+.TP
+.BR \-e
+äquivalent zu \-vE
+.TP
+.BR \-E ", " \-\-show\-ends
+$ am Ende jeder Zeile anzeigen
+.TP
+.BR \-n ", " \-\-number
+alle Ausgabezeilen nummerieren
+.TP
+.BR \-s ", " \-\-squeeze\-blank
+wiederholte leere Ausgabezeilen unterdrücken
+.TP
+.BR \-t
+äquivalent zu \-vT
+.TP
+.BR \-T ", " \-\-show\-tabs
+TAB-Zeichen als ^I anzeigen
+.TP
+.BR \-u
+(ignoriert)
+.TP
+.BR \-v ", " \-\-show\-nonprinting
+^- und M-Notation verwenden, außer für LFD und TAB
+.TP
+.B \-\-help
+Diese Hilfemeldung anzeigen und beenden
+.TP
+.B \-\-version
+Versionsinformationen ausgeben und beenden
+.SH EXAMPLES
+Dateien verketten, fehlende stillschweigend überspringen:
+.PP
+.nf
+catq datei1.txt datei2.txt datei3.txt > kombiniert.txt
+.fi
+.PP
+Datei mit Zeilennummern anzeigen:
+.PP
+.nf
+catq \-n notizen.txt
+.fi
+.PP
+Nicht druckbare Zeichen anzeigen:
+.PP
+.nf
+catq \-A daten.bin
+.fi
+.SH EXIT STATUS
+.TP
+.B 0
+Erfolg.
+.TP
+.B 1
+Benutzungsfehler oder Speichermangel.
+.SH ENVIRONMENT
+.TP
+.B LANGUAGE
+.TQ
+.B LC_ALL
+.TQ
+.B LC_MESSAGES
+.TQ
+.B LANG
+Wählt die Sprache für Meldungen und übersetzte Handbuchseiten, sofern verfügbar.
+.SH AUTHOR
+Geschrieben von @PROJECT_AUTHOR@.
+.SH REPORTING BUGS
+Fehler melden an <@PROJECT_EMAIL@>.
+.SH COPYRIGHT
+Copyright \(co @PROJECT_YEAR@ @PROJECT_AUTHOR@.
+License AGPL\-3.0\-or-later.
+.SH SEE ALSO
+.BR cat (1)
