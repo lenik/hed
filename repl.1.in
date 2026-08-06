@@ -7,6 +7,9 @@ repl \- batch replace text in files (human editor)
 .br
 .B repl
 [\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+\fB\-\-restore=\fIFILE\fR
 .SH DESCRIPTION
 .B repl
 searches for
@@ -128,12 +131,47 @@ If the argument is "..", this is equivalent to "1..inf" (replace all).
 .TP
 .BR \-r ", " \-\-recursive
 Read all files under each directory, recursively.
-Follow symbolic links only when they appear on the command line.
+Follow symbolic links only when they appear on the command line
+(and only that one command-line link; symlinks found while walking
+are not followed or recursed into).
 .TP
 .BR \-R ", " \-\-dereference\-recursive
 Like
 .BR \-r ,
 but follow symbolic links wherever they are found.
+.TP
+.BR \-p ", " \-\-patch[=\fIFILE\fR]
+Write a unified
+.BR diff (1)
+of every change to
+.I FILE
+so the edits can be undone later with
+.BR \-\-restore .
+If
+.I FILE
+is omitted, write
+.B /tmp/repl\-TIMESTAMP.patch
+(local time).
+Use
+.B \-\-patch=\fIFILE\fR
+or
+.B \-p\fIFILE\fR
+to choose a path
+(a separate
+.B \-p
+.I FILE
+argument is not accepted by getopt).
+The patch is old-to-new; restore applies it in reverse.
+.TP
+.B \-\-restore=\fIFILE\fR
+Restore files using a patch previously written by
+.BR \-\-patch
+(invokes
+.B patch \-R \-p0 \-f \-d /
+.IR FILE ;
+path labels are stored relative to
+.BR / ).
+Does not take a pattern or replacement.
 .TP
 .B \-\-max\-depth=\fINUM\fR
 Limit how deep directory recursion may go.

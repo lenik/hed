@@ -19,11 +19,13 @@
 #include <bas/proc/env.h>
 
 #include <getopt.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 define_logger();
@@ -41,6 +43,7 @@ enum {
     OPT_COLOR,
     OPT_PALETTE,
     OPT_RANGE,
+    OPT_RESTORE,
 };
 
 enum binary_mode {
@@ -82,6 +85,10 @@ typedef struct repl_ctx {
     int dryrun;       /* -n: report only, do not rewrite files */
     int context_diff; /* -c */
     int unified_diff; /* -u */
+    int want_patch;   /* -p/--patch: write undo patch */
+    const char *patch_path; /* NULL => choose /tmp/repl-TIMESTAMP.patch */
+    char *patch_path_owned;
+    FILE *patch_fp;
     enum color_when color_when;
     int use_color; /* resolved for this run */
     palette_t palette;
@@ -93,6 +100,7 @@ typedef struct repl_ctx {
 void usage(FILE *out) {
     fputs(_("Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
             "       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
+            "       repl --restore=FILE\n"
             "Batch replace PATTERN with REPLACEMENT in files.\n"
             "A file is rewritten only when its contents would change.\n"
             "With no FILE, read standard input and write to standard output.\n"),
@@ -137,6 +145,12 @@ void usage(FILE *out) {
           "                          ",
           out);
     fputs(_("recurse directories, following all symbolic links\n"), out);
+    fputs("  -p, --patch[=FILE]      ", out);
+    fputs(_("write a unified patch of changes for later restore "
+            "(default: /tmp/repl-TIMESTAMP.patch)\n"),
+          out);
+    fputs("      --restore=FILE      ", out);
+    fputs(_("restore files using a patch previously written by --patch\n"), out);
     fputs("      --max-depth=NUM     ", out);
     fputs(_("limit directory recursion depth\n"), out);
     fputs("      --exclude=GLOB      ", out);
@@ -414,6 +428,174 @@ static int print_diff(const repl_ctx_t *ctx, const char *path, const char *old, 
     return 0;
 }
 
+/* Append a patch(1)-ready unified diff (old -> new) labeled with path.
+ * Absolute paths are stored without the leading '/' so restore can use patch -d /.
+ */
+static int write_patch_diff(FILE *out, const char *path, const char *old, size_t old_len,
+                            const char *neu, size_t neu_len) {
+    char t1[] = "/tmp/hed-repl-a-XXXXXX";
+    char t2[] = "/tmp/hed-repl-b-XXXXXX";
+    char resolved[PATH_MAX];
+    const char *label = path;
+    int fd1, fd2;
+    FILE *f;
+    int pipefd[2];
+    pid_t pid;
+    int status;
+    FILE *in;
+    char buf[8192];
+    size_t n;
+
+    if (realpath(path, resolved) != NULL) {
+        label = (resolved[0] == '/') ? resolved + 1 : resolved;
+    } else if (path[0] == '/') {
+        label = path + 1;
+    }
+
+    fd1 = mkstemp(t1);
+    fd2 = mkstemp(t2);
+    if (fd1 < 0 || fd2 < 0) {
+        if (fd1 >= 0) {
+            close(fd1);
+            unlink(t1);
+        }
+        if (fd2 >= 0) {
+            close(fd2);
+            unlink(t2);
+        }
+        return -1;
+    }
+    f = fdopen(fd1, "wb");
+    if (!f || (old_len && fwrite(old, 1, old_len, f) != old_len) || fclose(f) != 0) {
+        close(fd2);
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+    f = fdopen(fd2, "wb");
+    if (!f || (neu_len && fwrite(neu, 1, neu_len, f) != neu_len) || fclose(f) != 0) {
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+
+    if (pipe(pipefd) != 0) {
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+
+    pid = fork();
+    if (pid == 0) {
+        close(pipefd[0]);
+        if (dup2(pipefd[1], STDOUT_FILENO) < 0) {
+            _exit(127);
+        }
+        close(pipefd[1]);
+        /* Labels so patch(1) targets the real path, not the temp files. */
+        execlp("diff", "diff", "-u", "-L", label, "-L", label, t1, t2, (char *)NULL);
+        _exit(127);
+    }
+    close(pipefd[1]);
+    if (pid < 0) {
+        close(pipefd[0]);
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+
+    in = fdopen(pipefd[0], "r");
+    if (!in) {
+        close(pipefd[0]);
+        waitpid(pid, &status, 0);
+        unlink(t1);
+        unlink(t2);
+        return -1;
+    }
+
+    while ((n = fread(buf, 1, sizeof buf, in)) > 0) {
+        if (fwrite(buf, 1, n, out) != n) {
+            fclose(in);
+            waitpid(pid, &status, 0);
+            unlink(t1);
+            unlink(t2);
+            return -1;
+        }
+    }
+    fclose(in);
+    waitpid(pid, &status, 0);
+    unlink(t1);
+    unlink(t2);
+    /* diff exits 1 when files differ — that is success for us */
+    if (WIFEXITED(status) && (WEXITSTATUS(status) == 0 || WEXITSTATUS(status) == 1)) {
+        return 0;
+    }
+    return -1;
+}
+
+static int do_restore(const char *prog, const char *patch_file) {
+    pid_t pid;
+    int status;
+
+    pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        return 1;
+    }
+    if (pid == 0) {
+        /*
+         * Reverse the old->new patch written by --patch.
+         * Labels are rooted at / (leading slash stripped), so -d / finds them.
+         */
+        execlp("patch", "patch", "-R", "-p0", "-f", "-d", "/", "-i", patch_file, (char *)NULL);
+        _exit(127);
+    }
+    if (waitpid(pid, &status, 0) < 0) {
+        perror("waitpid");
+        return 1;
+    }
+    if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+        return 0;
+    }
+    if (WIFEXITED(status) && WEXITSTATUS(status) == 127) {
+        fprintf(stderr, _("%s: failed to run patch(1)\n"), prog);
+    } else {
+        fprintf(stderr, _("%s: restore failed (patch exit %d)\n"), prog,
+                WIFEXITED(status) ? WEXITSTATUS(status) : -1);
+    }
+    return 1;
+}
+
+static int open_patch_file(repl_ctx_t *ctx) {
+    char defpath[64];
+    time_t now;
+    struct tm tm_buf;
+    struct tm *tm;
+
+    if (!ctx->want_patch) {
+        return 0;
+    }
+    if (!ctx->patch_path) {
+        now = time(NULL);
+        tm = localtime_r(&now, &tm_buf);
+        if (!tm || strftime(defpath, sizeof defpath, "/tmp/repl-%Y%m%d-%H%M%S.patch", tm) == 0) {
+            snprintf(defpath, sizeof defpath, "/tmp/repl-%ld.patch", (long)now);
+        }
+        ctx->patch_path_owned = strdup(defpath);
+        if (!ctx->patch_path_owned) {
+            return -1;
+        }
+        ctx->patch_path = ctx->patch_path_owned;
+    }
+    ctx->patch_fp = fopen(ctx->patch_path, "w");
+    if (!ctx->patch_fp) {
+        fprintf(stderr, "%s: ", ctx->prog);
+        perror(ctx->patch_path);
+        return -1;
+    }
+    return 0;
+}
+
 static int process_file(const char *path, void *userdata) {
     repl_ctx_t *ctx = userdata;
     char *old = NULL;
@@ -492,6 +674,13 @@ static int process_file(const char *path, void *userdata) {
         print_diff(ctx, path, old, old_len, neu, neu_len, ctx->unified_diff);
     }
 
+    if (ctx->patch_fp) {
+        if (write_patch_diff(ctx->patch_fp, path, old, old_len, neu, neu_len) != 0) {
+            fprintf(stderr, _("%s: failed to write patch for %s\n"), ctx->prog, path);
+            ctx->had_error = 1;
+        }
+    }
+
     if (ctx->dryrun) {
         ctx->stats.files_changed++;
         ctx->stats.replacements += n_repl;
@@ -552,6 +741,7 @@ int main(int argc, char **argv) {
     ctx.walk.device_action = 0;
 
     int pattern_from_opt = 0;
+    const char *restore_file = NULL;
 
     static const struct option long_opts[] = {
         {"extended-regexp", no_argument, NULL, 'E'},
@@ -571,6 +761,8 @@ int main(int argc, char **argv) {
         {"range", required_argument, NULL, OPT_RANGE},
         {"recursive", no_argument, NULL, 'r'},
         {"dereference-recursive", no_argument, NULL, 'R'},
+        {"patch", optional_argument, NULL, 'p'},
+        {"restore", required_argument, NULL, OPT_RESTORE},
         {"max-depth", required_argument, NULL, OPT_MAX_DEPTH},
         {"exclude", required_argument, NULL, OPT_EXCLUDE},
         {"exclude-from", required_argument, NULL, OPT_EXCLUDE_FROM},
@@ -596,7 +788,7 @@ int main(int argc, char **argv) {
     };
 
     for (;;) {
-        int c = getopt_long(argc, argv, "EFGPe:f:ivwxlg1rRd:D:IUznqcusVh", long_opts, NULL);
+        int c = getopt_long(argc, argv, "EFGPe:f:ivwxlg1rRp::d:D:IUznqcusVh", long_opts, NULL);
         if (c == -1) {
             break;
         }
@@ -715,6 +907,15 @@ int main(int argc, char **argv) {
             ctx.walk.dereference = 1;
             ctx.walk.recursive = 1;
             ctx.walk.dir_action = 2;
+            break;
+        case 'p':
+            ctx.want_patch = 1;
+            if (optarg && optarg[0]) {
+                ctx.patch_path = optarg;
+            }
+            break;
+        case OPT_RESTORE:
+            restore_file = optarg;
             break;
         case OPT_MAX_DEPTH: {
             char *end = NULL;
@@ -842,6 +1043,15 @@ int main(int argc, char **argv) {
     argc -= optind;
     argv += optind;
 
+    if (restore_file) {
+        if (argc > 0 || pattern_from_opt || ctx.want_patch) {
+            fprintf(stderr, _("%s: --restore does not take PATTERN/REPLACEMENT or --patch\n"),
+                    exe);
+            return 1;
+        }
+        return do_restore(exe, restore_file);
+    }
+
     if (!pattern_from_opt) {
         if (argc < 2) {
             fprintf(stderr, _("%s: missing PATTERN and REPLACEMENT\n"), exe);
@@ -890,6 +1100,16 @@ int main(int argc, char **argv) {
         ctx.use_color = isatty(STDOUT_FILENO);
     } else {
         ctx.use_color = 0;
+    }
+
+    if (open_patch_file(&ctx) != 0) {
+        match_engine_free(ctx.eng);
+        list_free(patterns, n_patterns);
+        list_free(exclude, n_exclude);
+        list_free(exclude_dir, n_exclude_dir);
+        list_free(include, n_include);
+        free(ctx.patch_path_owned);
+        return 1;
     }
 
     if (argc == 0 && !ctx.walk.recursive) {
@@ -941,6 +1161,17 @@ int main(int argc, char **argv) {
         }
     }
 
+    if (ctx.patch_fp) {
+        if (fclose(ctx.patch_fp) != 0) {
+            fprintf(stderr, "%s: ", exe);
+            perror(ctx.patch_path);
+            ctx.had_error = 1;
+        } else if (!ctx.quiet) {
+            printf(_("patch written: %s\n"), ctx.patch_path);
+        }
+        ctx.patch_fp = NULL;
+    }
+
     if (!ctx.quiet) {
         if (ctx.summary) {
             if (ctx.dryrun) {
@@ -972,5 +1203,6 @@ int main(int argc, char **argv) {
     list_free(exclude, n_exclude);
     list_free(exclude_dir, n_exclude_dir);
     list_free(include, n_include);
+    free(ctx.patch_path_owned);
     return ctx.had_error ? 1 : 0;
 }

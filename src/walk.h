@@ -21,7 +21,9 @@ typedef int (*walk_file_fn)(const char *path, void *userdata);
 
 /*
  * Visit path. If directory and recurse, walk children.
- * cmdline=1 means path was given on the command line (affects -r symlink following).
+ * cmdline=1 means path was given on the command line.
+ * With -r (recursive, not -R): follow a cmdline symlink once; do not follow
+ * symlinks discovered while walking.
  * Returns 0, or first non-zero from callback.
  */
 int walk_path(const char *path, int cmdline, const walk_opts_t *opts, walk_file_fn fn,

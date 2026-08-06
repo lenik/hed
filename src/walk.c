@@ -86,13 +86,28 @@ int walk_path(const char *path, int cmdline, const walk_opts_t *opts, walk_file_
             return 0; /* skip */
         }
         if (opts->dir_action == 2 || opts->recursive || opts->dereference) {
-            return walk_dir(path, 0, cmdline, opts, fn, userdata);
+            /* Descend once; children never get cmdline=1 (no further symlink follow with -r). */
+            return walk_dir(path, 0, 0, opts, fn, userdata);
         }
         /* treat as ordinary file — unusual; still try callback */
         return fn(path, userdata);
     }
 
-    if (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)) {
+    if (S_ISLNK(st.st_mode)) {
+        /*
+         * Not dereferenced: only command-line symlinks are processed (open follows once).
+         * Symlinks discovered while walking are skipped under -r.
+         */
+        if (!cmdline) {
+            return 0;
+        }
+        if (should_skip_file(path, opts)) {
+            return 0;
+        }
+        return fn(path, userdata);
+    }
+
+    if (S_ISREG(st.st_mode)) {
         if (should_skip_file(path, opts)) {
             return 0;
         }
@@ -169,7 +184,20 @@ static int walk_dir(const char *path, int depth, int cmdline, const walk_opts_t 
                 continue;
             }
             rc = walk_dir(child, depth + 1, 0, opts, fn, userdata);
+        } else if (S_ISLNK(st.st_mode)) {
+            /* -r: do not follow or process symlinks that were not on the command line */
+            free(child);
+            continue;
+        } else if (S_ISREG(st.st_mode)) {
+            if (!should_skip_file(child, opts)) {
+                rc = fn(child, userdata);
+            }
         } else {
+            /* device / fifo / socket */
+            if (opts->device_action == 1) {
+                free(child);
+                continue;
+            }
             if (!should_skip_file(child, opts)) {
                 rc = fn(child, userdata);
             }

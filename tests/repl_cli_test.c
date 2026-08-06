@@ -423,6 +423,146 @@ START_TEST(test_cli_range_option) {
 }
 END_TEST
 
+START_TEST(test_cli_recursive_skips_tree_symlinks) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char outside[] = "/tmp/hed-repl-out-XXXXXX";
+    char path[160];
+    char linkpath[160];
+    char outpath[160];
+    char *out;
+    char *argv[8];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    ck_assert_ptr_nonnull(mkdtemp(outside));
+
+    snprintf(path, sizeof path, "%s/real.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("old\n", f);
+        fclose(f);
+    }
+    snprintf(outpath, sizeof outpath, "%s/hidden.txt", outside);
+    {
+        FILE *f = fopen(outpath, "w");
+        fputs("old\n", f);
+        fclose(f);
+    }
+    snprintf(linkpath, sizeof linkpath, "%s/symdir", dir);
+    ck_assert_int_eq(symlink(outside, linkpath), 0);
+    snprintf(linkpath, sizeof linkpath, "%s/symfile.txt", dir);
+    ck_assert_int_eq(symlink(outpath, linkpath), 0);
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "-r";
+    argv[3] = "old";
+    argv[4] = "new";
+    argv[5] = dir;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "new\n");
+    free(out);
+    out = read_all(outpath);
+    ck_assert_str_eq(out, "old\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s %s", dir, outside);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_recursive_follows_cmdline_symlink) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char linkdir[] = "/tmp/hed-repl-lnk-XXXXXX";
+    char path[160];
+    char linkpath[160];
+    char *out;
+    char *argv[8];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    /* mkdtemp creates the dir; replace with symlink to dir */
+    ck_assert_ptr_nonnull(mkdtemp(linkdir));
+    snprintf(path, sizeof path, "%s/f.txt", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("old\n", f);
+        fclose(f);
+    }
+    rmdir(linkdir);
+    ck_assert_int_eq(symlink(dir, linkdir), 0);
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "-r";
+    argv[3] = "old";
+    argv[4] = "new";
+    argv[5] = linkdir;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "new\n");
+    free(out);
+
+    unlink(linkdir);
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_patch_restore) {
+    char dir[] = "/tmp/hed-repl-XXXXXX";
+    char path[160];
+    char patch[160];
+    char patch_arg[180];
+    char *out;
+    char *argv[10];
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/t.txt", dir);
+    snprintf(patch, sizeof patch, "%s/undo.patch", dir);
+    {
+        FILE *f = fopen(path, "w");
+        fputs("hello world\n", f);
+        fclose(f);
+    }
+
+    snprintf(patch_arg, sizeof patch_arg, "--patch=%s", patch);
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = patch_arg;
+    argv[3] = "world";
+    argv[4] = "there";
+    argv[5] = path;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "hello there\n");
+    free(out);
+    {
+        FILE *f = fopen(patch, "r");
+        ck_assert_ptr_nonnull(f);
+        fclose(f);
+    }
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "--restore";
+    argv[2] = patch;
+    argv[3] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    out = read_all(path);
+    ck_assert_str_eq(out, "hello world\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
 static Suite *suite(void) {
     Suite *s = suite_create("repl_cli");
     TCase *tc = tcase_create("cli");
@@ -432,12 +572,15 @@ static Suite *suite(void) {
     tcase_add_test(tc, test_cli_skip_unchanged);
     tcase_add_test(tc, test_cli_ignore_case);
     tcase_add_test(tc, test_cli_recursive);
+    tcase_add_test(tc, test_cli_recursive_skips_tree_symlinks);
+    tcase_add_test(tc, test_cli_recursive_follows_cmdline_symlink);
     tcase_add_test(tc, test_cli_ere);
     tcase_add_test(tc, test_cli_dryrun_no_write);
     tcase_add_test(tc, test_cli_unified_banner_dryrun);
     tcase_add_test(tc, test_cli_line_option);
     tcase_add_test(tc, test_cli_first_option);
     tcase_add_test(tc, test_cli_range_option);
+    tcase_add_test(tc, test_cli_patch_restore);
     suite_add_tcase(s, tc);
     return s;
 }
