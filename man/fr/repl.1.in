@@ -112,6 +112,19 @@ et
 .BR $ ).
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+Ne pas ignorer les chemins correspondants aux listes d'ignorance VCS
+(\fB.gitignore\fR / \fB.hgignore\fR / ignores Subversion).
+Par défaut,
+.B repl
+découvre l'arbre de travail VCS le plus proche et respecte ses règles.
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+Lister les chemins ignorés sous
+.I DIR
+puis quitter.
+N'accepte ni motif ni remplacement.
+.TP
 .BR \-r ", " \-\-recursive
 Lire tous les fichiers sous chaque répertoire, récursivement.
 Suivre les liens symboliques uniquement lorsqu'ils apparaissent sur la ligne de commande.

@@ -110,6 +110,19 @@ kaj
 .BR $ ).
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+Ne preterpasi vojojn kongruajn kun VCS-ignorlistoj
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion-ignoroj).
+Defaŭlte
+.B repl
+trovas la plej proksiman VCS-laborarbon kaj respektas ĝiajn regulojn.
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+Listigi ignoritajn vojojn sub
+.I DIR
+kaj eliri.
+Ne akceptas ŝablonon nek anstataŭigan ĉenon.
+.TP
 .BR \-r ", " \-\-recursive
 Legi ĉiujn dosierojn sub ĉiu dosierujo, rekursie.
 Sekvi simbolajn ligilojn nur kiam ili aperas sur la komandlinio.

@@ -110,6 +110,18 @@ repl \- ファイル内のテキストを一括置換する（人間向けエデ
 で固定されているかのように）。
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+VCS の無視リストに一致するパスをスキップしない
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion ignores)。
+既定では
+.B repl
+は最も近い VCS 作業ツリーを検出し、その無視規則に従います。
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+.I DIR
+配下で無視されるパスを列挙して終了します。
+パターンや置換文字列は取りません。
+.TP
 .BR \-r ", " \-\-recursive
 各ディレクトリの下にあるすべてのファイルを再帰的に読み込みます。
 コマンドライン上に現れたシンボリックリンクのみをたどります。

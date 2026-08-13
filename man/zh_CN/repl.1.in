@@ -7,6 +7,12 @@ repl \- 批量替换文件中的文本（面向人类的编辑器）
 .br
 .B repl
 [\fIOPTION\fR]... \fB\-e\fR \fIPATTERN\fR ... \fIREPLACEMENT\fR [\fIFILE\fR]...
+.br
+.B repl
+\fB\-\-restore=\fIFILE\fR
+.br
+.B repl
+\fB\-X\fR \fIDIR\fR
 .SH DESCRIPTION
 .B repl
 在每个指定的
@@ -20,6 +26,17 @@ repl \- 批量替换文件中的文本（面向人类的编辑器）
 就地编辑文件。
 仅当结果与原内容不同时才重写文件
 （通过目标旁的临时文件进行原子写入）。
+.PP
+遍历目录时，
+.B repl
+默认遵守 VCS 忽略列表
+（Git \fB.gitignore\fR、Mercurial \fB.hgignore\fR 或 Subversion 忽略规则），
+通过向上查找工作树根目录来发现。
+使用
+.B \-a
+处理全部文件，或使用
+.B \-X
+列出被忽略的路径。
 .PP
 若未提供任何
 .I FILE
@@ -113,6 +130,19 @@ repl \- 批量替换文件中的文本（面向人类的编辑器）
 .B $
 锚定）。
 .SS File selection
+.TP
+.BR \-a ", " \-\-all
+不跳过匹配 VCS 忽略列表的路径
+（\fB.gitignore\fR / \fB.hgignore\fR / Subversion 忽略规则）。
+默认情况下，
+.B repl
+会向上查找最近的 VCS 工作树并遵守其忽略规则。
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+列出
+.I DIR
+下被 VCS 忽略列表忽略的路径，然后退出。
+不接受模式或替换字符串。
 .TP
 .BR \-r ", " \-\-recursive
 递归读取每个目录下的所有文件。

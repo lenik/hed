@@ -115,6 +115,19 @@ und
 verankert).
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+Pfade, die von VCS-Ignore-Listen getroffen werden, nicht überspringen
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion-Ignores).
+Standardmäßig sucht
+.B repl
+den nächsten VCS-Arbeitsbaum und beachtet dessen Ignore-Regeln.
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+Ignorierte Pfade unter
+.I DIR
+auflisten und beenden.
+Erwartet kein Muster und keinen Ersatztext.
+.TP
 .BR \-r ", " \-\-recursive
 Alle Dateien unter jedem Verzeichnis rekursiv lesen.
 Symbolischen Links nur folgen, wenn sie auf der Befehlszeile angegeben sind.

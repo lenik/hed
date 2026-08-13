@@ -110,6 +110,19 @@ và
 .BR $ ).
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+Không bỏ qua các đường dẫn khớp danh sách ignore của VCS
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion ignores).
+Mặc định,
+.B repl
+tìm cây làm việc VCS gần nhất và tuân theo quy tắc ignore.
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+Liệt kê các đường dẫn bị ignore dưới
+.I DIR
+rồi thoát.
+Không nhận mẫu hay chuỗi thay thế.
+.TP
 .BR \-r ", " \-\-recursive
 Đọc tất cả các tập tin dưới mỗi thư mục, một cách đệ quy.
 Chỉ theo các liên kết mềm khi chúng xuất hiện trên dòng lệnh.

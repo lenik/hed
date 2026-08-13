@@ -110,6 +110,18 @@ repl \- 파일 내 텍스트를 일괄 치환한다(사람을 위한 편집기)
 로 고정된 것처럼).
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+VCS 무시 목록에 일치하는 경로를 건너뛰지 않습니다
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion ignores).
+기본적으로
+.B repl
+은 가장 가까운 VCS 작업 트리를 찾아 무시 규칙을 따릅니다.
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+.I DIR
+아래에서 무시되는 경로를 나열한 뒤 종료합니다.
+패턴이나 치환 문자열을 받지 않습니다.
+.TP
 .BR \-r ", " \-\-recursive
 각 디렉터리 아래의 모든 파일을 재귀적으로 읽는다.
 명령줄에 나타난 심볼릭 링크만 따라간다.

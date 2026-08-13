@@ -10,6 +10,9 @@ repl \- batch replace text in files (human editor)
 .br
 .B repl
 \fB\-\-restore=\fIFILE\fR
+.br
+.B repl
+\fB\-X\fR \fIDIR\fR
 .SH DESCRIPTION
 .B repl
 searches for
@@ -23,6 +26,17 @@ Unlike a stream editor,
 edits files in place.
 A file is rewritten only when the result differs from the original contents
 (atomic write via a temporary file beside the target).
+.PP
+When walking directories,
+.B repl
+honors VCS ignore lists by default
+(Git \fB.gitignore\fR, Mercurial \fB.hgignore\fR, or Subversion ignores),
+discovered by searching upward for a working-tree root.
+Use
+.B \-a
+to process all files, or
+.B \-X
+to list ignored paths.
 .PP
 With no
 .IR FILE
@@ -128,6 +142,19 @@ Replace the N-th through M-th occurrences per line (1-based).
 If M is omitted, replace from N to the end.
 If the argument is "..", this is equivalent to "1..inf" (replace all).
 .SS File selection
+.TP
+.BR \-a ", " \-\-all
+Do not skip paths matched by VCS ignore lists
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion ignores).
+By default,
+.B repl
+discovers the nearest VCS working tree and honors its ignore rules.
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+List paths under
+.I DIR
+that are ignored by the VCS ignore list, then exit.
+Does not take a pattern or replacement.
 .TP
 .BR \-r ", " \-\-recursive
 Read all files under each directory, recursively.

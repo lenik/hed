@@ -110,6 +110,19 @@ repl \- แทนที่ข้อความในไฟล์แบบชุ
 .BR $ )
 .SS File selection
 .TP
+.BR \-a ", " \-\-all
+ไม่ข้ามพาธที่ตรงกับรายการ ignore ของ VCS
+(\fB.gitignore\fR / \fB.hgignore\fR / Subversion ignores)
+โดยค่าเริ่มต้น
+.B repl
+จะค้นหา working tree ของ VCS ที่ใกล้ที่สุดและเคารพกฎ ignore
+.TP
+.BR \-X " \fIDIR\fR, " \-\-ignores=\fIDIR\fR
+แสดงพาธที่ถูก ignore ภายใต้
+.I DIR
+แล้วออก
+ไม่รับแพทเทิร์นหรือข้อความแทนที่
+.TP
 .BR \-r ", " \-\-recursive
 อ่านไฟล์ทั้งหมดใต้แต่ละไดเรกทอรีแบบเรียกซ้ำ
 ตามลิงก์สัญลักษณ์เฉพาะเมื่อปรากฏบนบรรทัดคำสั่ง
