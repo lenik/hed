@@ -93,11 +93,19 @@ insert_sources = [
     'src/digit_opt.c',
 ] + common_edit
 
+ignorelist_sources = [
+    'src/ignorelist/ignorelist.c',
+    'src/ignorelist/wildmatch.c',
+    'src/ignorelist/gitignore.c',
+    'src/ignorelist/hgignore.c',
+    'src/ignorelist/svnignore.c',
+]
+
 repl_sources = [
     'src/repl.c',
     'src/match.c',
     'src/walk.c',
-] + common_edit
+] + ignorelist_sources + common_edit
 
 catq_sources = [
     'src/catq.c',

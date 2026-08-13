@@ -36,7 +36,14 @@ static int basename_of(const char *path, char *buf, size_t buflen) {
     return 0;
 }
 
-static int should_skip_file(const char *path, const walk_opts_t *opts) {
+static int is_ignored(const char *path, int is_dir, const walk_opts_t *opts) {
+    if (!opts->ignorelist) {
+        return 0;
+    }
+    return ignorelist_match(opts->ignorelist, path, is_dir);
+}
+
+static int should_skip_file(const char *path, const walk_opts_t *opts, int check_ignore) {
     char base[512];
 
     if (basename_of(path, base, sizeof base) != 0) {
@@ -46,6 +53,9 @@ static int should_skip_file(const char *path, const walk_opts_t *opts) {
         return 1;
     }
     if (opts->n_include > 0 && !match_any(base, opts->include, opts->n_include)) {
+        return 1;
+    }
+    if (check_ignore && is_ignored(path, 0, opts)) {
         return 1;
     }
     return 0;
@@ -78,8 +88,15 @@ int walk_path(const char *path, int cmdline, const walk_opts_t *opts, walk_file_
 
     if (S_ISDIR(st.st_mode)) {
         char base[512];
-        if (basename_of(path, base, sizeof base) == 0 && opts->n_exclude_dir &&
-            match_any(base, opts->exclude_dir, opts->n_exclude_dir)) {
+        if (basename_of(path, base, sizeof base) == 0) {
+            if (ignorelist_is_vcs_dir(base)) {
+                return 0;
+            }
+            if (opts->n_exclude_dir && match_any(base, opts->exclude_dir, opts->n_exclude_dir)) {
+                return 0;
+            }
+        }
+        if (!cmdline && is_ignored(path, 1, opts)) {
             return 0;
         }
         if (opts->dir_action == 1) {
@@ -90,6 +107,9 @@ int walk_path(const char *path, int cmdline, const walk_opts_t *opts, walk_file_
             return walk_dir(path, 0, 0, opts, fn, userdata);
         }
         /* treat as ordinary file — unusual; still try callback */
+        if (should_skip_file(path, opts, !cmdline)) {
+            return 0;
+        }
         return fn(path, userdata);
     }
 
@@ -101,14 +121,14 @@ int walk_path(const char *path, int cmdline, const walk_opts_t *opts, walk_file_
         if (!cmdline) {
             return 0;
         }
-        if (should_skip_file(path, opts)) {
+        if (should_skip_file(path, opts, 0)) {
             return 0;
         }
         return fn(path, userdata);
     }
 
     if (S_ISREG(st.st_mode)) {
-        if (should_skip_file(path, opts)) {
+        if (should_skip_file(path, opts, !cmdline)) {
             return 0;
         }
         return fn(path, userdata);
@@ -118,7 +138,7 @@ int walk_path(const char *path, int cmdline, const walk_opts_t *opts, walk_file_
     if (opts->device_action == 1) {
         return 0;
     }
-    if (should_skip_file(path, opts)) {
+    if (should_skip_file(path, opts, !cmdline)) {
         return 0;
     }
     return fn(path, userdata);
@@ -149,8 +169,8 @@ static int walk_dir(const char *path, int depth, int cmdline, const walk_opts_t 
         if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
             continue;
         }
-        if (opts->n_exclude_dir && match_any(ent->d_name, opts->exclude_dir, opts->n_exclude_dir)) {
-            /* skip this name if it is a directory — check after stat */
+        if (ignorelist_is_vcs_dir(ent->d_name)) {
+            continue;
         }
 
         len = strlen(path) + 1 + strlen(ent->d_name) + 1;
@@ -179,6 +199,10 @@ static int walk_dir(const char *path, int depth, int cmdline, const walk_opts_t 
                 free(child);
                 continue;
             }
+            if (is_ignored(child, 1, opts)) {
+                free(child);
+                continue;
+            }
             if (opts->max_depth >= 0 && depth + 1 > opts->max_depth) {
                 free(child);
                 continue;
@@ -189,7 +213,7 @@ static int walk_dir(const char *path, int depth, int cmdline, const walk_opts_t 
             free(child);
             continue;
         } else if (S_ISREG(st.st_mode)) {
-            if (!should_skip_file(child, opts)) {
+            if (!should_skip_file(child, opts, 1)) {
                 rc = fn(child, userdata);
             }
         } else {
@@ -198,7 +222,7 @@ static int walk_dir(const char *path, int depth, int cmdline, const walk_opts_t 
                 free(child);
                 continue;
             }
-            if (!should_skip_file(child, opts)) {
+            if (!should_skip_file(child, opts, 1)) {
                 rc = fn(child, userdata);
             }
         }
@@ -209,6 +233,78 @@ static int walk_dir(const char *path, int depth, int cmdline, const walk_opts_t 
     }
     closedir(d);
     return rc;
+}
+
+static int list_ignored_dir(const char *path, int depth, const walk_opts_t *opts, FILE *out) {
+    DIR *d;
+    struct dirent *ent;
+
+    if (opts->max_depth >= 0 && depth > opts->max_depth) {
+        return 0;
+    }
+
+    d = opendir(path);
+    if (!d) {
+        return -1;
+    }
+
+    while ((ent = readdir(d)) != NULL) {
+        char *child;
+        size_t len;
+        struct stat st;
+
+        if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+            continue;
+        }
+        if (ignorelist_is_vcs_dir(ent->d_name)) {
+            continue;
+        }
+
+        len = strlen(path) + 1 + strlen(ent->d_name) + 1;
+        child = malloc(len);
+        if (!child) {
+            closedir(d);
+            return -1;
+        }
+        snprintf(child, len, "%s/%s", path, ent->d_name);
+
+        if (lstat(child, &st) != 0) {
+            free(child);
+            continue;
+        }
+
+        if (S_ISDIR(st.st_mode)) {
+            if (is_ignored(child, 1, opts)) {
+                fprintf(out, "%s\n", child);
+                free(child);
+                continue;
+            }
+            if (list_ignored_dir(child, depth + 1, opts, out) != 0) {
+                free(child);
+                closedir(d);
+                return -1;
+            }
+        } else if (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)) {
+            if (is_ignored(child, 0, opts)) {
+                fprintf(out, "%s\n", child);
+            }
+        }
+        free(child);
+    }
+    closedir(d);
+    return 0;
+}
+
+int walk_list_ignored(const char *dir, const walk_opts_t *opts, FILE *out) {
+    struct stat st;
+
+    if (!opts || !opts->ignorelist || !out) {
+        return -1;
+    }
+    if (stat(dir, &st) != 0 || !S_ISDIR(st.st_mode)) {
+        return -1;
+    }
+    return list_ignored_dir(dir, 0, opts, out);
 }
 
 int walk_load_exclude_from(const char *file, char ***list, size_t *n) {

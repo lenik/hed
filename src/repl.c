@@ -101,9 +101,11 @@ void usage(FILE *out) {
     fputs(_("Usage: repl [OPTION]... PATTERN REPLACEMENT [FILE]...\n"
             "       repl [OPTION]... -e PATTERN ... REPLACEMENT [FILE]...\n"
             "       repl --restore=FILE\n"
+            "       repl -X DIR\n"
             "Batch replace PATTERN with REPLACEMENT in files.\n"
             "A file is rewritten only when its contents would change.\n"
-            "With no FILE, read standard input and write to standard output.\n"),
+            "With no FILE, read standard input and write to standard output.\n"
+            "By default, skip paths matched by VCS ignore lists; use -a for all.\n"),
           out);
     fputs("\n", out);
     fputs(_("Pattern selection (default: fixed strings):\n"), out);
@@ -139,6 +141,10 @@ void usage(FILE *out) {
     fputs(_("replace N-th to M-th occurrences per line (1-based, .. = 1..inf)\n"), out);
     fputs("\n", out);
     fputs(_("File selection:\n"), out);
+    fputs("  -a, --all               ", out);
+    fputs(_("do not skip files matched by VCS ignore lists\n"), out);
+    fputs("  -X, --ignores=DIR       ", out);
+    fputs(_("list ignored paths under DIR and exit\n"), out);
     fputs("  -r, --recursive         ", out);
     fputs(_("recurse directories; follow symlinks only if on the command line\n"), out);
     fputs("  -R, --dereference-recursive\n"
@@ -742,6 +748,9 @@ int main(int argc, char **argv) {
 
     int pattern_from_opt = 0;
     const char *restore_file = NULL;
+    int use_ignorelist = 1; /* default: honor VCS ignore lists */
+    const char *list_ignores_dir = NULL;
+    ignorelist_t *il = NULL;
 
     static const struct option long_opts[] = {
         {"extended-regexp", no_argument, NULL, 'E'},
@@ -759,6 +768,8 @@ int main(int argc, char **argv) {
         {"global", no_argument, NULL, 'g'},
         {"first", no_argument, NULL, '1'},
         {"range", required_argument, NULL, OPT_RANGE},
+        {"all", no_argument, NULL, 'a'},
+        {"ignores", required_argument, NULL, 'X'},
         {"recursive", no_argument, NULL, 'r'},
         {"dereference-recursive", no_argument, NULL, 'R'},
         {"patch", optional_argument, NULL, 'p'},
@@ -788,7 +799,7 @@ int main(int argc, char **argv) {
     };
 
     for (;;) {
-        int c = getopt_long(argc, argv, "EFGPe:f:ivwxlg1rRp::d:D:IUznqcusVh", long_opts, NULL);
+        int c = getopt_long(argc, argv, "EFGPe:f:ivwxlg1arRp::X:d:D:IUznqcusVh", long_opts, NULL);
         if (c == -1) {
             break;
         }
@@ -899,6 +910,12 @@ int main(int argc, char **argv) {
             }
             break;
         }
+        case 'a':
+            use_ignorelist = 0;
+            break;
+        case 'X':
+            list_ignores_dir = optarg;
+            break;
         case 'r':
             ctx.walk.recursive = 1;
             ctx.walk.dir_action = 2;
@@ -1044,12 +1061,36 @@ int main(int argc, char **argv) {
     argv += optind;
 
     if (restore_file) {
-        if (argc > 0 || pattern_from_opt || ctx.want_patch) {
+        if (argc > 0 || pattern_from_opt || ctx.want_patch || list_ignores_dir) {
             fprintf(stderr, _("%s: --restore does not take PATTERN/REPLACEMENT or --patch\n"),
                     exe);
             return 1;
         }
         return do_restore(exe, restore_file);
+    }
+
+    if (list_ignores_dir) {
+        int rc;
+        if (argc > 0 || pattern_from_opt || ctx.want_patch) {
+            fprintf(stderr, _("%s: --ignores does not take PATTERN/REPLACEMENT\n"), exe);
+            return 1;
+        }
+        il = ignorelist_open(list_ignores_dir);
+        if (!il) {
+            fprintf(stderr, _("%s: no VCS working tree found for %s\n"), exe, list_ignores_dir);
+            return 1;
+        }
+        ctx.walk.ignorelist = il;
+        ctx.walk.recursive = 1;
+        ctx.walk.dir_action = 2;
+        rc = walk_list_ignored(list_ignores_dir, &ctx.walk, stdout);
+        ignorelist_free(il);
+        if (rc != 0) {
+            fprintf(stderr, "%s: ", exe);
+            perror(list_ignores_dir);
+            return 1;
+        }
+        return 0;
     }
 
     if (!pattern_from_opt) {
@@ -1153,6 +1194,11 @@ int main(int argc, char **argv) {
             argc = 1;
         }
         for (i = 0; i < argc; i++) {
+            if (use_ignorelist) {
+                ignorelist_free(il);
+                il = ignorelist_open(argv[i]);
+                ctx.walk.ignorelist = il;
+            }
             if (walk_path(argv[i], 1, &ctx.walk, process_file, &ctx) < 0) {
                 fprintf(stderr, "%s: ", exe);
                 perror(argv[i]);
@@ -1199,6 +1245,7 @@ int main(int argc, char **argv) {
     }
 
     match_engine_free(ctx.eng);
+    ignorelist_free(il);
     list_free(patterns, n_patterns);
     list_free(exclude, n_exclude);
     list_free(exclude_dir, n_exclude_dir);
