@@ -41,6 +41,26 @@ repl_unit = executable(
 )
 test('repl_unit', repl_unit)
 
+ignorelist_unit_sources = [
+    'ignorelist_test.c',
+    '../src/ignorelist/ignorelist.c',
+    '../src/ignorelist/wildmatch.c',
+    '../src/ignorelist/gitignore.c',
+    '../src/ignorelist/hgignore.c',
+    '../src/ignorelist/svnignore.c',
+]
+
+ignorelist_unit = executable(
+    'ignorelist_unit',
+    ignorelist_unit_sources,
+    c_args: c_args,
+    c_pch: c_pch,
+    include_directories: src_inc,
+    dependencies: [deps, check_dep],
+    install: false,
+)
+test('ignorelist_unit', ignorelist_unit)
+
 # CLI integration tests invoke the real binaries.
 insert_cli = executable(
     'insert_cli',

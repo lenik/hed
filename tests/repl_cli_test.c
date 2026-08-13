@@ -563,6 +563,229 @@ START_TEST(test_cli_patch_restore) {
 }
 END_TEST
 
+START_TEST(test_cli_ignorelist_skip_and_all) {
+    char dir[] = "/tmp/hed-repl-ign-XXXXXX";
+    char path[256];
+    char *out;
+    char *argv[8];
+    FILE *f;
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/.git", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+
+    snprintf(path, sizeof path, "%s/.gitignore", dir);
+    f = fopen(path, "w");
+    ck_assert_ptr_nonnull(f);
+    fputs("skip.txt\n", f);
+    fclose(f);
+
+    snprintf(path, sizeof path, "%s/keep.txt", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/skip.txt", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "-r";
+    argv[3] = "foo";
+    argv[4] = "bar";
+    argv[5] = dir;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    snprintf(path, sizeof path, "%s/keep.txt", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "bar\n");
+    free(out);
+    snprintf(path, sizeof path, "%s/skip.txt", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "foo\n"); /* ignored, unchanged */
+    free(out);
+
+    /* -a processes ignored files too */
+    argv[1] = "-q";
+    argv[2] = "-a";
+    argv[3] = "-r";
+    argv[4] = "foo";
+    argv[5] = "bar";
+    argv[6] = dir;
+    argv[7] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+    snprintf(path, sizeof path, "%s/skip.txt", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "bar\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_list_ignores) {
+    char dir[] = "/tmp/hed-repl-ignX-XXXXXX";
+    char path[256];
+    char out_path[256];
+    char *out;
+    char *argv[5];
+    FILE *f;
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/.git", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+    snprintf(path, sizeof path, "%s/.gitignore", dir);
+    f = fopen(path, "w");
+    fputs("skip.txt\nbuild/\n*.log\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/skip.txt", dir);
+    f = fopen(path, "w");
+    fputs("x\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/keep.txt", dir);
+    f = fopen(path, "w");
+    fputs("y\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/noise.log", dir);
+    f = fopen(path, "w");
+    fputs("z\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/build", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+    snprintf(path, sizeof path, "%s/build/inner.c", dir);
+    f = fopen(path, "w");
+    fputs("inner\n", f);
+    fclose(f);
+
+    snprintf(out_path, sizeof out_path, "%s/out.txt", dir);
+    argv[0] = (char *)repl_bin();
+    argv[1] = "--ignores";
+    argv[2] = dir;
+    argv[3] = NULL;
+    ck_assert_int_eq(run_repl_capture(argv, out_path), 0);
+    out = read_all(out_path);
+    ck_assert_ptr_nonnull(strstr(out, "skip.txt"));
+    ck_assert_ptr_nonnull(strstr(out, "build"));
+    ck_assert_ptr_nonnull(strstr(out, "noise.log"));
+    ck_assert_ptr_null(strstr(out, "keep.txt"));
+    ck_assert_ptr_null(strstr(out, "inner.c")); /* not descended into ignored dir */
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_ignorelist_cmdline_bypass) {
+    /* Explicit cmdline path is processed even when ignored. */
+    char dir[] = "/tmp/hed-repl-ignC-XXXXXX";
+    char path[256];
+    char *out;
+    char *argv[7];
+    FILE *f;
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/.git", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+    snprintf(path, sizeof path, "%s/.gitignore", dir);
+    f = fopen(path, "w");
+    fputs("tracked-but-ignored.txt\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/tracked-but-ignored.txt", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "foo";
+    argv[3] = "bar";
+    argv[4] = path;
+    argv[5] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+    out = read_all(path);
+    ck_assert_str_eq(out, "bar\n");
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
+START_TEST(test_cli_ignorelist_nested_gitignore) {
+    char dir[] = "/tmp/hed-repl-ignN-XXXXXX";
+    char path[256];
+    char *out;
+    char *argv[7];
+    FILE *f;
+
+    ck_assert_ptr_nonnull(mkdtemp(dir));
+    snprintf(path, sizeof path, "%s/.git", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+    snprintf(path, sizeof path, "%s/.gitignore", dir);
+    f = fopen(path, "w");
+    fputs("*.log\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/src", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+    snprintf(path, sizeof path, "%s/src/.gitignore", dir);
+    f = fopen(path, "w");
+    fputs("!debug.log\ncache/\n", f);
+    fclose(f);
+
+    snprintf(path, sizeof path, "%s/root.log", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/src/debug.log", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/src/app.c", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+    snprintf(path, sizeof path, "%s/src/cache", dir);
+    ck_assert_int_eq(mkdir(path, 0755), 0);
+    snprintf(path, sizeof path, "%s/src/cache/x", dir);
+    f = fopen(path, "w");
+    fputs("foo\n", f);
+    fclose(f);
+
+    argv[0] = (char *)repl_bin();
+    argv[1] = "-q";
+    argv[2] = "-r";
+    argv[3] = "foo";
+    argv[4] = "bar";
+    argv[5] = dir;
+    argv[6] = NULL;
+    ck_assert_int_eq(run_repl(argv), 0);
+
+    snprintf(path, sizeof path, "%s/root.log", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "foo\n"); /* ignored */
+    free(out);
+    snprintf(path, sizeof path, "%s/src/debug.log", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "bar\n"); /* un-ignored by nested ! */
+    free(out);
+    snprintf(path, sizeof path, "%s/src/app.c", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "bar\n");
+    free(out);
+    snprintf(path, sizeof path, "%s/src/cache/x", dir);
+    out = read_all(path);
+    ck_assert_str_eq(out, "foo\n"); /* under ignored cache/ */
+    free(out);
+
+    snprintf(path, sizeof path, "rm -rf %s", dir);
+    system(path);
+}
+END_TEST
+
 static Suite *suite(void) {
     Suite *s = suite_create("repl_cli");
     TCase *tc = tcase_create("cli");
@@ -581,6 +804,10 @@ static Suite *suite(void) {
     tcase_add_test(tc, test_cli_first_option);
     tcase_add_test(tc, test_cli_range_option);
     tcase_add_test(tc, test_cli_patch_restore);
+    tcase_add_test(tc, test_cli_ignorelist_skip_and_all);
+    tcase_add_test(tc, test_cli_list_ignores);
+    tcase_add_test(tc, test_cli_ignorelist_cmdline_bypass);
+    tcase_add_test(tc, test_cli_ignorelist_nested_gitignore);
     suite_add_tcase(s, tc);
     return s;
 }
