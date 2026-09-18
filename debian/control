@@ -3,7 +3,8 @@ Section: utils
 Priority: optional
 Maintainer: Lenik <hed@bodz.net>
 Build-Depends: debhelper-compat (= 13), meson, ninja-build, pkgconf, check,
- libbas-c-dev, libpcre2-dev
+ libbas-c-dev, libpcre2-dev,
+ asciidoctor
 Standards-Version: 4.6.0
 Homepage: https://github.com/lenik/hed
 Rules-Requires-Root: no

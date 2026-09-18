@@ -1,0 +1,100 @@
+= catq(1)
+{project-author} <{project-email}>
+v{project-version}, {project-year}
+:doctype: manpage
+:manmanual: User Commands
+:mansource: catq
+:man-linkstyle: blue R <>
+:nofooter:
+
+== NAME
+
+catq - concatenate files and print on standard output (quiet on missing files)
+
+== SYNOPSIS
+
+*catq* [_OPTION_]... [_FILE_]...
+
+== DESCRIPTION
+
+*catq* concatenates _FILE(s)_ to standard output. With no _FILE,_ or when _FILE_ is -, read standard input.
+
+Unlike *cat*(1), *catq* silently ignores missing files without printing an error message. This is useful when you want to concatenate multiple files but some may not exist.
+
+== OPTIONS
+
+*-A*, *--show-all*::
+  equivalent to -vET
+*-b*, *--number-nonblank*::
+  number nonempty output lines, overrides -n
+*-e*::
+  equivalent to -vE
+*-E*, *--show-ends*::
+  display $ at end of each line
+*-n*, *--number*::
+  number all output lines
+*-s*, *--squeeze-blank*::
+  suppress repeated empty output lines
+*-t*::
+  equivalent to -vT
+*-T*, *--show-tabs*::
+  display TAB characters as ^I
+*-u*::
+  (ignored)
+*-v*, *--show-nonprinting*::
+  use ^ and M- notation, except for LFD and TAB
+*--help*::
+  display this help and exit
+*--version*::
+  output version information and exit
+
+== EXAMPLES
+
+Concatenate files, silently skipping missing ones:
+
+....
+catq file1.txt file2.txt file3.txt > combined.txt
+....
+
+Display file with line numbers:
+
+....
+catq -n notes.txt
+....
+
+Show non-printing characters:
+
+....
+catq -A data.bin
+....
+
+== EXIT STATUS
+
+*0*::
+  Success.
+*1*::
+  Usage error or out of memory.
+
+== ENVIRONMENT
+
+*LANGUAGE* +
+*LC_ALL* +
+*LC_MESSAGES* +
+*LANG*::
+  Select the language for messages and translated man pages when available.
+
+== AUTHOR
+
+Written by {project-author}.
+
+== REPORTING BUGS
+
+Report bugs to <{project-email}>.
+
+== COPYRIGHT
+
+Copyright © {project-year} {project-author}. License AGPL-3.0-or-later.
+
+== SEE ALSO
+
+*cat*(1)

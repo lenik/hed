@@ -277,9 +277,10 @@ static int slot_find(const struct pattern_slot *slot, const match_opts_t *opts, 
 }
 
 static int find_any(const match_engine_t *eng, const char *data, size_t len, size_t start,
-                    size_t *m_off, size_t *m_len) {
+                    size_t *m_off, size_t *m_len, size_t *slot_i) {
     size_t best_off = (size_t)-1;
     size_t best_len = 0;
+    size_t best_slot = 0;
     size_t i;
     int found = 0;
 
@@ -289,6 +290,7 @@ static int find_any(const match_engine_t *eng, const char *data, size_t len, siz
             if (!found || off < best_off || (off == best_off && mlen > best_len)) {
                 best_off = off;
                 best_len = mlen;
+                best_slot = i;
                 found = 1;
             }
         }
@@ -298,19 +300,286 @@ static int find_any(const match_engine_t *eng, const char *data, size_t len, siz
     }
     *m_off = best_off;
     *m_len = best_len;
+    if (slot_i) {
+        *slot_i = best_slot;
+    }
     return 1;
 }
 
 int match_line_matches(const match_engine_t *eng, const char *line, size_t len) {
     size_t off, mlen;
 
-    if (!find_any(eng, line, len, 0, &off, &mlen)) {
+    if (!find_any(eng, line, len, 0, &off, &mlen, NULL)) {
         return 0;
     }
     if (eng->opts.line_regexp) {
         return off == 0 && mlen == len;
     }
     return 1;
+}
+
+#define REPL_MAX_GROUPS 32
+
+typedef struct {
+    size_t off;
+    size_t len;
+    int set;
+} repl_group_t;
+
+/* Fill capture groups for the match at m_off/m_len on the winning slot. */
+static int fill_repl_groups(const struct pattern_slot *slot, const char *data, size_t len,
+                            size_t m_off, size_t m_len, repl_group_t *g, size_t *n_groups) {
+    size_t i;
+
+    memset(g, 0, sizeof(repl_group_t) * REPL_MAX_GROUPS);
+    g[0].off = m_off;
+    g[0].len = m_len;
+    g[0].set = 1;
+    *n_groups = 1;
+
+    switch (slot->type) {
+    case MATCH_FIXED:
+        return 0;
+    case MATCH_BASIC:
+    case MATCH_EXTENDED: {
+        regmatch_t rm[REPL_MAX_GROUPS];
+        int rc;
+
+        if (!slot->preg_ok) {
+            return -1;
+        }
+        /* Rematch from the known start so subexpression offsets are available. */
+        rc = regexec(&slot->preg, data + m_off, REPL_MAX_GROUPS, rm, 0);
+        if (rc != 0) {
+            return -1;
+        }
+        if (rm[0].rm_so != 0 || (size_t)(rm[0].rm_eo - rm[0].rm_so) != m_len) {
+            /* Unexpected rematch; keep group 0 only. */
+            return 0;
+        }
+        for (i = 1; i < REPL_MAX_GROUPS; i++) {
+            if (rm[i].rm_so < 0) {
+                break;
+            }
+            g[i].off = m_off + (size_t)rm[i].rm_so;
+            g[i].len = (size_t)(rm[i].rm_eo - rm[i].rm_so);
+            g[i].set = 1;
+        }
+        *n_groups = i;
+        return 0;
+    }
+    case MATCH_PERL: {
+        pcre2_match_data *md;
+        PCRE2_SIZE *ovector;
+        int rc;
+        uint32_t oc;
+
+        if (!slot->re) {
+            return -1;
+        }
+        md = pcre2_match_data_create_from_pattern(slot->re, NULL);
+        if (!md) {
+            return -1;
+        }
+        rc = pcre2_match(slot->re, (PCRE2_SPTR)data, (PCRE2_SIZE)len, (PCRE2_SIZE)m_off, 0, md,
+                         NULL);
+        if (rc < 0) {
+            pcre2_match_data_free(md);
+            return -1;
+        }
+        ovector = pcre2_get_ovector_pointer(md);
+        if ((size_t)ovector[0] != m_off || (size_t)(ovector[1] - ovector[0]) != m_len) {
+            pcre2_match_data_free(md);
+            return 0;
+        }
+        oc = pcre2_get_ovector_count(md);
+        if (oc > REPL_MAX_GROUPS) {
+            oc = REPL_MAX_GROUPS;
+        }
+        for (i = 1; i < oc; i++) {
+            if (ovector[2 * i] == PCRE2_UNSET) {
+                continue;
+            }
+            g[i].off = (size_t)ovector[2 * i];
+            g[i].len = (size_t)(ovector[2 * i + 1] - ovector[2 * i]);
+            g[i].set = 1;
+        }
+        *n_groups = oc;
+        pcre2_match_data_free(md);
+        return 0;
+    }
+    }
+    return -1;
+}
+
+static int append_group(char **out, size_t *out_l, size_t *out_c, const char *data,
+                        const repl_group_t *g, size_t n_groups, unsigned idx) {
+    if (idx >= n_groups || !g[idx].set) {
+        return 0;
+    }
+    return buf_append(out, out_l, out_c, data + g[idx].off, g[idx].len);
+}
+
+/*
+ * Expand REPLACEMENT with backreferences for regexp engines (-E/-G/-P).
+ * Fixed-string matching (-F) appends replacement literally (no $N / \N / &).
+ *
+ *   &  \0  $0     whole match
+ *   \N  $N  ${N}  capture group N (1..)
+ *   \\  $$        literal \ or $
+ * Missing/unset groups expand to empty.
+ */
+static int append_expanded_replacement(char **out, size_t *out_l, size_t *out_c,
+                                       const struct pattern_slot *slot, const char *data,
+                                       size_t len, size_t m_off, size_t m_len,
+                                       const char *replacement) {
+    repl_group_t groups[REPL_MAX_GROUPS];
+    size_t n_groups = 0;
+    const char *p;
+
+    if (slot->type == MATCH_FIXED) {
+        return buf_append(out, out_l, out_c, replacement, strlen(replacement));
+    }
+
+    if (fill_repl_groups(slot, data, len, m_off, m_len, groups, &n_groups) != 0) {
+        return -1;
+    }
+
+    for (p = replacement; *p; ) {
+        if (*p == '\\') {
+            p++;
+            if (*p == '\0') {
+                if (buf_append_ch(out, out_l, out_c, '\\', 1) != 0) {
+                    return -1;
+                }
+                break;
+            }
+            if (*p == '\\') {
+                if (buf_append_ch(out, out_l, out_c, '\\', 1) != 0) {
+                    return -1;
+                }
+                p++;
+                continue;
+            }
+            if (*p == '&') {
+                if (append_group(out, out_l, out_c, data, groups, n_groups, 0) != 0) {
+                    return -1;
+                }
+                p++;
+                continue;
+            }
+            if (isdigit((unsigned char)*p)) {
+                unsigned idx = 0;
+                while (isdigit((unsigned char)*p)) {
+                    idx = idx * 10u + (unsigned)(*p - '0');
+                    p++;
+                    if (idx >= REPL_MAX_GROUPS) {
+                        break;
+                    }
+                }
+                while (isdigit((unsigned char)*p)) {
+                    p++;
+                }
+                if (append_group(out, out_l, out_c, data, groups, n_groups, idx) != 0) {
+                    return -1;
+                }
+                continue;
+            }
+            /* Unknown escape: keep the escaped character literally. */
+            if (buf_append_ch(out, out_l, out_c, *p, 1) != 0) {
+                return -1;
+            }
+            p++;
+            continue;
+        }
+        if (*p == '$') {
+            p++;
+            if (*p == '\0') {
+                if (buf_append_ch(out, out_l, out_c, '$', 1) != 0) {
+                    return -1;
+                }
+                break;
+            }
+            if (*p == '$') {
+                if (buf_append_ch(out, out_l, out_c, '$', 1) != 0) {
+                    return -1;
+                }
+                p++;
+                continue;
+            }
+            if (*p == '&') {
+                if (append_group(out, out_l, out_c, data, groups, n_groups, 0) != 0) {
+                    return -1;
+                }
+                p++;
+                continue;
+            }
+            if (*p == '{') {
+                const char *q = p + 1;
+                unsigned idx = 0;
+                if (!isdigit((unsigned char)*q)) {
+                    if (buf_append_ch(out, out_l, out_c, '$', 1) != 0) {
+                        return -1;
+                    }
+                    continue;
+                }
+                while (isdigit((unsigned char)*q)) {
+                    idx = idx * 10u + (unsigned)(*q - '0');
+                    q++;
+                    if (idx >= REPL_MAX_GROUPS) {
+                        break;
+                    }
+                }
+                while (isdigit((unsigned char)*q)) {
+                    q++;
+                }
+                if (*q != '}') {
+                    if (buf_append_ch(out, out_l, out_c, '$', 1) != 0) {
+                        return -1;
+                    }
+                    continue;
+                }
+                p = q + 1;
+                if (append_group(out, out_l, out_c, data, groups, n_groups, idx) != 0) {
+                    return -1;
+                }
+                continue;
+            }
+            if (isdigit((unsigned char)*p)) {
+                unsigned idx = 0;
+                while (isdigit((unsigned char)*p)) {
+                    idx = idx * 10u + (unsigned)(*p - '0');
+                    p++;
+                    if (idx >= REPL_MAX_GROUPS) {
+                        break;
+                    }
+                }
+                while (isdigit((unsigned char)*p)) {
+                    p++;
+                }
+                if (append_group(out, out_l, out_c, data, groups, n_groups, idx) != 0) {
+                    return -1;
+                }
+                continue;
+            }
+            if (buf_append_ch(out, out_l, out_c, '$', 1) != 0) {
+                return -1;
+            }
+            continue;
+        }
+        if (*p == '&') {
+            if (append_group(out, out_l, out_c, data, groups, n_groups, 0) != 0) {
+                return -1;
+            }
+            p++;
+            continue;
+        }
+        if (buf_append_ch(out, out_l, out_c, *p, 1) != 0) {
+            return -1;
+        }
+        p++;
+    }
+    return 0;
 }
 
 static int line_matches_any(const match_engine_t *eng, const char *line, size_t len) {
@@ -531,7 +800,6 @@ static char *replace_line_based(const match_engine_t *eng, const char *data, siz
     size_t out_l = 0, out_c = 0;
     size_t i = 0;
     size_t total_n = 0;
-    size_t rlen = strlen(replacement);
     char sep = eng->opts.line_sep;
     int range_n = eng->opts.range_n > 0 ? eng->opts.range_n : 1;
     int range_m = eng->opts.range_m > 0 ? eng->opts.range_m : -1;
@@ -561,8 +829,8 @@ static char *replace_line_based(const match_engine_t *eng, const char *data, siz
             size_t line_occurrence = 0;
 
             while (pos <= llen) {
-                size_t m_off, m_len;
-                if (!find_any(eng, data + line_start, llen, pos, &m_off, &m_len)) {
+                size_t m_off, m_len, slot_i = 0;
+                if (!find_any(eng, data + line_start, llen, pos, &m_off, &m_len, &slot_i)) {
                     if (buf_append(&line_out, &line_out_l, &line_out_c, 
                                   data + line_start + pos, llen - pos) != 0) {
                         free(line_out);
@@ -587,8 +855,9 @@ static char *replace_line_based(const match_engine_t *eng, const char *data, siz
                 if (should_replace) {
                     if (eng->opts.line_mode) {
                         /* -l: expand to entire line */
-                        if (buf_append(&line_out, &line_out_l, &line_out_c, 
-                                      replacement, rlen) != 0) {
+                        if (append_expanded_replacement(
+                                &line_out, &line_out_l, &line_out_c, &eng->slots[slot_i],
+                                data + line_start, llen, m_off, m_len, replacement) != 0) {
                             free(line_out);
                             free(out);
                             return NULL;
@@ -603,8 +872,9 @@ static char *replace_line_based(const match_engine_t *eng, const char *data, siz
                             free(out);
                             return NULL;
                         }
-                        if (buf_append(&line_out, &line_out_l, &line_out_c, 
-                                      replacement, rlen) != 0) {
+                        if (append_expanded_replacement(
+                                &line_out, &line_out_l, &line_out_c, &eng->slots[slot_i],
+                                data + line_start, llen, m_off, m_len, replacement) != 0) {
                             free(line_out);
                             free(out);
                             return NULL;
@@ -692,12 +962,10 @@ char *match_replace(const match_engine_t *eng, const char *data, size_t len,
     size_t out_l = 0, out_c = 0;
     size_t pos = 0;
     size_t n = 0;
-    size_t rlen;
 
     if (!replacement) {
         replacement = "";
     }
-    rlen = strlen(replacement);
 
     if (eng->opts.invert_match) {
         return replace_invert(eng, data, len, replacement, out_len, n_repl);
@@ -727,8 +995,8 @@ char *match_replace(const match_engine_t *eng, const char *data, size_t len,
     }
 
     while (pos <= len) {
-        size_t m_off, m_len;
-        if (!find_any(eng, data, len, pos, &m_off, &m_len)) {
+        size_t m_off, m_len, slot_i = 0;
+        if (!find_any(eng, data, len, pos, &m_off, &m_len, &slot_i)) {
             if (buf_append(&out, &out_l, &out_c, data + pos, len - pos) != 0) {
                 free(out);
                 return NULL;
@@ -739,7 +1007,8 @@ char *match_replace(const match_engine_t *eng, const char *data, size_t len,
             free(out);
             return NULL;
         }
-        if (buf_append(&out, &out_l, &out_c, replacement, rlen) != 0) {
+        if (append_expanded_replacement(&out, &out_l, &out_c, &eng->slots[slot_i], data, len,
+                                        m_off, m_len, replacement) != 0) {
             free(out);
             return NULL;
         }

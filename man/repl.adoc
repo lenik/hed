@@ -1,0 +1,210 @@
+= repl(1)
+{project-author} <{project-email}>
+v{project-version}, {project-year}
+:doctype: manpage
+:manmanual: User Commands
+:mansource: repl
+:man-linkstyle: blue R <>
+:nofooter:
+
+== NAME
+
+repl - batch replace text in files (human editor)
+
+== SYNOPSIS
+
+*repl* [_OPTION_]... _PATTERN_ _REPLACEMENT_ [_FILE_]... +
+*repl* [_OPTION_]... *-e* _PATTERN_ ... _REPLACEMENT_ [_FILE_]... +
+*repl* *--restore*=_FILE_ +
+*repl* *-X* _DIR_
+
+== DESCRIPTION
+
+*repl* searches for _PATTERN_ in each named _FILE_ and replaces matches with _REPLACEMENT_. Unlike a stream editor, *repl* edits files in place. A file is rewritten only when the result differs from the original contents (atomic write via a temporary file beside the target).
+
+When walking directories, *repl* honors VCS ignore lists by default (Git *.gitignore*, Mercurial *.hgignore*, or Subversion ignores), discovered by searching upward for a working-tree root. Use *-a* to process all files, or *-X* to list ignored paths.
+
+With no _FILE_ arguments, *repl* reads standard input and writes the substituted result to standard output.
+
+When *-e* and/or *-f* supply patterns, the first remaining non-option argument is _REPLACEMENT_ and any further arguments are files. Otherwise the first two non-option arguments are _PATTERN_ and _REPLACEMENT_.
+
+Pattern matching follows *grep*(1) conventions. The default pattern type is fixed strings (*-F*).
+
+In _REPLACEMENT_, when matching with *-E*, *-G*, or *-P*, the following
+backreferences are expanded for each match:
+
+*&*, *\0*, *$0*::
+  The entire matched text.
+*\N*, *$N*, *${N}*::
+  Capture group _N_ (1-based). Missing or unset groups expand to empty.
+*\\*, *$$*::
+  A literal backslash or dollar sign.
+
+With *-F* (the default), _REPLACEMENT_ is inserted literally (no backreference
+expansion).
+
+== OPTIONS
+
+=== Pattern selection
+
+*-F*, *--fixed-strings*::
+  Interpret patterns as fixed strings. This is the default.
+*-E*, *--extended-regexp*::
+  Interpret patterns as POSIX extended regular expressions (ERE).
+*-G*, *--basic-regexp*::
+  Interpret patterns as POSIX basic regular expressions (BRE).
+*-P*, *--perl-regexp*::
+  Interpret patterns as Perl-compatible regular expressions using PCRE2.
+*-e* _PATTERNS_, *--regexp=__PATTERNS__*::
+  Use _PATTERNS_ as the pattern(s). May be given multiple times and combined with *-f*. Useful to protect a pattern that begins with *-*.
+*-f* _FILE_, *--file=__FILE__*::
+  Obtain patterns from _FILE_, one per line. An empty file contributes zero patterns (nothing matches). Use *-* to read patterns from standard input.
+*-i*, *--ignore-case*::
+  Ignore case distinctions in patterns and input data.
+*--no-ignore-case*::
+  Do not ignore case (the default). Useful in scripts to cancel a prior *-i*.
+*-v*, *--invert-match*::
+  Invert the sense of matching: each line that does *not* match _PATTERN_ is replaced entirely by _REPLACEMENT_. Matching lines are left unchanged.
+*-w*, *--word-regexp*::
+  Select only matches that form whole words (bounded by non-word characters or the ends of the line). Word characters are letters, digits, and underscore. Has no effect if *-x* is also given.
+*-x*, *--line-regexp*::
+  Select only matches that span an entire line (as if the pattern were anchored with *^* and *$*).
+*-l*, *--line*::
+  Expand the match to the entire line. By default, only the matched portion is replaced.
+*-g*, *--global*::
+  Replace all occurrences in a single line (default).
+*-1*, *--first*::
+  Replace only the first occurrence in a single line.
+*--range=__N__.._M_*::
+  Replace the N-th through M-th occurrences per line (1-based). If M is omitted, replace from N to the end. If the argument is "..", this is equivalent to "1..inf" (replace all).
+
+=== File selection
+
+*-a*, *--all*::
+  Do not skip paths matched by VCS ignore lists (*.gitignore* / *.hgignore* / Subversion ignores). By default, *repl* discovers the nearest VCS working tree and honors its ignore rules.
+*-X* _DIR_, *--ignores=__DIR__*::
+  List paths under _DIR_ that are ignored by the VCS ignore list, then exit. Does not take a pattern or replacement.
+*-r*, *--recursive*::
+  Read all files under each directory, recursively. Follow symbolic links only when they appear on the command line (and only that one command-line link; symlinks found while walking are not followed or recursed into).
+*-R*, *--dereference-recursive*::
+  Like *-r*, but follow symbolic links wherever they are found.
+*-p*, *--patch[=__FILE__]*::
+  Write a unified *diff*(1) of every change to _FILE_ so the edits can be undone later with *--restore*. If _FILE_ is omitted, write */tmp/repl-TIMESTAMP.patch* (local time). Use *--patch=__FILE__* or *-p__FILE__* to choose a path (a separate *-p* _FILE_ argument is not accepted by getopt). The patch is old-to-new; restore applies it in reverse.
+*--restore=__FILE__*::
+  Restore files using a patch previously written by *--patch* (invokes *patch -R -p0 -f -d /* _FILE_; path labels are stored relative to */*). Does not take a pattern or replacement.
+*--max-depth=__NUM__*::
+  Limit how deep directory recursion may go. Depth 0 means only the starting directory entries.
+*--exclude=__GLOB__*::
+  Skip files whose base name matches _GLOB_ (shell-style, as in *fnmatch*(3)).
+*--exclude-from=__FILE__*::
+  Read exclude globs from _FILE_, one per line.
+*--exclude-dir=__GLOB__*::
+  Skip directories whose base name matches _GLOB_.
+*--include=__GLOB__*::
+  Process only files whose base name matches _GLOB_. If any *--include* option is given, a file must match at least one include glob.
+*-d*, *--directories=__ACTION__*::
+  How to handle directories named on the command line:
+  +
+  *repl*;;
+    Treat the directory as an ordinary file (default; usually fails).
+  *skip*;;
+    Skip directories silently.
+  *recurse*;;
+    Same as *-r*: process files under each directory recursively.
+*-D*, *--devices=__ACTION__*::
+  How to handle device nodes, FIFOs, and sockets: *repl* (default) or *skip*.
+*--binary-files=__TYPE__*::
+  Control binary-file handling:
+  +
+  *binary*;;
+    Default. Perform replacement only in the leading text portion of the file, stopping before the first non-printable byte (tab, newline, carriage return, and form feed are allowed).
+  *without-match*;;
+    Omit binary files entirely (do not modify them).
+  *text*;;
+    Treat the file as text; process the whole file.
+*-I*::
+  Same as *--binary-files=without-match*.
+*-U*, *--binary*::
+  Treat files as binary and disable the printable-prefix heuristic (process the whole buffer).
+*-z*, *--null-data*::
+  Treat input and output as sequences of lines terminated by a NUL byte instead of a newline. Affects line-oriented options such as *-v* and *-x*.
+
+=== Reporting
+
+*-n*, *--dryrun*, *--dry-run*::
+  Show what would change without rewriting files. Without *-u* or *-c*, print a *would change* line for each file that would be modified. With *-u* or *-c*, print the corresponding diffs but leave files untouched.
+*-q*, *--quiet*, *--silent*::
+  Do not print the default one-line summary of how many files changed.
+*-c*, *--context*::
+  For each changed file, print a context-style patch (derived from *diff -c*). Temporary path headers from *diff* are replaced by a single banner line *:::*_ FILE _*:::*_._
+*-u*, *--unified*::
+  For each changed file, print a unified-style patch (derived from *diff -u*), with the same *:::*_ FILE _*:::* banner instead of *---* / *+++* path headers.
+*-s*, *--summary*::
+  Print a detailed batch summary: files examined, files changed, replacement count, and binary files skipped.
+*--color[=__WHEN__]*::
+  Colorize patch output. _WHEN_ may be *never*, *always*, or *auto* (the default when *--color* is given with no value). With *auto*, color is used when standard output is a terminal.
+*--palette=__PALETTE__*::
+  Colors to use when *--color* is active. _PALETTE_ is a colon-separated list of capabilities in the style of *diff --palette*, each _name_*=*_SGR_ (Select Graphic Rendition numbers). Supported names: *rs* (reset), *hd* (file banner), *ad* (added lines), *de* (deleted lines), *ln* (hunk/line-number headers). The default is *rs=0:hd=1;7:ad=32:de=31:ln=36* (reverse-video file banner, green adds, red deletes, cyan hunk headers).
+*-h*, *--help*::
+  Print a usage message and exit.
+*--version*::
+  Print version information and exit.
+
+== EXIT STATUS
+
+*0*::
+  Success (including when no file needed changing).
+*1*::
+  A usage error occurred, a pattern failed to compile, or a file could not be processed.
+
+== EXAMPLES
+
+Replace a fixed string in one file:
+
+....
+repl foo bar notes.txt
+....
+
+Case-insensitive rename across a tree:
+
+....
+repl -i -r OldName NewName src/
+....
+
+Extended regexp digit wipe:
+
+....
+repl -E '[0-9]+' '#' data.txt
+....
+
+Replace 2nd and 3rd word characters in each line:
+
+....
+repl -n 2..3 -P '''w' . path/to/file
+....
+
+With the above, a line like "a/b/c/d/e" becomes "a/././d/e".
+
+== ENVIRONMENT
+
+*LANGUAGE* +
+*LC_ALL* +
+*LC_MESSAGES* +
+*LANG*::
+  Select the language for messages and translated man pages when available.
+
+== AUTHOR
+
+Written by {project-author}.
+
+== REPORTING BUGS
+
+Report bugs to <{project-email}>.
+
+== COPYRIGHT
+
+Copyright © {project-year} {project-author}. License AGPL-3.0-or-later.
+
+== SEE ALSO
+
+*grep*(1), *sed*(1), *diff*(1), *insert*(1)

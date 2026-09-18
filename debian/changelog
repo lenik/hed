@@ -1,3 +1,12 @@
+hed (1.5.0) testing; urgency=medium
+
+  * repl(1): with -E/-G/-P, expand capture-group backreferences in
+    REPLACEMENT ($N, \N, ${N}, &); -F inserts REPLACEMENT literally.
+  * Tests and man page for substitution backreferences.
+  * Convert English man pages to AsciiDoc; build with asciidoctor.
+
+ -- Lenik (谢继雷) <lenik@bodz.net>  Fri, 18 Sep 2026 23:10:00 +0800
+
 hed (1.4.0) testing; urgency=medium
 
   * repl(1): honor VCS ignore lists by default (gitignore/hgignore/svnignore).

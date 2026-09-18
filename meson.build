@@ -174,29 +174,33 @@ config_man.set('PROJECT_AUTHOR', project_author)
 config_man.set('PROJECT_EMAIL', project_email)
 config_man.set('PROJECT_YEAR', project_year)
 
-configure_file(
-    input: 'insert.1.in',
-    output: 'insert.1',
-    configuration: config_man,
-    install: true,
-    install_dir: mandir / 'man1',
-)
+asciidoctor = find_program('asciidoctor', required: true)
 
-configure_file(
-    input: 'repl.1.in',
-    output: 'repl.1',
-    configuration: config_man,
-    install: true,
-    install_dir: mandir / 'man1',
-)
-
-configure_file(
-    input: 'catq.1.in',
-    output: 'catq.1',
-    configuration: config_man,
-    install: true,
-    install_dir: mandir / 'man1',
-)
+puffs = [
+    'catq',
+    'insert',
+    'repl',
+]
+foreach puff : puffs
+    custom_target(
+        puff + '-man',
+        input: 'man' / (puff + '.adoc'),
+        output: puff + '.1',
+        command: [
+            asciidoctor,
+            '-b', 'manpage',
+            '-a', 'project-version=' + meson.project_version(),
+            '-a', 'project-year=@0@'.format(project_year),
+            '-a', 'project-author=' + project_author,
+            '-a', 'project-email=' + project_email,
+            '-o', '@OUTPUT@',
+            '@INPUT@',
+        ],
+        build_by_default: true,
+        install: true,
+        install_dir: mandir / 'man1',
+    )
+endforeach
 
 manpage_langs = ['de', 'eo', 'fr', 'it', 'ja', 'ko', 'th', 'vi', 'zh_CN', 'zh_TW']
 manpage_names = ['insert', 'repl', 'catq']

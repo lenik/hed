@@ -1,0 +1,149 @@
+= insert(1)
+{project-author} <{project-email}>
+v{project-version}, {project-year}
+:doctype: manpage
+:manmanual: User Commands
+:mansource: insert
+:man-linkstyle: blue R <>
+:nofooter:
+
+== NAME
+
+insert - insert text or file contents into a file at a line position
+
+== SYNOPSIS
+
+*insert* [_OPTION_]... _FILE_ [_SRC_]...
+
+== DESCRIPTION
+
+*insert* splices the contents of each _SRC_ into the target _FILE_ at a chosen line position. The target is rewritten only when the result differs (atomic write via a temporary file beside the target).
+
+By default each _SRC_ is an *extended* source (*-e*): if it begins with *@*, the remainder is a filename to read; otherwise the argument is a string literal.
+
+When no position option is given, *insert* appends to the end of the file.
+
+== OPTIONS
+
+=== Source modes
+
+These options are mutually exclusive; the last one wins.
+
+*-l*, *--strings*::
+  Treat each _SRC_ as a string literal (raw bytes, plus any trailing newlines from *--blank*).
+*-f*, *--filenames*::
+  Treat each _SRC_ as a path to read.
+*-e*, *--extended*::
+  Extended sources (default): *@*_FILE_ reads from _FILE_; any other argument is a string literal.
+
+=== Position
+
+*-n*_ NUM_::
+  Insert before 1-based line _NUM_. If the file has fewer than _NUM_ lines, empty lines are appended after the end of the file (and a missing final newline is added first if needed) so the inserted content lands on line _NUM_.
+*-0* .. *-9*::
+  Digit short options that accumulate into a decimal number (for example *-20* is *2* then *0*).
+  +
+  *-1*;;
+    Same as *--prepend*.
+  *-0*;;
+    Prepend the content and then one blank line (content appears before the original start, separated by an empty line).
+  *-N*;;
+    (with _N_ ≥ 2) Same as *-n*_ N_ (insert before line _N_, with end-of-file padding when necessary).
+  After;;
+    *-a* Digits select append style: *0* appends at end; *1* or greater inserts before the Nth line from the end.
+*-a*, *--append*::
+  Append-oriented position. *-a* or *-a0* appends at the end of the file (like shell *>>*). *-a1* inserts before the last line; *-a*_N_ (with _N_ ≥ 1) inserts before the __N__th line from the end.
+*-p*, *--prepend*::
+  Prepend to the start of the file.
+*-r*_ NUM_*, *--remove=**_NUM_::
+  Remove _NUM_ lines at the insert point before inserting. With no _SRC_ arguments this deletes those lines. Examples:
+  +
+  *insert -3 -r2 FILE*;;
+    Delete lines 3 and 4.
+  *insert -p -r1 script.sh '#!/bin/whale'*;;
+    Replace the shebang.
+  *insert -a1 -r1 FILE newfoot*;;
+    Replace the last line (footer).
+
+When *-r* is used with no insert content and the line position is past the end of the file, no empty lines are padded; only deletion is attempted (often a no-op at EOF). When no _SRC_ is given at prepend (*-p*, *-1*, *-0*), _NUM_ specifies how many lines to remove from the beginning (1-based). With *-0*, the count is relative to the blank line (e.g. *insert -0 -r3 FILE* on _a/b/c/d/e_ yields _c/d/e_). With *-1*, the count is exact (e.g. *insert -1 -r3 FILE* on _a/b/c/d/e_ yields _d/e_).
+
+=== Source formatting
+
+*-b*_ NUM_*, *--blank=**_NUM_::
+  Append _NUM_ newline characters after each _SRC_. When this option is omitted, the default is *1* for string literals and *0* for filenames (under *-e*: string arguments vs *@*_FILE_*).* When *-b* is given, the same _NUM_ applies to every _SRC_.
+*-m*_ TEXT_*, *--missing=**_TEXT_::
+  If a filename source cannot be read, use _TEXT_ instead of failing. Missing-text is treated like a string for *--blank* defaults.
+
+=== Common
+
+*-v*, *--verbose*::
+  Increase logging verbosity (may be repeated).
+*-q*, *--quiet*::
+  Decrease logging verbosity.
+*-h*, *--help*::
+  Print a usage message and exit.
+*--version*::
+  Print version information and exit.
+
+== EXIT STATUS
+
+*0*::
+  Success.
+*1*::
+  Usage error, missing target, I/O failure, or out of memory.
+
+== EXAMPLES
+
+Prepend a header line (string default adds a trailing newline):
+
+....
+insert -p notes.txt Header
+....
+
+Insert a file snippet before line 20 (pads if the file is shorter):
+
+....
+insert -20 notes.txt @snippet.txt
+....
+
+Delete lines 3–4:
+
+....
+insert -3 -r2 notes.txt
+....
+
+Replace the shebang:
+
+....
+insert -p -r1 script.sh '#!/bin/whale'
+....
+
+Replace the footer line:
+
+....
+insert -a1 -r1 notes.txt newfoot
+....
+
+== ENVIRONMENT
+
+*LANGUAGE* +
+*LC_ALL* +
+*LC_MESSAGES* +
+*LANG*::
+  Select the language for messages and translated man pages when available.
+
+== AUTHOR
+
+Written by {project-author}.
+
+== REPORTING BUGS
+
+Report bugs to <{project-email}>.
+
+== COPYRIGHT
+
+Copyright © {project-year} {project-author}. License AGPL-3.0-or-later.
+
+== SEE ALSO
+
+*repl*(1), *sed*(1)
